@@ -10,3 +10,6 @@
 [submodule "makd"]
 	path = submodules/makd
 	url = git@github.com:sociomantic-tsunami/makd.git
+[submodule "beaver"]
+	path = submodules/beaver
+	url = git@github.com:sociomantic-tsunami/beaver.git
