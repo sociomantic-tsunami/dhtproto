@@ -50,4 +50,4 @@ Major   Initial release date Supported until Notes
 v13.x.x v13.0.0_: 01/08/2017 TBD             First open source release
 ======= ==================== =============== =====
 
-.. _v13.0.0: https://github.com/sociomantic/dhtproto/releases/tag/v13.0.0
+.. _v13.0.0: https://github.com/sociomantic-tsunami/dhtproto/releases/tag/v13.0.0
