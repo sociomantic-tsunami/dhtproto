@@ -1,5 +1,9 @@
-FROM sociomantic/dlang
-RUN apt-get update && apt-get install -y \
+#!/bin/sh
+set -xe
+
+# Install dependencies
+apt-get update
+apt-get install -y \
     liblzo2-dev \
     libebtree6-dev \
     libpcre3-dev \
