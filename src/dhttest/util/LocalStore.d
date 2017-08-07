@@ -283,4 +283,129 @@ public struct LegacyVerifier
     }
 }
 
+/*******************************************************************************
 
+    Verifier which checks the contents of the DHT, using neo requests, against
+    the contents of a LocalStore instance.
+
+*******************************************************************************/
+
+public struct NeoVerifier
+{
+    import dhtproto.client.DhtClient;
+    import turtle.runner.Logging;
+    import ocean.core.array.Search : contains;
+    import ocean.core.Test;
+    import ocean.task.Task;
+
+    /// LocalStore to check against. Set in verifyAgainstDht.
+    private LocalStore* local;
+
+    /***************************************************************************
+
+        Performs a series of tests to confirm that the content of the DHT
+        exactly matches the content of the map.
+
+        Params:
+            local = LocalStore instance to check against
+            dht = DHT client to use to perform tests
+            channel = name of channel to compare against in DHT
+
+        Throws:
+            TestException upon verification failure
+
+    ***************************************************************************/
+
+    public void verifyAgainstDht ( ref LocalStore local, DhtClient dht,
+        cstring channel )
+    {
+        this.local = &local;
+
+        this.verifyGet(dht, channel);
+        this.verifyGetAll(dht, channel);
+    }
+
+    /***************************************************************************
+
+        Compares all records in the DHT channel against the records in the local
+        store, using DHT Get requests.
+
+        Params:
+            dht = DHT client to use to perform tests
+            channel = name of channel to compare against in DHT
+
+        Throws:
+            TestException upon verification failure
+
+    ***************************************************************************/
+
+    private void verifyGet ( DhtClient dht, cstring channel )
+    {
+        log.trace("\tVerifying channel with Get");
+        foreach ( k, v; this.local.data )
+        {
+            void[] buf;
+            auto res = dht.blocking.get(channel.dup, k, buf);
+            test(res.succeeded);
+            test!("==")(res.value, v);
+        }
+    }
+
+    /***************************************************************************
+
+        Compares all records in the DHT channel against the records in the local
+        store, using DHT Get requests.
+
+        Params:
+            dht = DHT client to use to perform tests
+            channel = name of channel to compare against in DHT
+
+        Throws:
+            TestException upon verification failure
+
+    ***************************************************************************/
+
+    private void verifyGetAll ( DhtClient dht, cstring channel )
+    {
+        log.trace("\tVerifying channel with GetAll");
+        auto task = Task.getThis();
+
+        void[][hash_t] records;
+        bool duplicate;
+
+        void notifier ( DhtClient.Neo.GetAll.Notification info,
+            DhtClient.Neo.GetAll.Args args )
+        {
+            with ( info.Active ) switch ( info.active )
+            {
+                case received:
+                    if ( info.received.key in records )
+                        duplicate = true;
+                    else
+                        records[info.received.key] = info.received.value.dup;
+                    break;
+
+                case started:
+                    break;
+
+                case finished:
+                    task.resume();
+                    break;
+
+                default:
+                    assert(false);
+            }
+        }
+
+        dht.neo.getAll(channel.dup, &notifier);
+        task.suspend();
+
+        test(!duplicate);
+        test!("==")(records.length, this.local.data.length);
+        foreach ( k, v; this.local.data )
+        {
+            test!("in")(k, records);
+            test!("==")(v, records[k]);
+        }
+    }
+}

@@ -1,5 +1,6 @@
 export ASSERT_ON_STOMPING_PREVENTION=1
 
+override LDFLAGS += -llzo2 -lebtree -lrt -lgcrypt -lgpg-error -lglib-2.0 -lpcre
 override DFLAGS  += -w
 
 ifeq ($(DVER),1)
@@ -13,9 +14,6 @@ $B/fakedht: override LDFLAGS += -llzo2 -lebtree -lrt -lpcre
 
 all += $B/fakedht
 
-$O/%unittests: override LDFLAGS += -llzo2 -lebtree -lrt -lpcre
-
-$O/test-fakedht: override LDFLAGS += -llzo2 -lebtree  -lrt -lpcre
 $O/test-fakedht: $B/fakedht
 
 $B/dhtapp: $C/src/dummydhtapp/main.d

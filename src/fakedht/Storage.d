@@ -200,6 +200,8 @@ struct DHT
 
 class Channel
 {
+    import ocean.text.convert.Formatter;
+
     /***************************************************************************
 
         Defines a channel listener type which expects one argument for
@@ -351,6 +353,19 @@ class Channel
 
     /***************************************************************************
 
+        Ditto
+
+    ***************************************************************************/
+
+    public ValueType get ( hash_t key )
+    {
+        mstring key_str;
+        sformat(key_str, "{:x16}", key);
+        return this.get(key_str);
+    }
+
+    /***************************************************************************
+
         Params:
             key = record key to look for
 
@@ -367,6 +382,19 @@ class Channel
         auto value = key in this.data;
         enforce!(MissingRecordException)(value !is null, idup(key));
         return *value;
+    }
+
+    /***************************************************************************
+
+        Ditto
+
+    ***************************************************************************/
+
+    public ValueType getVerify ( hash_t key )
+    {
+        mstring key_str;
+        sformat(key_str, "{:x16}", key);
+        return this.getVerify(key_str);
     }
 
     /***************************************************************************
@@ -388,6 +416,19 @@ class Channel
         this.listeners.trigger(Listeners.Listener.Code.DataReady, key);
         if (Task.getThis() !is null)
             this.listeners.waitUntilFlushed();
+    }
+
+    /***************************************************************************
+
+        Ditto
+
+    ***************************************************************************/
+
+    public void put ( hash_t key, ValueType value )
+    {
+        mstring key_str;
+        sformat(key_str, "{:x16}", key);
+        this.put(key_str, value);
     }
 
     /***************************************************************************
@@ -417,6 +458,10 @@ class Channel
     public void remove ( cstring key )
     {
         this.data.remove(idup(key));
+
+        this.listeners.trigger(Listeners.Listener.Code.Deletion, key);
+        if (Task.getThis() !is null)
+            this.listeners.waitUntilFlushed();
     }
 
     /***************************************************************************
