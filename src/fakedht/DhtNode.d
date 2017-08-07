@@ -25,7 +25,7 @@ import ocean.util.log.Log;
 
 import fakedht.ConnectionHandler;
 
-import swarm.node.model.Node;
+import swarm.node.model.NeoNode;
 
 /*******************************************************************************
 
@@ -58,6 +58,8 @@ public class DhtNode
 
     import dhtproto.client.legacy.DhtConst;
     import swarm.node.connection.ConnectionHandler;
+    import swarm.neo.authentication.HmacDef: Key;
+    import fakedht.neo.RequestHandlers;
 
     import fakedht.Storage;
 
@@ -88,7 +90,17 @@ public class DhtNode
         params.epoll = epoll;
         params.node_info = this;
 
-        super (node_item, params, backlog);
+        Options neo_options;
+        neo_options.cmd_handlers = request_handlers;
+        neo_options.epoll = epoll;
+        neo_options.no_delay = true; // favour network turn-around over packet efficiency
+        neo_options.credentials_map["test"] = Key.init;
+
+        ushort neo_port = node_item.Port;
+        if ( neo_port != 0)
+            neo_port += 100; // See dhtnode.node.DhtHashRange.newNodeAdded()
+
+        super(node_item, neo_port, params, neo_options, backlog);
         this.error_callback = &this.onError;
     }
 

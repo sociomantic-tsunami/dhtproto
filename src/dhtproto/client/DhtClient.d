@@ -242,6 +242,40 @@ public class ExtensibleDhtClient ( Plugins ... ) : DhtClient
 
         super(epoll, conn_limit, queue_size, fiber_stack_size);
     }
+
+
+    /***************************************************************************
+
+        Constructor with support for the neo protocol.
+
+        Params:
+            epoll = EpollSelectDispatcher instance to use
+            plugin_instances = instances of Plugins
+            auth_name = client name for authorisation
+            auth_key = client key (password) for authorisation. This should be a
+                cryptographic random number which only the client and the
+                nodes know. See `README_client_neo.rst` for suggestions. The key
+                must be of the length defined in
+                swarm.neo.authentication.HmacDef (128 bytes)
+            conn_notifier = Neo.DhtConnectionNotifier conn_notifier,
+            conn_limit = maximum number of connections to each DHT node
+            queue_size = maximum size of the per-node request queue
+            fiber_stack_size = size of connection fibers' stack (in bytes)
+
+    ***************************************************************************/
+
+    public this ( EpollSelectDispatcher epoll, Plugins plugin_instances,
+        cstring auth_name, ubyte[] auth_key,
+        Neo.DhtConnectionNotifier conn_notifier,
+        size_t conn_limit = IClient.Config.default_connection_limit,
+        size_t queue_size = IClient.Config.default_queue_size,
+        size_t fiber_stack_size = IClient.default_fiber_stack_size )
+    {
+        this.setPlugins(plugin_instances);
+
+        super(epoll, auth_name, auth_key, conn_notifier,
+                conn_limit, queue_size, fiber_stack_size);
+    }
 }
 
 
@@ -311,6 +345,41 @@ public class SchedulingDhtClient : ExtensibleDhtClient!(RequestScheduler)
         uint max_events = 0 )
     {
         super(epoll, new RequestScheduler(epoll, max_events), conn_limit,
+            queue_size, fiber_stack_size);
+    }
+
+    /***************************************************************************
+
+        Constructor with support for the neo protocol.
+
+        Params:
+            epoll = EpollSelectorDispatcher instance to use
+            auth_name = client name for authorisation
+            auth_key = client key (password) for authorisation. This should be a
+                cryptographic random number which only the client and the
+                nodes know. See `README_client_neo.rst` for suggestions. The key
+                must be of the length defined in
+                swarm.neo.authentication.HmacDef (128 bytes)
+            conn_notifier = Neo.DhtConnectionNotifier conn_notifier,
+            conn_limit = maximum number of connections to each DHT node
+            queue_size = maximum size of the per-node request queue
+            fiber_stack_size = size of connection fibers' stack (in bytes)
+            max_events = limit on the number of events which can be managed
+                by the scheduler at one time. (0 = no limit)
+
+    ***************************************************************************/
+
+    public this ( EpollSelectDispatcher epoll,
+        cstring auth_name, ubyte[] auth_key,
+        Neo.DhtConnectionNotifier conn_notifier,
+        size_t conn_limit = IClient.Config.default_connection_limit,
+        size_t queue_size = IClient.Config.default_queue_size,
+        size_t fiber_stack_size = IClient.default_fiber_stack_size,
+        uint max_events = 0 )
+    {
+        super(epoll, new RequestScheduler(epoll, max_events),
+            auth_name, auth_key, conn_notifier,
+            conn_limit,
             queue_size, fiber_stack_size);
     }
 }
@@ -557,6 +626,17 @@ public class DhtClient : IClient
 
     /***************************************************************************
 
+        Neo protocol support.
+
+    ***************************************************************************/
+
+    import dhtproto.client.mixins.NeoSupport;
+
+    mixin NeoSupport!();
+
+
+    /***************************************************************************
+
         Constructor -- automatically calls addNodes() with the node definition
         file specified in the Config instance.
 
@@ -613,6 +693,43 @@ public class DhtClient : IClient
         this.null_filter_exception = new NullFilterException;
 
         this.node_handshake = new NodeHandshake;
+    }
+
+
+    /***************************************************************************
+
+        Constructor with support for the neo protocol.
+
+        TODO: legacy constructors will be deprecated
+
+        Params:
+            epoll = select dispatcher to use
+            auth_name = client name for authorisation
+            auth_key = client key (password) for authorisation. This should be a
+                cryptographic random number which only the client and the
+                nodes know. See `README_client_neo.rst` for suggestions. The key
+                must be of the length defined in
+                swarm.neo.authentication.HmacDef (128 bytes)
+            conn_notifier = delegate which is called when a connection attempt
+                succeeds or fails (including when a connection is
+                re-established). Of type:
+                void delegate ( IPAddress node_address, Exception e )
+            conn_limit  = maximum number of connections in pool
+            queue_size = size (in bytes) of per-node queue of pending requests
+            fiber_stack_size = size (in bytes) of stack of individual connection
+                fibers
+
+    ***************************************************************************/
+
+    public this ( EpollSelectDispatcher epoll, cstring auth_name, ubyte[] auth_key,
+        Neo.DhtConnectionNotifier conn_notifier,
+        size_t conn_limit = IClient.Config.default_connection_limit,
+        size_t queue_size = IClient.Config.default_queue_size,
+        size_t fiber_stack_size = IClient.default_fiber_stack_size )
+    {
+        this(epoll, conn_limit, queue_size, fiber_stack_size);
+
+        this.neoInit(auth_name, auth_key, conn_notifier);
     }
 
 
