@@ -22,6 +22,59 @@ import dhtproto.client.DhtClient;
 
 /*******************************************************************************
 
+    Test case for Task-blocking GetAll.
+
+*******************************************************************************/
+
+public class GetAllBlocking : NeoDhtTestCase
+{
+    import ocean.task.Task;
+    import ocean.io.select.client.TimerEvent;
+    import ocean.math.random.Random;
+
+    override public Description description ( )
+    {
+        Description desc;
+        desc.name = "Neo Puts followed by Task-blocking neo GetAll";
+        return desc;
+    }
+
+    public override void run ( )
+    {
+        auto task = Task.getThis();
+        auto rand = new Random;
+
+        const num_records = 1000;
+        ubyte[] val;
+        val.length = 8 * 1024;
+        for ( hash_t key = 0; key < num_records; key++ )
+        {
+            foreach ( ref b; val )
+                b = rand.uniform!(ubyte)();
+
+            auto res = this.dht.blocking.put(this.test_channel, key, val);
+            test(res.succeeded);
+        }
+
+        void[] buf;
+        void[][hash_t] received;
+        bool duplicate;
+        foreach ( k, v; this.dht.blocking.getAll(this.test_channel, buf) )
+        {
+            if ( k in received )
+                duplicate = true;
+            received[k] = v.dup;
+        }
+
+        test!("==")(received.length, num_records);
+        test(!duplicate);
+        for ( hash_t key = 0; key < num_records; key++ )
+            test!("in")(key, received);
+    }
+}
+
+/*******************************************************************************
+
     Test case which starts a GetAll then suspends and resumes it.
 
 *******************************************************************************/
