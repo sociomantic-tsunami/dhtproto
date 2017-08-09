@@ -844,7 +844,201 @@ template NeoSupport ( )
             return res;
         }
 
-        // TODO: task blocking GetAll
+        /***********************************************************************
+
+            Struct to provide an opApply for a task-blocking GetAll.
+
+            Node that the Task-blocking GetAll consciously provides a
+            simplistic, clean API, without any of the more advanced features of
+            the request (e.g. suspending). If you need these features, please
+            use the standard, callback-based version of the request.
+
+        ***********************************************************************/
+
+        public struct GetAllFruct
+        {
+            import ocean.core.array.Mutation: copy;
+
+            /// User task to resume/suspend.
+            private Task task;
+
+            /// Key of the current record.
+            private hash_t record_key;
+
+            /// Value of the current record.
+            private void[]* record_value;
+
+            /// Possible states of the request.
+            private enum State
+            {
+                /// The request is running.
+                Running,
+
+                /// The user has stopped this request by breaking from foreach
+                /// (the request may still be running for some time, but all
+                /// records will be ignored).
+                Stopped,
+
+                /// The request has finished on all nodes.
+                Finished
+            }
+
+            /// Indicator of the request's state.
+            private State state;
+
+            /// Channel to iterate over.
+            private cstring channel;
+
+            /// Neo instance to assign the request with.
+            private Neo neo;
+
+            /// Error indicator.
+            public bool error;
+
+            /// Request id (used internally).
+            private Neo.RequestId rq_id;
+
+            /*******************************************************************
+
+                Notifier used to set the local values and resume the task.
+
+                Params:
+                    info = information and payload about the event user has
+                        been notified about
+                    args = arguments passed by the user when starting request
+
+            *******************************************************************/
+
+            private void notifier ( Neo.GetAll.Notification info,
+                Neo.GetAll.Args args )
+            {
+                with ( info.Active ) switch ( info.active )
+                {
+                    case received:
+                        // Ignore all received value on user break.
+                        if (this.state == State.Stopped)
+                            break;
+
+                        // Store the received value.
+                        this.record_key = info.received.key;
+
+                        copy(*this.record_value, info.received.value);
+                        enableStomping(*this.record_value);
+
+                        if (this.task.suspended())
+                        {
+                            this.task.resume();
+                        }
+                        break;
+
+                    case stopped:
+                    case finished:
+                        // Even if the user has requested stopping,
+                        // but finished arrived, we will just finish and exit.
+                        this.state = State.Finished;
+                        this.task.resume();
+                        break;
+
+                    case node_disconnected:
+                    case node_error:
+                    case unsupported:
+                        // Ignore all errors on user break.
+                        if (this.state == State.Stopped)
+                            break;
+
+                        // Otherwise flag an error and finish.
+                        this.state = State.Finished;
+                        this.error = true;
+                        this.task.resume();
+                        break;
+
+                    case started:
+                        // Irrelevant.
+                        break;
+
+                    default: assert(false);
+                }
+            }
+
+            /*******************************************************************
+
+                Task-blocking opApply iteration over GetAll.
+
+            *******************************************************************/
+
+            public int opApply ( int delegate ( ref hash_t key,
+                ref void[] value ) dg )
+            {
+                int ret;
+
+                this.rq_id = this.neo.getAll(this.channel, &this.notifier);
+
+                while (this.state != State.Finished)
+                {
+                    Task.getThis().suspend();
+
+                    // No more records.
+                    if (this.state == State.Finished
+                            || this.state == State.Stopped
+                            || this.error)
+                        break; 
+
+                    ret = dg(this.record_key, *this.record_value);
+
+                    if (ret)
+                    {
+                        this.state = State.Stopped;
+
+                        this.neo.control(this.rq_id,
+                            ( Neo.GetAll.IController get_all )
+                            {
+                                get_all.stop();
+                            });
+
+                        // Wait for the request to finish.
+                        Task.getThis().suspend();
+                        break;
+                    }
+                }
+
+                return ret;
+            }
+        }
+
+        /***********************************************************************
+
+            Assigns a task blocking GetAll request, getting the values from
+            the specified channel and range. This method only provides
+            nothing but the most basic usage (no request context, no way to
+            control the request (stop/resume/suspend)), so if that is needed,
+            please use non-task blocking getRange.
+
+            Breaking out of the iteration stops the GetAll request.
+
+            Params:
+                channel = name of the channel to get the records from
+                record_buffer = reusable buffer to store the current record's
+                    values into
+
+            Returns:
+                GetAllFruct structure, whose opApply should be used
+
+        ***********************************************************************/
+
+        public GetAllFruct getAll ( cstring channel, ref void[] record_buffer )
+        {
+            auto task = Task.getThis();
+            assert(task !is null,
+                    "This method may only be called from inside a Task");
+
+            GetAllFruct res;
+            res.task = task;
+            res.neo = this.outer.neo;
+            res.record_value = &record_buffer;
+            res.channel = channel;
+
+            return res;
+        }
     }
 
     /***************************************************************************
