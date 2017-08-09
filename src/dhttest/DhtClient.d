@@ -35,6 +35,7 @@ class DhtClient
     import ocean.core.Array : copy;
     import ocean.task.Task;
     import ocean.task.Scheduler;
+    import ocean.task.util.Timer : wait;
 
     import swarm.client.plugins.ScopeRequests;
     import swarm.util.Hash;
@@ -555,6 +556,16 @@ class DhtClient
 
         this.swarm_client.assign(this.swarm_client.listen(channel,
             &listener.record, &listener.notifier));
+
+        // FLAKY: As there is no notification when the Listen request has
+        // started being handled by the node, it's possible that the dummy
+        // record put (see below) will arrive before the Listen request is
+        // registered with the channel to receive updates. Given the lack of
+        // notification, it's impossible to write a non-flaky test for this.
+        // In this circumstance, simply waiting 100ms after assigning the Listen
+        // request -- while it could, in principle, still fail -- will massively
+        // reduce flakiness.
+        wait(100_000);
 
         auto original_value = this.get(channel, key);
         this.put(channel, key, "dummy_value"[]);
