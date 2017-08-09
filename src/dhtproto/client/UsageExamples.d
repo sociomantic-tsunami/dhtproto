@@ -548,6 +548,26 @@ unittest
     }
 }
 
+/// Example of Task-blocking neo GetAll request usage
+unittest
+{
+    class GetAllExample : ExampleApp
+    {
+        override protected void example ( )
+        {
+            void[] buf;
+
+            // Assign a neo GetAll request. Note that the channel is copied
+            // inside the client -- the user does not need to maintain it after
+            // calling this method.
+            foreach ( k, v; this.dht.blocking.getAll("channel", buf) )
+            {
+                log.trace("GetAll received 0x{:x16}:{}", k, v);
+            }
+        }
+    }
+}
+
 /// Example of using the DHT client's stats APIs
 unittest
 {
