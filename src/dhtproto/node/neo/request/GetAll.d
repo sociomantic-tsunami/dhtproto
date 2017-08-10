@@ -53,6 +53,10 @@ public abstract scope class GetAllProtocol_v0
     /// message sent by the client.
     private bool has_ended;
 
+    /// If true, only record keys will be sent, no values.
+    private bool keys_only;
+
+
     /***************************************************************************
 
         Request handler. Reads the initial message from the client, responds to
@@ -75,8 +79,10 @@ public abstract scope class GetAllProtocol_v0
         cstring channel;
         bool continuing;
         hash_t continue_from;
+        Const!(void)[] value_filter;
         this.connection.event_dispatcher.message_parser.parseBody(msg_payload,
-            start_suspended, channel, continuing, continue_from);
+            start_suspended, channel, continuing, continue_from, this.keys_only,
+            value_filter);
 
         bool ok;
         if ( continuing )
