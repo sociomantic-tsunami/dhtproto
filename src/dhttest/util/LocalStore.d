@@ -324,6 +324,7 @@ public struct NeoVerifier
         this.verifyGet(dht, channel);
         this.verifyGetAll(dht, channel);
         this.verifyGetAllKeysOnly(dht, channel);
+        this.verifyGetAllFilter(dht, channel);
     }
 
     /***************************************************************************
@@ -465,5 +466,72 @@ public struct NeoVerifier
         test!("==")(keys.length, this.local.data.length);
         foreach ( k, v; this.local.data )
             test!("in")(k, keys);
+    }
+
+    /***************************************************************************
+
+        Compares all records in the DHT channel against the records in the local
+        store, using a DHT GetAll request with a filter.
+
+        Params:
+            dht = DHT client to use to perform tests
+            channel = name of channel to compare against in DHT
+
+        Throws:
+            TestException upon verification failure
+
+    ***************************************************************************/
+
+    private void verifyGetAllFilter ( DhtClient dht, cstring channel )
+    {
+        log.trace("\tVerifying channel with GetAll, filtering");
+        auto task = Task.getThis();
+
+        const filter = "0";
+
+        hash_t[] local_filtered;
+        foreach ( k, v; this.local.data )
+            if ( v.contains(filter) )
+                local_filtered ~= k;
+
+        void[][hash_t] records;
+        bool duplicate;
+
+        void notifier ( DhtClient.Neo.GetAll.Notification info,
+            DhtClient.Neo.GetAll.Args args )
+        {
+            with ( info.Active ) switch ( info.active )
+            {
+                case received:
+                    if ( info.received.key in records )
+                        duplicate = true;
+                    else
+                        records[info.received.key] = info.received.value.dup;
+                    break;
+
+                case started:
+                    break;
+
+                case finished:
+                    task.resume();
+                    break;
+
+                default:
+                    assert(false);
+            }
+        }
+
+        DhtClient.Neo.GetAll.Settings settings;
+        settings.value_filter = cast(void[])filter;
+        dht.neo.getAll(channel.dup, &notifier, settings);
+        task.suspend();
+
+        test(!duplicate);
+        test!("==")(records.length, local_filtered.length);
+        foreach ( k, v; records )
+        {
+            test!("in")(k, this.local.data);
+            test!("==")(v, this.local.data[k]);
+        }
     }
 }
