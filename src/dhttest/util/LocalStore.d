@@ -354,7 +354,7 @@ public struct NeoVerifier
     /***************************************************************************
 
         Compares all records in the DHT channel against the records in the local
-        store, using DHT Get requests.
+        store, using a DHT GetAll request.
 
         Params:
             dht = DHT client to use to perform tests
