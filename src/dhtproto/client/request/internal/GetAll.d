@@ -300,6 +300,8 @@ private scope class GetAllHandler
         payload.addArray(this.context.user_params.args.channel);
         payload.add(this.continuing);
         payload.add(this.last_key); // If not continuing, this field is ignored
+        payload.add(this.context.user_params.args.settings.keys_only);
+        payload.addArray(this.context.user_params.args.settings.value_filter);
     }
 
     /***************************************************************************
