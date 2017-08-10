@@ -56,6 +56,61 @@ public abstract scope class GetAllProtocol_v0
     /// If true, only record keys will be sent, no values.
     private bool keys_only;
 
+    /// Value filtering wrapper struct.
+    private struct ValueFilter
+    {
+        import ocean.text.Search;
+
+        /// Sub-array matcher. (Type ubyte as doesn't compile with void.)
+        private SearchFruct!(Const!(ubyte)) matcher;
+
+        /// Filtering active?
+        private bool active;
+
+        /***********************************************************************
+
+            Initialises the filter from the specified filter array.
+
+            Params:
+                filter = sub-array to filter records by. If empty, no filtering
+                    is employed
+
+        ***********************************************************************/
+
+        public void init ( in void[] filter )
+        {
+            if ( filter.length > 0 )
+            {
+                this.matcher = search(cast(Const!(ubyte)[])filter);
+                this.active = true;
+            }
+        }
+
+        /***********************************************************************
+
+            Checks whether the provided record value passes the filter or not.
+
+            Params:
+                value = value to filter
+
+            Returns:
+                true if the value passes (i.e. matches) the filter or if
+                filtering is not active
+
+        ***********************************************************************/
+
+        public bool match ( in void[] value )
+        {
+            if ( this.active )
+                return this.matcher.forward(cast(Const!(ubyte)[])value)
+                    < value.length;
+            else
+                return true;
+        }
+    }
+
+    /// Value filter.
+    private ValueFilter filter;
 
     /***************************************************************************
 
@@ -101,6 +156,9 @@ public abstract scope class GetAllProtocol_v0
 
         if ( !ok )
             return;
+
+        // Set up filtering.
+        this.filter.init(value_filter);
 
         // Acquire required resources.
         this.value_buffer = this.resources.getVoidBuffer();
@@ -230,6 +288,9 @@ public abstract scope class GetAllProtocol_v0
             // Iterate over the channel and send each record to the client.
             while ( this.outer.getNext(key, *this.outer.value_buffer) )
             {
+                if ( !this.outer.filter.match(*this.outer.value_buffer) )
+                    continue;
+
                 cstring key_slice = (cast(char*)&key)[0..key.sizeof];
                 auto add_result = this.addToBatch(key_slice,
                     cast(cstring)*this.outer.value_buffer);
