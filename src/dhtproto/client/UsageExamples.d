@@ -529,6 +529,7 @@ unittest
             {
                 case started:
                 case received:
+                case received_key:
                 case finished:
                 case stopped:
                 case suspended:

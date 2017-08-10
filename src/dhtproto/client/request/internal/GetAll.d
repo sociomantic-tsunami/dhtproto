@@ -492,23 +492,45 @@ private scope class GetAllHandler
 
             this.outer.batch.decompress(cast(Const!(ubyte)[])compressed_batch);
 
-            foreach ( key, value; this.outer.batch )
+            void notify ( GetAll.Notification notification )
             {
-                hash_t hash_key = *(cast(hash_t*)key.ptr);
-
-                GetAll.Notification n;
-                n.received = RequestRecordInfo(
-                    this.outer.context.request_id, hash_key, value);
                 if ( suspendable_control.notifyAndCheckStateChange!(GetAll)(
-                    this.outer.context, n) )
+                    this.outer.context, notification) )
                 {
                     // The user used the controller in the notifier callback
                     this.outer.resources.request_event_dispatcher.signal(
                         this.outer.conn,
                         suspendable_control.Signal.StateChangeRequested);
                 }
+            }
 
-                this.outer.last_key = hash_key;
+            if ( this.outer.context.user_params.args.settings.keys_only )
+            {
+                foreach ( key; this.outer.batch )
+                {
+                    hash_t hash_key = *(cast(hash_t*)key.ptr);
+
+                    GetAll.Notification n;
+                    n.received_key = RequestKeyInfo(
+                        this.outer.context.request_id, hash_key);
+                    notify(n);
+
+                    this.outer.last_key = hash_key;
+                }
+            }
+            else
+            {
+                foreach ( key, value; this.outer.batch )
+                {
+                    hash_t hash_key = *(cast(hash_t*)key.ptr);
+
+                    GetAll.Notification n;
+                    n.received = RequestRecordInfo(
+                        this.outer.context.request_id, hash_key, value);
+                    notify(n);
+
+                    this.outer.last_key = hash_key;
+                }
             }
         }
     }

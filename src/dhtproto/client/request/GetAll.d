@@ -71,6 +71,10 @@ private union NotificationUnion
     /// A record has been received from the DHT.
     RequestRecordInfo received;
 
+    /// A record key has been received from the DHT. (Only used when in
+    /// keys-only mode. See Settings.)
+    RequestKeyInfo received_key;
+
     /// The connection to a node has disconnected; the request will
     /// automatically continue after reconnection.
     RequestNodeExceptionInfo node_disconnected;

@@ -973,6 +973,10 @@ template NeoSupport ( )
                         this.task.resume();
                         break;
 
+                    case received_key:
+                        // Not yet supported by blocking GetAll.
+                        break;
+
                     case started:
                         // Irrelevant.
                         break;

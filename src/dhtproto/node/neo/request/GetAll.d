@@ -231,7 +231,7 @@ public abstract scope class GetAllProtocol_v0
             while ( this.outer.getNext(key, *this.outer.value_buffer) )
             {
                 cstring key_slice = (cast(char*)&key)[0..key.sizeof];
-                auto add_result = this.outer.batcher.add(key_slice,
+                auto add_result = this.addToBatch(key_slice,
                     cast(cstring)*this.outer.value_buffer);
 
                 // If suspended, wait until resumed.
@@ -246,7 +246,7 @@ public abstract scope class GetAllProtocol_v0
                         // New record does not fit into this batch, send it
                         // and add the record to the next batch
                         this.sendBatch();
-                        add_result = this.outer.batcher.add(key_slice,
+                        add_result = this.addToBatch(key_slice,
                             cast(cstring)*this.outer.value_buffer);
                         assert(add_result == Added);
                         break;
@@ -285,6 +285,29 @@ public abstract scope class GetAllProtocol_v0
             // It's no longer valid to handle control messages.
             this.outer.resources.request_event_dispatcher.abort(
                 this.outer.controller.fiber);
+        }
+
+        /***********************************************************************
+
+            Tries to add the provided record to the batch. If a keys-only
+            iteration was requested by the client, only the key is added to the
+            batch.
+
+            Params:
+                key = record key
+                value = record value; added if `this.outer.keys_only` is false
+
+            Returns:
+                result of adding the record to the batch
+
+        ***********************************************************************/
+
+        private RecordBatcher.AddResult addToBatch ( cstring key, cstring value )
+        {
+            if ( this.outer.keys_only )
+                return this.outer.batcher.add(key);
+            else
+                return this.outer.batcher.add(key, value);
         }
 
         /***********************************************************************
