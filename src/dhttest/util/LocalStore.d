@@ -323,6 +323,7 @@ public struct NeoVerifier
 
         this.verifyGet(dht, channel);
         this.verifyGetAll(dht, channel);
+        this.verifyGetAllKeysOnly(dht, channel);
     }
 
     /***************************************************************************
@@ -407,5 +408,62 @@ public struct NeoVerifier
             test!("in")(k, records);
             test!("==")(v, records[k]);
         }
+    }
+
+    /***************************************************************************
+
+        Compares all record keys in the DHT channel against the keys in the
+        local store, using a DHT GetAll request in keys-only mode.
+
+        Params:
+            dht = DHT client to use to perform tests
+            channel = name of channel to compare against in DHT
+
+        Throws:
+            TestException upon verification failure
+
+    ***************************************************************************/
+
+    private void verifyGetAllKeysOnly ( DhtClient dht, cstring channel )
+    {
+        log.trace("\tVerifying channel with GetAll, keys-only");
+        auto task = Task.getThis();
+
+        bool[hash_t] keys;
+        bool duplicate;
+
+        void notifier ( DhtClient.Neo.GetAll.Notification info,
+            DhtClient.Neo.GetAll.Args args )
+        {
+            with ( info.Active ) switch ( info.active )
+            {
+                case received_key:
+                    if ( info.received_key.key in keys )
+                        duplicate = true;
+                    else
+                        keys[info.received_key.key] = true;
+                    break;
+
+                case started:
+                    break;
+
+                case finished:
+                    task.resume();
+                    break;
+
+                default:
+                    assert(false);
+            }
+        }
+
+        DhtClient.Neo.GetAll.Settings settings;
+        settings.keys_only = true;
+        dht.neo.getAll(channel.dup, &notifier, settings);
+        task.suspend();
+
+        test(!duplicate);
+        test!("==")(keys.length, this.local.data.length);
+        foreach ( k, v; this.local.data )
+            test!("in")(k, keys);
     }
 }
