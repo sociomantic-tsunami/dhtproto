@@ -24,6 +24,23 @@ public import dhtproto.client.NotifierTypes;
 
 /*******************************************************************************
 
+    GetAll behaviour settings. May be optionally passed to the getAll() method
+    of the DHT client, to modify the default behaviour.
+
+*******************************************************************************/
+
+public struct Settings
+{
+    /// If true, only record keys will be fetched, no values.
+    bool keys_only;
+
+    /// If non-empty, only records whose values contain these bytes as a
+    /// "substring" will be fetched.
+    void[] value_filter;
+}
+
+/*******************************************************************************
+
     Request-specific arguments provided by the user and passed to the notifier.
 
 *******************************************************************************/
@@ -32,6 +49,9 @@ public struct Args
 {
     /// Name of the channel to fetch.
     mstring channel;
+
+    /// Settings for the behaviour of the request.
+    Settings settings;
 }
 
 /*******************************************************************************

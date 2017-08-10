@@ -309,8 +309,12 @@ template NeoSupport ( )
             for detailed documentation.
 
             Params:
+                Options = tuple of types of additional arguments
                 channel = name of the channel to read from
                 notifier = notifier delegate
+                options = additional arguments. The following are supported:
+                    dhtproto.client.request.GetAll.Settings: GetAll behaviour
+                        configuration
 
             Returns:
                 id of newly assigned request
@@ -320,10 +324,23 @@ template NeoSupport ( )
 
         ***********************************************************************/
 
-        public RequestId getAll ( cstring channel, GetAll.Notifier notifier )
+        public RequestId getAll ( Options ... ) ( cstring channel,
+            GetAll.Notifier notifier, Options options )
         {
+            GetAll.Settings settings;
+
+            setupOptionalArgs!(options.length)(options,
+                ( GetAll.Settings user_settings )
+                {
+                    settings = user_settings;
+                }
+            );
+
             auto params = Const!(Internals.GetAll.UserSpecifiedParams)(
-                Const!(GetAll.Args)(channel),
+                Const!(GetAll.Args)(
+                    channel,
+                    settings
+                ),
                 Const!(Internals.GetAll.UserSpecifiedParams.SerializedNotifier)(
                     *(cast(Const!(ubyte[notifier.sizeof])*)&notifier)
                 )
