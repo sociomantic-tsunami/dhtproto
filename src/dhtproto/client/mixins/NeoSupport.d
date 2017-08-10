@@ -260,8 +260,12 @@ template NeoSupport ( )
             for detailed documentation.
 
             Params:
+                Options = tuple of types of additional arguments
                 channel = name of the channel to receive updates from
                 notifier = notifier delegate
+                options = additional arguments. The following are supported:
+                    dhtproto.client.request.Mirror.Settings: Mirror behaviour
+                        configuration
 
             Returns:
                 id of newly assigned request
