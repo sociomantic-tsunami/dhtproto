@@ -14,6 +14,11 @@ module dhtproto.node.neo.request.Mirror;
 
 import ocean.util.log.Log;
 
+version ( UnitTest )
+{
+    import ocean.core.Test;
+}
+
 /// ditto
 public abstract scope class MirrorProtocol_v0
 {
@@ -53,8 +58,7 @@ public abstract scope class MirrorProtocol_v0
 
     /***************************************************************************
 
-        Struct template implementing a simple, array-based queue.
-        TODO use a proper ring queue to avoid mem shifting
+        Struct template implementing a simple, typed, array-based ring queue.
 
         Params:
             E = type of queue element
@@ -65,18 +69,50 @@ public abstract scope class MirrorProtocol_v0
     {
         import ocean.core.array.Mutation : removeShift;
 
-        /// Array of elements in the queue. Must be set before using the queue.
-        private E[]* queue;
+        /// Backing array in which elements are stored. Must be set before using
+        /// the queue.
+        private E[] queue;
 
         /// Maximum allowed size of the queue in bytes.
         private const max_size = 256 * 1024;
 
-        /// Maximum allowed length of the queue.
-        private const max_length = max_size / E.sizeof;
+        /// Maximum allowed elements of type E of the queue.
+        private size_t max_elems;
 
+        /// Current number of elements in the queue.
+        private size_t num_elems;
+
+        /// Index (E-based) of the next element to write.
+        private size_t write_to_elem;
+
+        /// Index (E-based) of the next element to read.
+        private size_t read_from_elem;
+
+        /// Tests for basic sanity of num_elems and the read/write indices.
         invariant ( )
         {
-            assert(this.queue !is null);
+            if ( this.num_elems == 0 )
+                assert(this.write_to_elem == this.read_from_elem);
+            else
+                assert(this.write_to_elem ==
+                    (this.read_from_elem + this.num_elems) % this.max_elems);
+        }
+
+        /***********************************************************************
+
+            Initialises the queue for use, setting up the provided array for use
+            as the queue's backing storage.
+
+            Params:
+                buf = array to use to back queue storage
+
+        ***********************************************************************/
+
+        public void initialise ( ref void[] buf )
+        {
+            this.max_elems = (max_size / E.sizeof) * E.sizeof;
+            buf.length = this.max_elems * E.sizeof;
+            this.queue = cast(E[])buf;
         }
 
         /***********************************************************************
@@ -93,13 +129,14 @@ public abstract scope class MirrorProtocol_v0
 
         public bool push ( E e )
         {
-            if ( this.queue.length < max_length )
-            {
-                *this.queue ~= e;
-                return true;
-            }
-            else
+            if ( this.num_elems >= this.max_elems )
                 return false;
+
+            this.queue[this.write_to_elem] = e;
+            this.incWrap(this.write_to_elem);
+            this.num_elems++;
+
+            return true;
         }
 
         /***********************************************************************
@@ -115,12 +152,15 @@ public abstract scope class MirrorProtocol_v0
         public E pop ( )
         in
         {
-            assert(this.queue.length > 0);
+            assert(this.num_elems > 0);
         }
         body
         {
-            auto e = (*this.queue)[0];
-            removeShift(*this.queue, 0);
+            E e;
+            e = this.queue[this.read_from_elem];
+            this.incWrap(this.read_from_elem);
+            this.num_elems--;
+
             return e;
         }
 
@@ -133,7 +173,7 @@ public abstract scope class MirrorProtocol_v0
 
         public size_t length ( )
         {
-            return this.queue.length;
+            return this.num_elems;
         }
 
         /***********************************************************************
@@ -145,8 +185,60 @@ public abstract scope class MirrorProtocol_v0
 
         public bool isFull ( )
         {
-            return this.queue.length == max_length;
+            return this.num_elems == this.max_elems;
         }
+
+        /***********************************************************************
+
+            Helper function to increment an element index, taking account of
+            wrapping in the ring queue.
+
+            Params:
+                elem_index = element index to increment and wrap
+
+        ***********************************************************************/
+
+        private void incWrap ( ref size_t elem_index )
+        {
+            elem_index++;
+            assert(elem_index <= this.max_elems);
+            if ( elem_index == this.max_elems )
+                elem_index = 0;
+        }
+    }
+
+    // Tests Queue pushing, popping, and wrapping.
+    unittest
+    {
+        void[] backing;
+        Queue!(Update) q;
+        q.initialise(backing);
+
+        const elems_per_cycle = 7;
+        uint write_wraps, read_wraps;
+        Update update;
+        for ( uint i; i < q.max_elems; i++ )
+        {
+            for ( uint pu; pu < elems_per_cycle; pu++ )
+            {
+                update.key = i * pu;
+                auto pushed = q.push(update);
+                test(pushed);
+                if ( q.write_to_elem == 0 )
+                    write_wraps++;
+            }
+
+            for ( uint po; po < elems_per_cycle; po++ )
+            {
+                auto popped = q.pop();
+                test!("==")(popped.key, i * po);
+                if ( q.read_from_elem == 0 )
+                    read_wraps++;
+            }
+        }
+
+        test!("==")(write_wraps, elems_per_cycle);
+        test!("==")(read_wraps, elems_per_cycle);
     }
 
     /// Queue of updates.
@@ -288,10 +380,8 @@ public abstract scope class MirrorProtocol_v0
             return;
 
         this.value_buffer = this.resources.getVoidBuffer();
-        this.update_queue = Queue!(Update)(
-            cast(Update[]*)this.resources.getVoidBuffer());
-        this.refresh_queue = Queue!(hash_t)(
-            cast(hash_t[]*)this.resources.getVoidBuffer());
+        this.update_queue.initialise(*this.resources.getVoidBuffer());
+        this.refresh_queue.initialise(*this.resources.getVoidBuffer());
 
         // Start the three fibers which form the request handling logic.
         scope writer_ = new Writer;
