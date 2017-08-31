@@ -46,11 +46,7 @@ public struct RequestRecordInfo
     public void toString ( void delegate ( cstring chunk ) sink )
     {
         Formatter.sformat(
-            ( cstring chunk )
-            {
-                sink(chunk);
-                return chunk.length;
-            },
+            sink,
             "Request #{} provided the record 0x{:x16}:{}",
             this.request_id, this.key, this.value);
     }
@@ -84,11 +80,7 @@ public struct RequestKeyInfo
     public void toString ( void delegate ( cstring chunk ) sink )
     {
         Formatter.sformat(
-            ( cstring chunk )
-            {
-                sink(chunk);
-                return chunk.length;
-            },
+            sink,
             "Request #{} provided the key 0x{:x16}",
             this.request_id, this.key);
     }
