@@ -334,6 +334,7 @@ unittest
                 case node_error:
                 case wrong_node:
                 case unsupported:
+                case timed_out:
                     this.log.error(this.msg_buf);
                     break;
 
@@ -378,6 +379,7 @@ unittest
                 case node_error:
                 case wrong_node:
                 case unsupported:
+                case timed_out:
                     this.log.error(this.msg_buf);
                     break;
 
