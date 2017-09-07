@@ -431,32 +431,12 @@ public struct NeoVerifier
         log.trace("\tVerifying channel with GetChannels");
         auto task = Task.getThis();
 
+        mstring buf;
         mstring[] channels;
-
-        void notifier ( DhtClient.Neo.GetChannels.Notification info,
-            DhtClient.Neo.GetChannels.Args args )
-        {
-            with ( info.Active ) switch ( info.active )
-            {
-                case received:
-                    channels ~= cast(mstring)info.received.value.dup;
-                    break;
-
-                case finished:
-                    task.resume();
-                    break;
-
-                default:
-                    assert(false);
-            }
-        }
-
-        dht.neo.getChannels(&notifier);
-        task.suspend();
+        foreach ( channel; dht.blocking.getChannels(buf) )
+            channels ~= channel.dup;
 
         test(channels.contains(channel));
-
-        // TODO: use task-blocking GetChannels
     }
 
     /***************************************************************************
