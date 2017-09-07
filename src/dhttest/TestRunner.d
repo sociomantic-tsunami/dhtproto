@@ -38,6 +38,7 @@ import dhttest.cases.neo.OrderedPut;
 import dhttest.cases.neo.UnorderedPut;
 import dhttest.cases.neo.Mirror;
 import dhttest.cases.neo.GetAll;
+import dhttest.cases.neo.GetChannels;
 
 /*******************************************************************************
 

@@ -321,6 +321,7 @@ public struct NeoVerifier
     {
         this.local = &local;
 
+        this.verifyGetChannels(dht, channel);
         this.verifyGet(dht, channel);
         this.verifyGetAll(dht, channel);
         this.verifyGetAllKeysOnly(dht, channel);
@@ -409,6 +410,53 @@ public struct NeoVerifier
             test!("in")(k, records);
             test!("==")(v, records[k]);
         }
+    }
+
+    /***************************************************************************
+
+        Gets the names of all channels in the DHT and checks that the specified
+        channel is in the list.
+
+        Params:
+            dht = DHT client to use to perform tests
+            channel = name of channel to compare against in DHT
+
+        Throws:
+            TestException upon verification failure
+
+    ***************************************************************************/
+
+    private void verifyGetChannels ( DhtClient dht, cstring channel )
+    {
+        log.trace("\tVerifying channel with GetChannels");
+        auto task = Task.getThis();
+
+        mstring[] channels;
+
+        void notifier ( DhtClient.Neo.GetChannels.Notification info,
+            DhtClient.Neo.GetChannels.Args args )
+        {
+            with ( info.Active ) switch ( info.active )
+            {
+                case received:
+                    channels ~= cast(mstring)info.received.value.dup;
+                    break;
+
+                case finished:
+                    task.resume();
+                    break;
+
+                default:
+                    assert(false);
+            }
+        }
+
+        dht.neo.getChannels(&notifier);
+        task.suspend();
+
+        test(channels.contains(channel));
+
+        // TODO: use task-blocking GetChannels
     }
 
     /***************************************************************************
