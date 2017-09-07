@@ -582,6 +582,24 @@ unittest
     }
 }
 
+/// Example of Task-blocking neo GetChannels request usage
+unittest
+{
+    class GetChannelsExample : ExampleApp
+    {
+        override protected void example ( )
+        {
+            mstring buf;
+
+            // Assign a neo GetChannels request.
+            foreach ( channel_name; this.dht.blocking.getChannels(buf) )
+            {
+                log.trace("GetChannels received {}", channel_name);
+            }
+        }
+    }
+}
+
 /// Example of using the DHT client's stats APIs
 unittest
 {
