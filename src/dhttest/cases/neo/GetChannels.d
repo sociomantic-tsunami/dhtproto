@@ -50,28 +50,10 @@ public class GetChannels : NeoDhtTestCase
             test(res.succeeded);
         }
 
+        mstring buf;
         mstring[] received_channels;
-
-        void notifier ( DhtClient.Neo.GetChannels.Notification info,
-            DhtClient.Neo.GetChannels.Args args )
-        {
-            with ( info.Active ) switch ( info.active )
-            {
-                case received:
-                    received_channels ~= cast(mstring)info.received.value.dup;
-                    break;
-
-                case finished:
-                    task.resume();
-                    break;
-
-                default:
-                    assert(false);
-            }
-        }
-
-        dht.neo.getChannels(&notifier);
-        task.suspend();
+        foreach ( channel; dht.blocking.getChannels(buf) )
+            received_channels ~= channel.dup;
 
         test!("==")(this.channels.length, received_channels.length);
         foreach ( channel; this.channels )
@@ -124,28 +106,10 @@ public class GetChannelsRemove : NeoDhtTestCase
         legacy_dht.handshake(10000);
         legacy_dht.removeChannel(this.channels[0]);
 
+        mstring buf;
         mstring[] received_channels;
-
-        void notifier ( DhtClient.Neo.GetChannels.Notification info,
-            DhtClient.Neo.GetChannels.Args args )
-        {
-            with ( info.Active ) switch ( info.active )
-            {
-                case received:
-                    received_channels ~= cast(mstring)info.received.value.dup;
-                    break;
-
-                case finished:
-                    task.resume();
-                    break;
-
-                default:
-                    assert(false);
-            }
-        }
-
-        dht.neo.getChannels(&notifier);
-        task.suspend();
+        foreach ( channel; dht.blocking.getChannels(buf) )
+            received_channels ~= channel.dup;
 
         test!("==")(this.channels.length - 1, received_channels.length);
         foreach ( channel; this.channels[1..$] )

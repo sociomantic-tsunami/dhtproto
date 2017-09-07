@@ -1066,10 +1066,10 @@ template NeoSupport ( )
         /***********************************************************************
 
             Assigns a task blocking GetAll request, getting the values from
-            the specified channel and range. This method only provides
-            nothing but the most basic usage (no request context, no way to
-            control the request (stop/resume/suspend)), so if that is needed,
-            please use non-task blocking getRange.
+            the specified channel and range. This method provides nothing but
+            the most basic usage (no request context, no way to control the
+            request (stop/resume/suspend)), so if that is needed, please use the
+            non-task blocking getAll.
 
             Breaking out of the iteration stops the GetAll request.
 
@@ -1094,6 +1094,164 @@ template NeoSupport ( )
             res.neo = this.outer.neo;
             res.record_value = &record_buffer;
             res.channel = channel;
+
+            return res;
+        }
+
+        /***********************************************************************
+
+            Struct to provide an opApply for a task-blocking GetChannels.
+
+        ***********************************************************************/
+
+        public struct GetChannelsFruct
+        {
+            import ocean.core.array.Mutation: copy;
+
+            /// User task to resume/suspend.
+            private Task task;
+
+            /// Name of the current channel.
+            private mstring* channel_name;
+
+            /// Possible states of the request.
+            private enum State
+            {
+                /// The request is running.
+                Running,
+
+                /// The user has stopped this request by breaking from foreach
+                /// (the request may still be running for some time, but all
+                /// channel names will be ignored).
+                Stopped,
+
+                /// The request has finished on all nodes.
+                Finished
+            }
+
+            /// Indicator of the request's state.
+            private State state;
+
+            /// Neo instance to assign the request with.
+            private Neo neo;
+
+            /// Error indicator.
+            public bool error;
+
+            /*******************************************************************
+
+                Notifier used to set the local values and resume the task.
+
+                Params:
+                    info = information and payload about the event user has
+                        been notified about
+                    args = arguments passed by the user when starting request
+
+            *******************************************************************/
+
+            private void notifier ( Neo.GetChannels.Notification info,
+                Neo.GetChannels.Args args )
+            {
+                with ( info.Active ) switch ( info.active )
+                {
+                    case received:
+                        // Ignore all received value on user break.
+                        if (this.state == State.Stopped)
+                            break;
+
+                        copy(*this.channel_name,
+                            cast(cstring)info.received.value);
+
+                        if (this.task.suspended())
+                        {
+                            this.task.resume();
+                        }
+                        break;
+
+                    case finished:
+                        this.state = State.Finished;
+                        this.task.resume();
+                        break;
+
+                    case node_disconnected:
+                    case node_error:
+                    case unsupported:
+                        // Ignore all errors on user break.
+                        if (this.state == State.Stopped)
+                            break;
+
+                        // Otherwise flag an error and finish.
+                        this.state = State.Finished;
+                        this.error = true;
+                        this.task.resume();
+                        break;
+
+                    default: assert(false);
+                }
+            }
+
+            /*******************************************************************
+
+                Task-blocking opApply iteration over GetChannels.
+
+            *******************************************************************/
+
+            public int opApply ( int delegate ( ref mstring channel_name ) dg )
+            {
+                int ret;
+
+                this.neo.getChannels(&this.notifier);
+
+                while (this.state != State.Finished)
+                {
+                    Task.getThis().suspend();
+
+                    // No more records.
+                    if (this.state == State.Finished
+                            || this.state == State.Stopped
+                            || this.error)
+                        break; 
+
+                    ret = dg(*this.channel_name);
+
+                    if (ret)
+                    {
+                        this.state = State.Stopped;
+
+                        // Wait for the request to finish.
+                        Task.getThis().suspend();
+                        break;
+                    }
+                }
+
+                return ret;
+            }
+        }
+
+        /***********************************************************************
+
+            Assigns a task blocking GetChannels request, getting the channel
+            names from the DHT.
+
+            Params:
+                channel_buffer = reusable buffer to store the current channel's
+                    name in
+
+            Returns:
+                GetChannelsFruct structure, whose opApply should be used
+
+        ***********************************************************************/
+
+        public GetChannelsFruct getChannels ( ref mstring channel_buffer )
+        {
+            auto task = Task.getThis();
+            assert(task !is null,
+                    "This method may only be called from inside a Task");
+
+            GetChannelsFruct res;
+            res.task = task;
+            res.neo = this.outer.neo;
+            res.channel_name = &channel_buffer;
 
             return res;
         }
