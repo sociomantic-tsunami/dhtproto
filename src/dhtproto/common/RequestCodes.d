@@ -19,5 +19,6 @@ public enum RequestCode : ubyte
     Put,
     Get,
     Mirror,
-    GetAll
+    GetAll,
+    GetChannels
 }
