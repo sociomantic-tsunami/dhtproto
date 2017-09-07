@@ -616,7 +616,7 @@ unittest
                 foreach ( conn_sender_io, conn_receiver_io; stats.connection_io )
                 {
                     // See swarm.neo.protocol.socket.IOStats
-                    this.log.info("Total bytes sent/received over connection {}: {}",
+                    this.log.info("Total bytes sent/received over connection {}: {} / {}",
                         i++, conn_sender_io.socket.total, conn_receiver_io.socket.total);
                 }
             }
