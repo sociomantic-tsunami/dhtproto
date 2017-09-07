@@ -87,6 +87,7 @@ template NeoSupport ( )
         public import Get = dhtproto.client.request.Get;
         public import Mirror = dhtproto.client.request.Mirror;
         public import GetAll = dhtproto.client.request.GetAll;
+        public import GetChannels = dhtproto.client.request.GetChannels;
 
         /***********************************************************************
 
@@ -101,6 +102,7 @@ template NeoSupport ( )
             import dhtproto.client.request.internal.Get;
             import dhtproto.client.request.internal.Mirror;
             import dhtproto.client.request.internal.GetAll;
+            import dhtproto.client.request.internal.GetChannels;
         }
 
         /***********************************************************************
@@ -347,6 +349,37 @@ template NeoSupport ( )
             );
 
             auto id = this.assign!(Internals.GetAll)(params);
+            return id;
+        }
+
+        /***********************************************************************
+
+            Assigns a GetChannels request, reading the names of all channels in
+            the DHT.
+            See $(LINK2 dhtproto/client/request/GetChannels.html, dhtproto.client.request.GetChannels)
+            for detailed documentation.
+
+            Params:
+                notifier = notifier delegate
+
+            Returns:
+                id of newly assigned request
+
+            Throws:
+                NoMoreRequests if the pool of active requests is full
+
+        ***********************************************************************/
+
+        public RequestId getChannels ( GetChannels.Notifier notifier )
+        {
+            auto params = Const!(Internals.GetChannels.UserSpecifiedParams)(
+                Const!(GetChannels.Args)(),
+                Const!(Internals.GetChannels.UserSpecifiedParams.SerializedNotifier)(
+                    *(cast(Const!(ubyte[notifier.sizeof])*)&notifier)
+                )
+            );
+
+            auto id = this.assign!(Internals.GetChannels)(params);
             return id;
         }
 
