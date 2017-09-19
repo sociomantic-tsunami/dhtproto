@@ -26,6 +26,8 @@ import ocean.transition;
 public final class NodeHashRanges : NodeHashRangesBase
 {
     import swarm.neo.client.ConnectionSet;
+    import swarm.neo.client.RequestOnConn;
+    import swarm.neo.client.RequestHandlers : UseNodeDg;
 
     /// Set of connections to nodes (one per node)
     private ConnectionSet connections;
@@ -53,6 +55,94 @@ public final class NodeHashRanges : NodeHashRangesBase
     {
         this.connections = connections;
         this.new_node_dg = new_node_dg;
+    }
+
+    /***************************************************************************
+
+        Helper encapsulating the node-selection logic required by requests that
+        get a single record from the DHT. Namely:
+
+            During a data redistribution, more than one node may be responsible
+            for a given key. In this case, the node that was most recently
+            reported as being responsible for the key is queried first, followed
+            by others (in order) until the record is located, an error occurs,
+            or no node has the record.
+
+        TODO: test the logic for retrying the request on other nodes which
+        previously covered the hash. This will require a full neo implementation
+        of the Redistribute request. See
+        https://github.com/sociomantic-tsunami/dhtnode/issues/21
+
+        Params:
+            h = hash to query
+            node_hash_ranges = buffer to receive hash range information of
+                nodes which cover the specified hash
+            use_node = delegate to call to gain access to a request-on-conn to
+                communicate with the selected node
+            get = delegate to communicate with the selected node (over the
+                request-on-conn provided by use_node). Should return true if the
+                get succeeded or false to try the next node
+
+    ***************************************************************************/
+
+    public void getFromNode ( hash_t h, ref NodeHashRange[] node_hash_ranges,
+        UseNodeDg use_node,
+        bool delegate ( RequestOnConn.EventDispatcher ) get )
+    {
+        auto nodes = this.getNodesForHash(h, node_hash_ranges);
+        if ( nodes.length == 0 )
+            return;
+
+        foreach ( node_hash_range; nodes )
+        {
+            bool try_next_node;
+            use_node(node_hash_range.addr,
+                ( RequestOnConn.EventDispatcher conn )
+                {
+                    try_next_node = get(conn);
+                }
+            );
+
+            // If we got the record or an error occurred, don't try more nodes
+            if ( !try_next_node )
+                break;
+        }
+    }
+
+    /***************************************************************************
+
+        Helper encapsulating the node-selection logic required by requests that
+        put a single record to the DHT. Namely:
+
+            During a data redistribution, more than one node may be responsible
+            for a given key. In this case, the record is written to the node
+            that was most recently reported as being responsible for the key.
+
+        Params:
+            h = hash to query
+            node_hash_ranges = buffer to receive hash range information of
+                nodes which cover the specified hash
+            use_node = delegate to call to gain access to a request-on-conn to
+                communicate with the selected node
+            put = delegate to communicate with the selected node (over the
+                request-on-conn provided by use_node)
+
+    ***************************************************************************/
+
+    public void putToNode ( hash_t h, ref NodeHashRange[] node_hash_ranges,
+        UseNodeDg use_node,
+        void delegate ( RequestOnConn.EventDispatcher ) put )
+    {
+        auto nodes = this.getNodesForHash(h, node_hash_ranges);
+        if ( nodes.length == 0 )
+            return;
+
+        use_node(nodes[0].addr,
+            ( RequestOnConn.EventDispatcher conn )
+            {
+                put(conn);
+            }
+        );
     }
 
     /***************************************************************************

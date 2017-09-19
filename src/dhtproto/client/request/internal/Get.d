@@ -146,36 +146,24 @@ public struct Get
             context.request_resources.get());
         scope acquired_resources = shared_resources.new RequestResources;
 
-        // Get the list of nodes which cover the record's hash (newest first)
-        auto nodes = shared_resources.node_hash_ranges.getNodesForHash(
+        // Try getting the record from the nodes responsible for the hash,
+        // querying them in newest -> oldest order
+        bool get_called;
+        shared_resources.node_hash_ranges.getFromNode(
             context.user_params.args.key,
-            *acquired_resources.getNodeHashRangeBuffer());
+            *acquired_resources.getNodeHashRangeBuffer(), use_node,
+            ( RequestOnConn.EventDispatcher conn )
+            {
+                get_called = true;
+                return getFromNode(conn, context);
+            }
+        );
 
-        // Bail out if no nodes cover the record's hash
-        if ( nodes.length == 0 )
+        if ( !get_called )
         {
+            // Bail out if no nodes cover the record's hash
             context.shared_working.result = SharedWorking.Result.NoNode;
             return;
-        }
-
-        // Try reading from nodes in newest -> oldest responsibility order
-        // TODO: test the logic for retrying the request on other nodes which
-        // previously covered the hash. This will require a full neo
-        // implementation of the Redistribute request. See
-        // https://github.com/sociomantic/dhtnode/issues/624
-        foreach ( node; nodes )
-        {
-            bool try_next_node;
-            use_node(node.addr,
-                ( RequestOnConn.EventDispatcher conn )
-                {
-                    try_next_node = getFromNode(conn, context);
-                }
-            );
-
-            // If we got the record or an error occurred, don't try more nodes
-            if ( !try_next_node )
-                break;
         }
     }
 

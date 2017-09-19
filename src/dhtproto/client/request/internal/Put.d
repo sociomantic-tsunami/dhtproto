@@ -136,25 +136,23 @@ public struct Put
             context.request_resources.get());
         scope acquired_resources = shared_resources.new RequestResources;
 
-        // Get the list of nodes which cover the record's hash (newest first)
-        auto nodes = shared_resources.node_hash_ranges.getNodesForHash(
+        // Try putting the record to the newest node responsible for the hash.
+        bool put_called;
+        shared_resources.node_hash_ranges.putToNode(
             context.user_params.args.key,
-            *acquired_resources.getNodeHashRangeBuffer());
+            *acquired_resources.getNodeHashRangeBuffer(), use_node,
+            ( RequestOnConn.EventDispatcher conn )
+            {
+                put_called = true;
+                putToNode(conn, context);
+            }
+        );
 
-        // Bail out if no nodes cover the record's hash
-        if ( nodes.length == 0 )
+        if ( !put_called )
         {
             context.shared_working.result = SharedWorking.Result.NoNode;
             return;
         }
-
-        // Send Put request to newest node reported to cover the record's hash
-        use_node(nodes[0].addr,
-            ( RequestOnConn.EventDispatcher conn )
-            {
-                putToNode(conn, context);
-            }
-        );
     }
 
     /***************************************************************************
