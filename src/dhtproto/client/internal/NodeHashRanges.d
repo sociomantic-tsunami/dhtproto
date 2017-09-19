@@ -118,6 +118,7 @@ private class NodeHashRangesBase
     import swarm.neo.AddrPort;
     import swarm.neo.client.ConnectionSet;
     import swarm.util.Hash : isWithinNodeResponsibility;
+    import ocean.core.array.Mutation : sort;
 
     /// Value of the next created NodeHashRange's order field.
     private static ulong order_counter;
@@ -170,7 +171,9 @@ private class NodeHashRangesBase
     /***************************************************************************
 
         Gets the list of nodes (along with hash range and ordering information)
-        which cover the specified hash.
+        which cover the specified hash, sorted (descending) by the values of
+        their `order` fields. (This means that the node most recently reported
+        as covering the specified hash will appear first in the list.)
 
         Params:
             h = hash to query
@@ -198,6 +201,14 @@ private class NodeHashRangesBase
             }
         }
 
+        bool sortPred ( NodeHashRange e1, NodeHashRange e2 )
+        {
+            assert(e1.order != e2.order);
+            return e1.order > e2.order;
+        }
+
+        node_hash_ranges.sort(&sortPred);
+
         return node_hash_ranges;
     }
 
@@ -223,29 +234,16 @@ private class NodeHashRangesBase
 version ( UnitTest )
 {
     import ocean.core.Test;
-    import ocean.core.array.Mutation : sort;
     import Integer = ocean.text.convert.Integer_tango;
     import swarm.neo.AddrPort;
     import ocean.core.BitManip : bitswap;
-}
 
-unittest
-{
     alias NodeHashRange.HashRange HR;
 
     void checkTestCase ( NodeHashRange[] r1, NodeHashRange[] r2, long line_num = __LINE__ )
     {
         auto t = new NamedTest(idup("Test at line " ~ Integer.toString(line_num)));
         t.test!("==")(r1.length, r2.length);
-
-        bool sortPred ( NodeHashRange e1, NodeHashRange e2 )
-        {
-            return e1.addr.cmp_id < e2.addr.cmp_id;
-        }
-
-        // Ordering doesn't matter, so we sort both arrays
-        r1.sort(&sortPred);
-        r2.sort(&sortPred);
 
         foreach ( i, e; r1 )
         {
@@ -255,7 +253,11 @@ unittest
             t.test!("==")(e.order, r2[i].order);
         }
     }
+}
 
+// Tests for hash range overlaps and gaps
+unittest
+{
     auto addr1 = AddrPort(1, 1);
     auto addr2 = AddrPort(2, 2);
 
@@ -279,8 +281,8 @@ unittest
         [NodeHashRange(addr1, HR(hash_t.min, hash_t.max), 0)]);
     hr.getNodesForHash(hash_t.max, ranges);
     checkTestCase(ranges,
-        [NodeHashRange(addr1, HR(hash_t.min, hash_t.max), 0),
-         NodeHashRange(addr2, HR(0x8000000000000000, hash_t.max), 1)]);
+        [NodeHashRange(addr2, HR(0x8000000000000000, hash_t.max), 1),
+         NodeHashRange(addr1, HR(hash_t.min, hash_t.max), 0)]);
 
     // Change the range of the first node to cover the other half of the range
     hr.updateNodeHashRange(addr1, hash_t.min, 0x7fffffffffffffff);
@@ -300,4 +302,60 @@ unittest
     hr.getNodesForHash(hash_t.max, ranges);
     checkTestCase(ranges,
         [NodeHashRange(addr2, HR(0x9000000000000000, hash_t.max), 3)]);
+}
+
+// Tests for hash range ordering
+unittest
+{
+    // Reset ordering counter, as it was modified in other unittests
+    NodeHashRangesBase.order_counter = 0;
+
+    auto addr1 = AddrPort(1, 1);
+    auto addr2 = AddrPort(2, 2);
+    auto addr3 = AddrPort(3, 3);
+    auto range = HR(hash_t.min, hash_t.max);
+
+    NodeHashRange[] ranges;
+    auto hr = new NodeHashRangesBase;
+
+    // Initially empty
+    hr.getNodesForHash(0, ranges);
+    checkTestCase(ranges, []);
+
+    // One node
+    hr.updateNodeHashRange(addr1, range.min, range.max);
+    hr.getNodesForHash(0, ranges);
+    checkTestCase(ranges,
+        [NodeHashRange(addr1, range, 0)]);
+
+    // Add a second node
+    hr.updateNodeHashRange(addr2, range.min, range.max);
+    hr.getNodesForHash(0, ranges);
+    checkTestCase(ranges,
+        [NodeHashRange(addr2, range, 1),
+         NodeHashRange(addr1, range, 0)]);
+
+    // Add a third node
+    hr.updateNodeHashRange(addr3, range.min, range.max);
+    hr.getNodesForHash(0, ranges);
+    checkTestCase(ranges,
+        [NodeHashRange(addr3, range, 2),
+         NodeHashRange(addr2, range, 1),
+         NodeHashRange(addr1, range, 0)]);
+
+    // Modify the first node
+    hr.updateNodeHashRange(addr1, range.min, range.max);
+    hr.getNodesForHash(0, ranges);
+    checkTestCase(ranges,
+        [NodeHashRange(addr1, range, 3),
+         NodeHashRange(addr3, range, 2),
+         NodeHashRange(addr2, range, 1)]);
+
+    // Modify the third node
+    hr.updateNodeHashRange(addr3, range.min, range.max);
+    hr.getNodesForHash(0, ranges);
+    checkTestCase(ranges,
+        [NodeHashRange(addr3, range, 4),
+         NodeHashRange(addr1, range, 3),
+         NodeHashRange(addr2, range, 1)]);
 }

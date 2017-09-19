@@ -146,7 +146,7 @@ public struct Get
             context.request_resources.get());
         scope acquired_resources = shared_resources.new RequestResources;
 
-        // Select the newest node reported to cover the record's hash
+        // Get the list of nodes which cover the record's hash (newest first)
         auto nodes = shared_resources.node_hash_ranges.getNodesForHash(
             context.user_params.args.key,
             *acquired_resources.getNodeHashRangeBuffer());
@@ -163,7 +163,7 @@ public struct Get
         // previously covered the hash. This will require a full neo
         // implementation of the Redistribute request. See
         // https://github.com/sociomantic/dhtnode/issues/624
-        foreach_reverse ( node; nodes )
+        foreach ( node; nodes )
         {
             bool try_next_node;
             use_node(node.addr,
