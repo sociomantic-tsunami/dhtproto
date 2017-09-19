@@ -292,6 +292,8 @@ unittest
         [NodeHashRange(addr2, HR(0x8000000000000000, hash_t.max), 1)]);
 
     // Change the range of the second node to create a gap
+    // (Note that bitswap is used to mimic the internal behaviour of
+    // isWithinNodeResponsibility, used in getNodesForHash.)
     hr.updateNodeHashRange(addr2, 0x9000000000000000, hash_t.max);
     hr.getNodesForHash(bitswap(0x8000000000000000), ranges);
     checkTestCase(ranges, []);
