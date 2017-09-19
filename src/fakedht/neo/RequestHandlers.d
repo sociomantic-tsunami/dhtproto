@@ -21,6 +21,7 @@ import Put = fakedht.neo.request.Put;
 import Get = fakedht.neo.request.Get;
 import Mirror = fakedht.neo.request.Mirror;
 import GetAll = fakedht.neo.request.GetAll;
+import GetChannels = fakedht.neo.request.GetChannels;
 
 /*******************************************************************************
 
@@ -39,4 +40,5 @@ static this ( )
     request_handlers[RequestCode.Get] = &Get.handle;
     request_handlers[RequestCode.Mirror] = &Mirror.handle;
     request_handlers[RequestCode.GetAll] = &GetAll.handle;
+    request_handlers[RequestCode.GetChannels] = &GetChannels.handle;
 }
