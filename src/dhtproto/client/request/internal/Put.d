@@ -136,7 +136,7 @@ public struct Put
             context.request_resources.get());
         scope acquired_resources = shared_resources.new RequestResources;
 
-        // Select the newest node reported to cover the record's hash
+        // Get the list of nodes which cover the record's hash (newest first)
         auto nodes = shared_resources.node_hash_ranges.getNodesForHash(
             context.user_params.args.key,
             *acquired_resources.getNodeHashRangeBuffer());
@@ -148,19 +148,8 @@ public struct Put
             return;
         }
 
-        size_t newest;
-        ulong newest_order;
-        foreach ( i, node_hash_range; nodes )
-        {
-            if ( node_hash_range.order > newest_order )
-            {
-                newest = i;
-                newest_order = node_hash_range.order;
-            }
-        }
-
-        // Send Put request to selected node
-        use_node(nodes[newest].addr,
+        // Send Put request to newest node reported to cover the record's hash
+        use_node(nodes[0].addr,
             ( RequestOnConn.EventDispatcher conn )
             {
                 putToNode(conn, context);
