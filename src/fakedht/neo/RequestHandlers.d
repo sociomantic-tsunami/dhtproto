@@ -31,14 +31,14 @@ import GetChannels = fakedht.neo.request.GetChannels;
 
 *******************************************************************************/
 
-public ConnectionHandler.CmdHandlers request_handlers;
+public ConnectionHandler.RequestMap requests;
 
 static this ( )
 {
-    request_handlers[RequestCode.GetHashRange] = &GetHashRange.handle;
-    request_handlers[RequestCode.Put] = &Put.handle;
-    request_handlers[RequestCode.Get] = &Get.handle;
-    request_handlers[RequestCode.Mirror] = &Mirror.handle;
-    request_handlers[RequestCode.GetAll] = &GetAll.handle;
-    request_handlers[RequestCode.GetChannels] = &GetChannels.handle;
+    requests.add(RequestCode.GetHashRange, "GetHashRange", &GetHashRange.handle);
+    requests.add(RequestCode.Put, "Put", &Put.handle);
+    requests.add(RequestCode.Get, "Get", &Get.handle);
+    requests.add(RequestCode.Mirror, "Mirror", &Mirror.handle);
+    requests.add(RequestCode.GetAll, "GetAll", &GetAll.handle);
+    requests.add(RequestCode.GetChannels, "GetChannels", &GetChannels.handle);
 }
