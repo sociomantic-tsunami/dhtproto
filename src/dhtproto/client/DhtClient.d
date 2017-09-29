@@ -200,7 +200,9 @@ public class ExtensibleDhtClient ( Plugins ... ) : DhtClient
 
     /***************************************************************************
 
-        Constructor
+        Constructor with support for only the legacy protocol. Automatically
+        calls addNodes() with the node definition file specified in the Config
+        instance.
 
         Params:
             epoll = EpollSelectDispatcher instance to use
@@ -222,7 +224,9 @@ public class ExtensibleDhtClient ( Plugins ... ) : DhtClient
 
     /***************************************************************************
 
-        Constructor
+        Constructor with support for only the legacy protocol. This constructor
+        that accepts all arguments manually (i.e. not read from a config file)
+        is mostly of use in tests.
 
         Params:
             epoll = EpollSelectDispatcher instance to use
@@ -246,7 +250,9 @@ public class ExtensibleDhtClient ( Plugins ... ) : DhtClient
 
     /***************************************************************************
 
-        Constructor with support for the neo protocol.
+        Constructor with support for the neo and legacy protocols. This
+        constructor that accepts all arguments manually (i.e. not read from
+        config files) is mostly of use in tests.
 
         Params:
             epoll = EpollSelectDispatcher instance to use
@@ -257,7 +263,10 @@ public class ExtensibleDhtClient ( Plugins ... ) : DhtClient
                 nodes know. See `README_client_neo.rst` for suggestions. The key
                 must be of the length defined in
                 swarm.neo.authentication.HmacDef (128 bytes)
-            conn_notifier = Neo.DhtConnectionNotifier conn_notifier,
+            conn_notifier = delegate which is called when a connection attempt
+                succeeds or fails (including when a connection is
+                re-established). Of type:
+                void delegate ( IPAddress node_address, Exception e )
             conn_limit = maximum number of connections to each DHT node
             queue_size = maximum size of the per-node request queue
             fiber_stack_size = size of connection fibers' stack (in bytes)
@@ -305,9 +314,9 @@ public class SchedulingDhtClient : ExtensibleDhtClient!(RequestScheduler)
 
     /***************************************************************************
 
-        Constructor
-
-        Adds the nodes in the file specified in the config to the node registry
+        Constructor with support for only the legacy protocol. Automatically
+        calls addNodes() with the node definition file specified in the Config
+        instance.
 
         Params:
             epoll = EpollSelectorDispatcher instance to use
@@ -326,7 +335,9 @@ public class SchedulingDhtClient : ExtensibleDhtClient!(RequestScheduler)
 
     /***************************************************************************
 
-        Constructor
+        Constructor with support for only the legacy protocol. This constructor
+        that accepts all arguments manually (i.e. not read from a config file)
+        is mostly of use in tests.
 
         Params:
             epoll = EpollSelectorDispatcher instance to use
@@ -350,17 +361,22 @@ public class SchedulingDhtClient : ExtensibleDhtClient!(RequestScheduler)
 
     /***************************************************************************
 
-        Constructor with support for the neo protocol.
+        Constructor with support for the neo and legacy protocols. This
+        constructor that accepts all arguments manually (i.e. not read from
+        config files) is mostly of use in tests.
 
         Params:
-            epoll = EpollSelectorDispatcher instance to use
+            epoll = EpollSelectDispatcher instance to use
             auth_name = client name for authorisation
             auth_key = client key (password) for authorisation. This should be a
                 cryptographic random number which only the client and the
                 nodes know. See `README_client_neo.rst` for suggestions. The key
                 must be of the length defined in
                 swarm.neo.authentication.HmacDef (128 bytes)
-            conn_notifier = Neo.DhtConnectionNotifier conn_notifier,
+            conn_notifier = delegate which is called when a connection attempt
+                succeeds or fails (including when a connection is
+                re-established). Of type:
+                void delegate ( IPAddress node_address, Exception e )
             conn_limit = maximum number of connections to each DHT node
             queue_size = maximum size of the per-node request queue
             fiber_stack_size = size of connection fibers' stack (in bytes)
@@ -637,8 +653,9 @@ public class DhtClient : IClient
 
     /***************************************************************************
 
-        Constructor -- automatically calls addNodes() with the node definition
-        file specified in the Config instance.
+        Constructor with support for only the legacy protocol. Automatically
+        calls addNodes() with the node definition file specified in the Config
+        instance.
 
         Params:
             epoll = EpollSelectorDispatcher instance to use
@@ -664,7 +681,9 @@ public class DhtClient : IClient
 
     /***************************************************************************
 
-        Constructor
+        Constructor with support for only the legacy protocol. This constructor
+        that accepts all arguments manually (i.e. not read from a config file)
+        is mostly of use in tests.
 
         Params:
             epoll = EpollSelectorDispatcher instance to use
@@ -698,12 +717,12 @@ public class DhtClient : IClient
 
     /***************************************************************************
 
-        Constructor with support for the neo protocol.
-
-        TODO: legacy constructors will be deprecated
+        Constructor with support for the neo and legacy protocols. This
+        constructor that accepts all arguments manually (i.e. not read from
+        config files) is mostly of use in tests.
 
         Params:
-            epoll = select dispatcher to use
+            epoll = EpollSelectDispatcher instance to use
             auth_name = client name for authorisation
             auth_key = client key (password) for authorisation. This should be a
                 cryptographic random number which only the client and the
@@ -714,10 +733,9 @@ public class DhtClient : IClient
                 succeeds or fails (including when a connection is
                 re-established). Of type:
                 void delegate ( IPAddress node_address, Exception e )
-            conn_limit  = maximum number of connections in pool
-            queue_size = size (in bytes) of per-node queue of pending requests
-            fiber_stack_size = size (in bytes) of stack of individual connection
-                fibers
+            conn_limit = maximum number of connections to each DHT node
+            queue_size = maximum size of the per-node request queue
+            fiber_stack_size = size of connection fibers' stack (in bytes)
 
     ***************************************************************************/
 
