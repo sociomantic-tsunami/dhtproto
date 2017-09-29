@@ -42,7 +42,7 @@ Dependencies
 Dependency  Version
 ==========  =======
 ocean       v3.1.4
-swarm       v4.0.x
+swarm       v4.3.x
 turtle      v8.0.x
 ==========  =======
 

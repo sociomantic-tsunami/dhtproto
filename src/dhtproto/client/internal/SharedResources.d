@@ -25,6 +25,7 @@ public final class SharedResources
     import ocean.io.compress.Lzo;
     import swarm.neo.request.RequestEventDispatcher;
     import swarm.neo.util.MessageFiber;
+    import swarm.neo.util.VoidBufferAsArrayOf;
     import swarm.util.RecordBatcher;
 
     /// Global NodeHashRanges instance
@@ -188,9 +189,9 @@ public final class SharedResources
 
         ***********************************************************************/
 
-        public NodeHashRange[]* getNodeHashRangeBuffer ( )
+        public VoidBufferAsArrayOf!(NodeHashRange) getNodeHashRangeBuffer ( )
         {
-            return this.acquired_node_hash_range_buffers.acquire();
+            return this.acquired_node_hash_range_buffers.acquireWrapped();
         }
 
         /***********************************************************************
