@@ -259,10 +259,10 @@ public class ExtensibleDhtClient ( Plugins ... ) : DhtClient
             plugin_instances = instances of Plugins
             config = swarm.client.model.IClient.Config instance. (The Config
                 class is designed to be read from an application's config.ini
-                file via ocean.util.config.ClassFiller.)
+                file via ocean.util.config.ConfigFiller.)
             neo_config = swarm.neo.client.mixins.ClientCore.Config instance.
                 (The Config class is designed to be read from an application's
-                config.ini file via ocean.util.config.ClassFiller.)
+                config.ini file via ocean.util.config.ConfigFiller.)
             conn_notifier = delegate which is called when a connection attempt
                 succeeds or fails (including when a connection is
                 re-established). Of type:
@@ -404,10 +404,10 @@ public class SchedulingDhtClient : ExtensibleDhtClient!(RequestScheduler)
             epoll = EpollSelectDispatcher instance to use
             config = swarm.client.model.IClient.Config instance. (The Config
                 class is designed to be read from an application's config.ini
-                file via ocean.util.config.ClassFiller.)
+                file via ocean.util.config.ConfigFiller.)
             neo_config = swarm.neo.client.mixins.ClientCore.Config instance.
                 (The Config class is designed to be read from an application's
-                config.ini file via ocean.util.config.ClassFiller.)
+                config.ini file via ocean.util.config.ConfigFiller.)
             conn_notifier = delegate which is called when a connection attempt
                 succeeds or fails (including when a connection is
                 re-established). Of type:
@@ -731,7 +731,7 @@ public class DhtClient : IClient
             epoll = EpollSelectorDispatcher instance to use
             config = Config instance (see swarm.client.model.IClient. The
                 Config class is designed to be read from an application's
-                config.ini file via ocean.util.config.ClassFiller)
+                config.ini file via ocean.util.config.ConfigFiller)
             fiber_stack_size = size (in bytes) of stack of individual connection
                 fibers
 
@@ -795,10 +795,10 @@ public class DhtClient : IClient
             epoll = EpollSelectDispatcher instance to use
             config = swarm.client.model.IClient.Config instance. (The Config
                 class is designed to be read from an application's config.ini
-                file via ocean.util.config.ClassFiller.)
+                file via ocean.util.config.ConfigFiller.)
             neo_config = swarm.neo.client.mixins.ClientCore.Config instance.
                 (The Config class is designed to be read from an application's
-                config.ini file via ocean.util.config.ClassFiller.)
+                config.ini file via ocean.util.config.ConfigFiller.)
             conn_notifier = delegate which is called when a connection attempt
                 succeeds or fails (including when a connection is
                 re-established). Of type:
