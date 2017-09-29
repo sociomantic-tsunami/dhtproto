@@ -69,19 +69,9 @@ version ( UnitTest )
         // Logger used for logging notifications.
         protected Logger log;
 
-        // Struct encapsulating neo client config options to read from the
-        // config file.
-        private struct NeoConfig
-        {
-            // Name of the neo client (used during connection authentication).
-            istring auth_name;
-
-            // Key of the neo client (used during connection authentication).
-            istring auth_key;
-        }
-
-        // Neo config instance to be read from the config file.
-        private NeoConfig neo_config;
+        // Legacy and neo config instances to be read from the config file.
+        private DhtClient.Config config;
+        private DhtClient.Neo.Config neo_config;
 
         // Constructor. Initialises the scheduler.
         public this ( )
@@ -96,27 +86,26 @@ version ( UnitTest )
             initScheduler(scheduler_config);
         }
 
-        // Reads this.neo_config from the config file.
+        // Reads the required config from the config file.
         override public void processConfig ( IApplication app,
-            ConfigParser config )
+            ConfigParser config_parser )
         {
-            ConfigFiller.fill("DHT_Neo", this.neo_config, config);
+            ConfigFiller.fill("DHT", this.config, config_parser);
+            ConfigFiller.fill("DHT_Neo", this.neo_config, config_parser);
         }
 
         // Application run method. Initialises the DHT client and starts the
         // main application task.
         override protected int run ( Arguments args, ConfigParser config )
         {
-            // Convert the hex-string auth key read from the config file to the
-            // binary (ubyte[]) format required by the neo client.
-            ubyte[] auth_key_bin;
-            hexToBin(this.neo_config.auth_key, auth_key_bin);
-
-            // Create a DHT client instance, passing the additional
-            // arguments required by neo: the authorisation name and key and the
-            // connection notifier.
-            this.dht = new DhtClient(theScheduler.epoll,
-                this.neo_config.auth_name, auth_key_bin, &this.connNotifier);
+            // Create a DHT client instance, passing the filled config instances
+            // and the neo connection notifier. The node definitiion files
+            // specified in the config instances are automatically read and the
+            // defined nodes added to the client's registry. Note that the neo
+            // protocol does not require an explicit handshake; it happens
+            // automatically in the background.
+            this.dht = new DhtClient(theScheduler.epoll, this.config,
+                this.neo_config, &this.connNotifier);
 
             // Schedule the application's main task and start the event loop.
             theScheduler.schedule(new AppTask);
