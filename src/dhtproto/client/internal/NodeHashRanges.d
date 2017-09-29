@@ -21,6 +21,7 @@
 module dhtproto.client.internal.NodeHashRanges;
 
 import ocean.transition;
+import swarm.neo.util.VoidBufferAsArrayOf;
 
 /// ditto
 public final class NodeHashRanges : NodeHashRangesBase
@@ -85,15 +86,15 @@ public final class NodeHashRanges : NodeHashRangesBase
 
     ***************************************************************************/
 
-    public void getFromNode ( hash_t h, ref NodeHashRange[] node_hash_ranges,
-        UseNodeDg use_node,
+    public void getFromNode ( hash_t h,
+        VoidBufferAsArrayOf!(NodeHashRange) node_hash_ranges, UseNodeDg use_node,
         bool delegate ( RequestOnConn.EventDispatcher ) get )
     {
         auto nodes = this.getNodesForHash(h, node_hash_ranges);
         if ( nodes.length == 0 )
             return;
 
-        foreach ( node_hash_range; nodes )
+        foreach ( node_hash_range; nodes.array() )
         {
             bool try_next_node;
             use_node(node_hash_range.addr,
@@ -129,15 +130,15 @@ public final class NodeHashRanges : NodeHashRangesBase
 
     ***************************************************************************/
 
-    public void putToNode ( hash_t h, ref NodeHashRange[] node_hash_ranges,
-        UseNodeDg use_node,
+    public void putToNode ( hash_t h,
+        VoidBufferAsArrayOf!(NodeHashRange) node_hash_ranges, UseNodeDg use_node,
         void delegate ( RequestOnConn.EventDispatcher ) put )
     {
         auto nodes = this.getNodesForHash(h, node_hash_ranges);
         if ( nodes.length == 0 )
             return;
 
-        use_node(nodes[0].addr,
+        use_node(nodes.array()[0].addr,
             ( RequestOnConn.EventDispatcher conn )
             {
                 put(conn);
@@ -276,11 +277,10 @@ private class NodeHashRangesBase
 
     ***************************************************************************/
 
-    public NodeHashRange[] getNodesForHash ( hash_t h,
-        ref NodeHashRange[] node_hash_ranges )
+    public VoidBufferAsArrayOf!(NodeHashRange) getNodesForHash ( hash_t h,
+        VoidBufferAsArrayOf!(NodeHashRange) node_hash_ranges )
     {
         node_hash_ranges.length = 0;
-        enableStomping(node_hash_ranges);
 
         foreach ( nhr; this.node_hash_ranges )
         {
@@ -297,7 +297,7 @@ private class NodeHashRangesBase
             return e1.order > e2.order;
         }
 
-        node_hash_ranges.sort(&sortPred);
+        node_hash_ranges.array().sort(&sortPred);
 
         return node_hash_ranges;
     }
@@ -330,12 +330,13 @@ version ( UnitTest )
 
     alias NodeHashRange.HashRange HR;
 
-    void checkTestCase ( NodeHashRange[] r1, NodeHashRange[] r2, long line_num = __LINE__ )
+    void checkTestCase ( VoidBufferAsArrayOf!(NodeHashRange) r1,
+        NodeHashRange[] r2, long line_num = __LINE__ )
     {
         auto t = new NamedTest(idup("Test at line " ~ Integer.toString(line_num)));
         t.test!("==")(r1.length, r2.length);
 
-        foreach ( i, e; r1 )
+        foreach ( i, e; r1.array() )
         {
             t.test!("==")(e.addr, r2[i].addr);
             t.test!("==")(e.hash_range.min, r2[i].hash_range.min);
@@ -351,7 +352,8 @@ unittest
     auto addr1 = AddrPort(1, 1);
     auto addr2 = AddrPort(2, 2);
 
-    NodeHashRange[] ranges;
+    void[] backing;
+    auto ranges = VoidBufferAsArrayOf!(NodeHashRange)(&backing);
     auto hr = new NodeHashRangesBase;
 
     // Initially empty
@@ -405,7 +407,8 @@ unittest
     auto addr3 = AddrPort(3, 3);
     auto range = HR(hash_t.min, hash_t.max);
 
-    NodeHashRange[] ranges;
+    void[] backing;
+    auto ranges = VoidBufferAsArrayOf!(NodeHashRange)(&backing);
     auto hr = new NodeHashRangesBase;
 
     // Initially empty

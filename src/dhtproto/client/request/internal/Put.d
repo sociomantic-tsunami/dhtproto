@@ -140,7 +140,7 @@ public struct Put
         bool put_called;
         shared_resources.node_hash_ranges.putToNode(
             context.user_params.args.key,
-            *acquired_resources.getNodeHashRangeBuffer(), use_node,
+            acquired_resources.getNodeHashRangeBuffer(), use_node,
             ( RequestOnConn.EventDispatcher conn )
             {
                 put_called = true;

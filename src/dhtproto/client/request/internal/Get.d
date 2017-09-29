@@ -151,7 +151,7 @@ public struct Get
         bool get_called;
         shared_resources.node_hash_ranges.getFromNode(
             context.user_params.args.key,
-            *acquired_resources.getNodeHashRangeBuffer(), use_node,
+            acquired_resources.getNodeHashRangeBuffer(), use_node,
             ( RequestOnConn.EventDispatcher conn )
             {
                 get_called = true;
