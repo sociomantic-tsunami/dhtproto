@@ -346,6 +346,69 @@ unittest
     }
 }
 
+/// Example of neo Get request usage, including record deserialization
+unittest
+{
+    class GetExample : ExampleApp
+    {
+        import ocean.util.serialize.contiguous.Contiguous;
+
+        override protected void example ( )
+        {
+            // Assign a neo Get request. Note that the channel is copied inside
+            // the client -- the user does not need to maintain it after calling
+            // this method.
+            this.dht.neo.get("channel", 0x1234567812345678, &this.getNotifier);
+        }
+
+        // Notifier which is called when something of interest happens to
+        // the Get request. See dhtproto.client.request.Get for
+        // details of the parameters of the notifier.
+        private void getNotifier ( DhtClient.Neo.Get.Notification info,
+            DhtClient.Neo.Get.Args args )
+        {
+            // Struct expected to be serialized in the received record value.
+            struct Record
+            {
+                mstring name;
+                hash_t id;
+                ulong[7] daily_totals;
+            }
+
+            formatNotification(info, this.msg_buf);
+
+            with ( info.Active ) final switch ( info.active )
+            {
+                case received:
+                    this.log.trace(this.msg_buf);
+
+                    Contiguous!(Record) record;
+                    auto deserialized = info.received.deserialize(record);
+                    this.log.trace("Deserialized: {} / {} / {}",
+                        deserialized.name, deserialized.id,
+                        deserialized.daily_totals);
+                    break;
+
+                case no_record:
+                    this.log.trace(this.msg_buf);
+                    break;
+
+                case failure:
+                case no_node:
+                case node_disconnected:
+                case node_error:
+                case wrong_node:
+                case unsupported:
+                case timed_out:
+                    this.log.error(this.msg_buf);
+                    break;
+
+                mixin(handleInvalidCases);
+            }
+        }
+    }
+}
+
 /// Example of Task-blocking neo Get request usage with a notifier
 unittest
 {
