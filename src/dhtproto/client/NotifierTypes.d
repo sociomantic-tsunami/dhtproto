@@ -24,6 +24,7 @@ import Formatter = ocean.text.convert.Formatter;
 public struct RequestRecordInfo
 {
     import swarm.neo.protocol.Message : RequestId;
+    import swarm.neo.client.mixins.DeserializeMethod;
 
     /// ID of the request for which the notification is occurring.
     RequestId request_id;
@@ -33,6 +34,9 @@ public struct RequestRecordInfo
 
     /// Record value.
     Const!(void)[] value;
+
+    /// Template method to deserialize `value` as a given struct.
+    mixin DeserializeMethod!(value);
 
     /***************************************************************************
 
