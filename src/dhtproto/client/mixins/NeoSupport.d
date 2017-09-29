@@ -1299,7 +1299,7 @@ template NeoSupport ( )
         Params:
             config = swarm.client.model.IClient.Config instance. (The Config
                 class is designed to be read from an application's config.ini
-                file via ocean.util.config.ClassFiller.)
+                file via ocean.util.config.ConfigFiller.)
             conn_notifier = delegate which is called when a connection attempt
                 succeeds or fails (including when a connection is
                 re-established) and when the hash-range for a node is first
