@@ -149,10 +149,7 @@ public struct Put
         );
 
         if ( !put_called )
-        {
             context.shared_working.result = SharedWorking.Result.NoNode;
-            return;
-        }
     }
 
     /***************************************************************************
