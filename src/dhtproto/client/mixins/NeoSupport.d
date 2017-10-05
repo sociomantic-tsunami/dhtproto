@@ -1292,7 +1292,47 @@ template NeoSupport ( )
 
     /***************************************************************************
 
-        Helper function to initialise neo components.
+        Helper function to initialise neo components. Automatically calls
+        addNodes() with the node definition files specified in the Config
+        instance.
+
+        Params:
+            config = swarm.client.model.IClient.Config instance. (The Config
+                class is designed to be read from an application's config.ini
+                file via ocean.util.config.ClassFiller.)
+            conn_notifier = delegate which is called when a connection attempt
+                succeeds or fails (including when a connection is
+                re-established) and when the hash-range for a node is first
+                queried. Of type:
+                void delegate ( Neo.DhtConnNotification )
+
+    ***************************************************************************/
+
+    private void neoInit ( Neo.Config config,
+        Neo.DhtConnectionNotifier user_conn_notifier )
+    in
+    {
+        assert(user_conn_notifier !is null);
+    }
+    body
+    {
+        this.user_conn_notifier = user_conn_notifier;
+
+        this.shared_resources = new SharedResources;
+        this.neo = new Neo(config, &this.connNotifier, this.shared_resources);
+        auto node_hash_ranges = new NodeHashRanges(this.neo.connections,
+            &this.hashRangeNotifier);
+        this.shared_resources.setNodeHashRanges(node_hash_ranges);
+        this.blocking = new TaskBlocking;
+
+        this.neo.assignGetHashRange();
+    }
+
+    /***************************************************************************
+
+        Helper function to initialise neo components. This initialiser that
+        accepts all arguments manually (i.e. not read from config files) is
+        mostly of use in tests.
 
         Params:
             auth_name = client name for authorisation

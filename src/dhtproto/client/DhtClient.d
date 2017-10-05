@@ -250,6 +250,41 @@ public class ExtensibleDhtClient ( Plugins ... ) : DhtClient
 
     /***************************************************************************
 
+        Constructor with support for the neo and legacy protocols. Automatically
+        calls addNodes() with the node definition files specified in the legacy
+        and neo Config instances.
+
+        Params:
+            epoll = EpollSelectDispatcher instance to use
+            plugin_instances = instances of Plugins
+            config = swarm.client.model.IClient.Config instance. (The Config
+                class is designed to be read from an application's config.ini
+                file via ocean.util.config.ClassFiller.)
+            neo_config = swarm.neo.client.mixins.ClientCore.Config instance.
+                (The Config class is designed to be read from an application's
+                config.ini file via ocean.util.config.ClassFiller.)
+            conn_notifier = delegate which is called when a connection attempt
+                succeeds or fails (including when a connection is
+                re-established). Of type:
+                void delegate ( IPAddress node_address, Exception e )
+            fiber_stack_size = size (in bytes) of stack of individual connection
+                fibers
+
+    ***************************************************************************/
+
+    public this ( EpollSelectDispatcher epoll, Plugins plugin_instances,
+        IClient.Config config, Neo.Config neo_config,
+        Neo.DhtConnectionNotifier conn_notifier,
+        size_t fiber_stack_size = IClient.default_fiber_stack_size )
+    {
+        this.setPlugins(plugin_instances);
+
+        super(epoll, config, neo_config, conn_notifier, fiber_stack_size);
+    }
+
+
+    /***************************************************************************
+
         Constructor with support for the neo and legacy protocols. This
         constructor that accepts all arguments manually (i.e. not read from
         config files) is mostly of use in tests.
@@ -358,6 +393,41 @@ public class SchedulingDhtClient : ExtensibleDhtClient!(RequestScheduler)
         super(epoll, new RequestScheduler(epoll, max_events), conn_limit,
             queue_size, fiber_stack_size);
     }
+
+    /***************************************************************************
+
+        Constructor with support for the neo and legacy protocols. Automatically
+        calls addNodes() with the node definition files specified in the legacy
+        and neo Config instances.
+
+        Params:
+            epoll = EpollSelectDispatcher instance to use
+            config = swarm.client.model.IClient.Config instance. (The Config
+                class is designed to be read from an application's config.ini
+                file via ocean.util.config.ClassFiller.)
+            neo_config = swarm.neo.client.mixins.ClientCore.Config instance.
+                (The Config class is designed to be read from an application's
+                config.ini file via ocean.util.config.ClassFiller.)
+            conn_notifier = delegate which is called when a connection attempt
+                succeeds or fails (including when a connection is
+                re-established). Of type:
+                void delegate ( IPAddress node_address, Exception e )
+            fiber_stack_size = size (in bytes) of stack of individual connection
+                fibers
+            max_events = limit on the number of events which can be managed
+                by the scheduler at one time. (0 = no limit)
+
+    ***************************************************************************/
+
+    public this ( EpollSelectDispatcher epoll, IClient.Config config,
+        Neo.Config neo_config, Neo.DhtConnectionNotifier conn_notifier,
+        size_t fiber_stack_size = IClient.default_fiber_stack_size,
+        uint max_events = 0 )
+    {
+        super(epoll, new RequestScheduler(epoll, max_events),
+            config, neo_config, conn_notifier, fiber_stack_size);
+    }
+
 
     /***************************************************************************
 
@@ -712,6 +782,44 @@ public class DhtClient : IClient
         this.null_filter_exception = new NullFilterException;
 
         this.node_handshake = new NodeHandshake;
+    }
+
+
+    /***************************************************************************
+
+        Constructor with support for the neo and legacy protocols. Automatically
+        calls addNodes() with the node definition files specified in the legacy
+        and neo Config instances.
+
+        Params:
+            epoll = EpollSelectDispatcher instance to use
+            config = swarm.client.model.IClient.Config instance. (The Config
+                class is designed to be read from an application's config.ini
+                file via ocean.util.config.ClassFiller.)
+            neo_config = swarm.neo.client.mixins.ClientCore.Config instance.
+                (The Config class is designed to be read from an application's
+                config.ini file via ocean.util.config.ClassFiller.)
+            conn_notifier = delegate which is called when a connection attempt
+                succeeds or fails (including when a connection is
+                re-established). Of type:
+                void delegate ( IPAddress node_address, Exception e )
+            fiber_stack_size = size (in bytes) of stack of individual connection
+                fibers
+
+    ***************************************************************************/
+
+    public this ( EpollSelectDispatcher epoll, IClient.Config config,
+        Neo.Config neo_config, Neo.DhtConnectionNotifier conn_notifier,
+        size_t fiber_stack_size = IClient.default_fiber_stack_size )
+    {
+        with ( config )
+        {
+            this(epoll, connection_limit(), queue_size(), fiber_stack_size);
+
+            this.addNodes(nodes_file);
+        }
+
+        this.neoInit(neo_config, conn_notifier);
     }
 
 
