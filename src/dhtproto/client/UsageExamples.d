@@ -219,6 +219,7 @@ unittest
                     break;
 
                 case failure:
+                case value_too_big:
                 case no_node:
                 case node_disconnected:
                 case node_error:
@@ -262,6 +263,7 @@ unittest
                     break;
 
                 case failure:
+                case value_too_big:
                 case no_node:
                 case node_disconnected:
                 case node_error:

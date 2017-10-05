@@ -11,6 +11,9 @@
         3. The request ends when either the record is pushed to the node or the
            node could not handle the request due to an error.
 
+    Note that this request enforces a size limit on record values (see
+    MaxRecordSize constant, below).
+
     During a data redistribution, more than one node may be responsible for a
     given key. In this case, the record is written to the node which was most
     recently reported as being responsible for the key.
@@ -34,6 +37,18 @@ module dhtproto.client.request.Put;
 import ocean.transition;
 import ocean.core.SmartUnion;
 public import swarm.neo.client.NotifierTypes;
+import swarm.util.RecordBatcher;
+
+/// Maximum allowed size of record values. The maximum record value size depends
+/// on the size of the batch used by GetAll requests. It must not be possible to
+/// store a record in the DHT that cannot be returned by a GetAll request.
+// TODO: ideally, the GetAll batch size should be defined in terms of the
+// maximum record size, not the other way around. However, support for easily
+// calculating the required size of a record batch based on the size of a record
+// that can fit in it is lacking.
+// See https://github.com/sociomantic-tsunami/swarm/issues/142
+public const MaxRecordSize =
+    RecordBatcher.DefaultMaxBatchSize - hash_t.sizeof - (size_t.sizeof * 2);
 
 /*******************************************************************************
 
@@ -67,6 +82,10 @@ private union NotificationUnion
 
     /// The request failed because it is unsupported.
     RequestNodeUnsupportedInfo unsupported;
+
+    /// The length of the provided record value exceeds the MaxRecordSize
+    /// constant (see above).
+    RequestInfo value_too_big;
 
     /// The DHT node to which the request was sent is not responsible for the
     /// record's key. This is a sanity check performed within the node in order
