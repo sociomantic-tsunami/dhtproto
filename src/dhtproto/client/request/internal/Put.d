@@ -80,6 +80,7 @@ public struct Put
         public enum Result
         {
             Failure,
+            ValueTooBig,
             NoNode,
             Error,
             Success
@@ -135,6 +136,12 @@ public struct Put
         auto shared_resources = SharedResources.fromObject(
             context.request_resources.get());
         scope acquired_resources = shared_resources.new RequestResources;
+
+        if ( context.user_params.args.value.length > MaxRecordSize )
+        {
+            context.shared_working.result = SharedWorking.Result.ValueTooBig;
+            return;
+        }
 
         // Try putting the record to the newest node responsible for the hash.
         bool put_called;
@@ -259,6 +266,9 @@ public struct Put
         {
             case Success:
                 n.success = RequestInfo(context.request_id);
+                break;
+            case ValueTooBig:
+                n.value_too_big = RequestInfo(context.request_id);
                 break;
             case NoNode:
                 n.no_node = RequestInfo(context.request_id);

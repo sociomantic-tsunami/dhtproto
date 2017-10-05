@@ -34,6 +34,7 @@ import dhttest.cases.UnorderedRemove;
 import dhttest.cases.BatchListen;
 
 import dhttest.cases.neo.Basic;
+import dhttest.cases.neo.Put;
 import dhttest.cases.neo.OrderedPut;
 import dhttest.cases.neo.UnorderedPut;
 import dhttest.cases.neo.Mirror;

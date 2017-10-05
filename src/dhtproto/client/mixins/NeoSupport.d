@@ -725,6 +725,7 @@ template NeoSupport ( )
                             task.resume();
                         break;
 
+                    case value_too_big:
                     case node_disconnected:
                     case node_error:
                     case unsupported:
