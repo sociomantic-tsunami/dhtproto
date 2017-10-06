@@ -251,7 +251,7 @@ unittest
         // Struct contained (serialized) in the channel
         static struct Record
         {
-            import ocean.text.convert.Format;
+            import ocean.text.convert.Formatter;
 
             ulong update_time;
             hash_t id;
@@ -259,7 +259,7 @@ unittest
 
             istring toString ( )
             {
-                return Format("[{}, {}, {}]",
+                return format("[{}, {}, {}]",
                     this.update_time, this.id, this.count);
             }
         }

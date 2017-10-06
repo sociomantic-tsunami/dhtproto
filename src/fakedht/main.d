@@ -27,7 +27,7 @@ import ocean.io.select.EpollSelectDispatcher;
 import ocean.io.select.client.TimerEvent;
 import ocean.core.MessageFiber;
 
-import ocean.util.log.Log;
+import ocean.util.log.Logger;
 import ocean.util.log.AppendConsole;
 
 /*******************************************************************************
@@ -53,9 +53,10 @@ void main ( )
     auto epoll = new EpollSelectDispatcher;
     auto node = new DhtNode(DhtConst.NodeItem("127.0.0.1".dup, 10000), epoll);
 
-    Log("Registering fake node");
+    auto log = Log.lookup("fakedht.main");
+    log.info("Registering fake node");
     node.register(epoll);
 
-    Log("Starting infinite event loop, kill the process if not needed anymore");
+    log.info("Starting infinite event loop, kill the process if not needed anymore");
     epoll.eventLoop();
 }

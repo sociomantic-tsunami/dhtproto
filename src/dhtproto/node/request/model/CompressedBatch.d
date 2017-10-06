@@ -23,7 +23,7 @@ module dhtproto.node.request.model.CompressedBatch;
 import dhtproto.node.request.model.SingleChannel;
 
 import ocean.transition;
-import ocean.util.log.Log;
+import ocean.util.log.Logger;
 
 /*******************************************************************************
 

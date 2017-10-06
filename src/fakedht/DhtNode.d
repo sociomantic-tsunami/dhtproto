@@ -21,7 +21,7 @@ module fakedht.DhtNode;
 
 import ocean.transition;
 
-import ocean.util.log.Log;
+import ocean.util.log.Logger;
 
 import fakedht.ConnectionHandler;
 

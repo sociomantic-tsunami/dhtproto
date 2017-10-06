@@ -25,6 +25,7 @@ import fakedht.Storage;
 import ocean.core.Test;
 import ocean.task.Scheduler;
 import ocean.task.util.Timer;
+import ocean.text.convert.Formatter;
 
 /*******************************************************************************
 
@@ -80,7 +81,6 @@ public class Dht : Node!(DhtNode, "dht")
     import ocean.util.serialize.Version;
 
     import ocean.text.convert.Integer_tango;
-    import ocean.text.convert.Format;
 
     /***************************************************************************
 
@@ -329,7 +329,7 @@ public class Dht : Node!(DhtNode, "dht")
         }
         while (total_wait < timeout);
 
-        throw new TestException(Format(
+        throw new TestException(.format(
             "No change for record {} in channel '{}' during {} seconds",
             str_key,
             channel,
@@ -377,7 +377,7 @@ public class Dht : Node!(DhtNode, "dht")
         }
         while (total_wait < timeout);
 
-        throw new TestException(Format(
+        throw new TestException(.format(
             "Expected condition was not hit for record {} in channel '{}' " ~
                 "during {} seconds",
             str_key,

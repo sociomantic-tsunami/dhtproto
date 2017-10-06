@@ -32,7 +32,7 @@ import ocean.transition;
 public struct Record
 {
     import ocean.io.digest.Fnv1;
-    import ocean.text.convert.Format;
+    import ocean.text.convert.Formatter;
 
     /***************************************************************************
 
@@ -109,7 +109,7 @@ public struct Record
     {
         Record r;
         r.key = key;
-        Format.format(r.val, "{}", r.key);
+        sformat(r.val, "{}", r.key);
         return r;
     }
 }
