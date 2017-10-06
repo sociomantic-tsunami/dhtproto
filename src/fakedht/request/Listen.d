@@ -19,7 +19,7 @@ module fakedht.request.Listen;
 *******************************************************************************/
 
 import ocean.transition;
-import ocean.util.log.Log;
+import ocean.util.log.Logger;
 
 import Protocol = dhtproto.node.request.Listen;
 import fakedht.Storage; // DhtListener

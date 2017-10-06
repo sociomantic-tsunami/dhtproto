@@ -19,7 +19,7 @@ module fakedht.ConnectionHandler;
 
 *******************************************************************************/
 
-import ocean.util.log.Log;
+import ocean.util.log.Logger;
 
 import ocean.net.server.connection.IConnectionHandler;
 

@@ -22,6 +22,8 @@ import ocean.transition;
 
 import dhtproto.node.request.model.DhtCommand;
 
+import ocean.text.convert.Formatter;
+
 /*******************************************************************************
 
     Common base for single channel request protocols
@@ -32,8 +34,6 @@ public abstract scope class SingleChannel : DhtCommand
 {
     import dhtproto.client.legacy.DhtConst;
     import swarm.Const : validateChannelName;
-
-    import ocean.text.convert.Format;
 
     /***************************************************************************
 
@@ -167,7 +167,7 @@ public abstract scope class SingleChannel : DhtCommand
         super.description(dst);
 
         auto channel = *this.channel_buffer;
-        Format.format(dst, " on channel '{}'", channel.length ? channel : "?");
+        sformat(dst, " on channel '{}'", channel.length ? channel : "?");
         return dst;
     }
 }
