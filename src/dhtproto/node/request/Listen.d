@@ -84,8 +84,15 @@ public abstract scope class Listen : SingleChannel
             // the cleanup also assumes the "write" event was active).
             this.writer.fiber.unregister();
             this.reader.fiber.epoll.register(disconnect_detector);
-            this.waitEvents(finish, flush);
-            this.reader.fiber.epoll.unregister(disconnect_detector);
+
+            try
+            {
+                this.waitEvents(finish, flush);
+            }
+            finally
+            {
+                this.reader.fiber.epoll.unregister(disconnect_detector);
+            }
 
             if (disconnect_detector.disconnected)
                 return;
