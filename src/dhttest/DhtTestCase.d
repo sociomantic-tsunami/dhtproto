@@ -247,6 +247,8 @@ abstract class NeoDhtTestCase : TestCase
             enforce(!this.connect_error, "Test DHT neo connection error");
             this.connect_task.suspend();
         }
+
+        this.connect_task = null;
     }
 
     /***************************************************************************
@@ -312,7 +314,8 @@ abstract class NeoDhtTestCase : TestCase
             default: assert(false);
         }
 
-        this.connect_task.resume();
+        if ( this.connect_task !is null )
+            this.connect_task.resume();
     }
 }
 
