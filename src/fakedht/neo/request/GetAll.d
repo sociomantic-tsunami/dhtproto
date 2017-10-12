@@ -154,10 +154,7 @@ private scope class GetAllImpl_v0 : GetAllProtocol_v0
 
         // Cut off any records after the last key iterated over.
         if ( index < this.iterate_keys.length )
-        {
-            auto new_length = index > 1 ? index - 1 : 0;
-            this.iterate_keys.length = new_length;
-        }
+            this.iterate_keys.length = index;
 
         return true;
     }
