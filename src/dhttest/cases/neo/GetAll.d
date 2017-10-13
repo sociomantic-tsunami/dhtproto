@@ -17,6 +17,7 @@ module dhttest.cases.neo.GetAll;
 
 import ocean.transition;
 import ocean.core.Test;
+import ocean.math.random.Random;
 import dhttest.DhtTestCase : NeoDhtTestCase;
 import dhtproto.client.DhtClient;
 
@@ -30,7 +31,6 @@ public class GetAllBlocking : NeoDhtTestCase
 {
     import ocean.task.Task;
     import ocean.io.select.client.TimerEvent;
-    import ocean.math.random.Random;
 
     override public Description description ( )
     {
@@ -42,19 +42,9 @@ public class GetAllBlocking : NeoDhtTestCase
     public override void run ( )
     {
         auto task = Task.getThis();
-        auto rand = new Random;
 
         const num_records = 1000;
-        ubyte[] val;
-        val.length = 8 * 1024;
-        for ( hash_t key = 0; key < num_records; key++ )
-        {
-            foreach ( ref b; val )
-                b = rand.uniform!(ubyte)();
-
-            auto res = this.dht.blocking.put(this.test_channel, key, val);
-            test(res.succeeded);
-        }
+        putRecords(this.dht, this.test_channel, num_records);
 
         void[] buf;
         void[][hash_t] received;
@@ -83,7 +73,6 @@ public class GetAllSuspend : NeoDhtTestCase
 {
     import ocean.task.Task;
     import ocean.io.select.client.TimerEvent;
-    import ocean.math.random.Random;
 
     override public Description description ( )
     {
@@ -95,19 +84,9 @@ public class GetAllSuspend : NeoDhtTestCase
     public override void run ( )
     {
         auto task = Task.getThis();
-        auto rand = new Random;
 
         const num_records = 1000;
-        ubyte[] val;
-        val.length = 8 * 1024;
-        for ( hash_t key = 0; key < num_records; key++ )
-        {
-            foreach ( ref b; val )
-                b = rand.uniform!(ubyte)();
-
-            auto res = this.dht.blocking.put(this.test_channel, key, val);
-            test(res.succeeded);
-        }
+        putRecords(this.dht, this.test_channel, num_records);
 
         auto getall = GetAll(this.dht);
 
@@ -174,7 +153,6 @@ public class GetAllConnError : NeoDhtTestCase
     import turtle.env.ControlSocket : sendCommand;
     import ocean.task.Task;
     import ocean.io.select.client.TimerEvent;
-    import ocean.math.random.Random;
     import swarm.neo.client.requests.NotificationFormatter;
 
     override public Description description ( )
@@ -187,19 +165,9 @@ public class GetAllConnError : NeoDhtTestCase
     public override void run ( )
     {
         auto task = Task.getThis();
-        auto rand = new Random;
 
         const num_records = 1000;
-        ubyte[] val;
-        val.length = 8 * 1024;
-        for ( hash_t key = 0; key < num_records; key++ )
-        {
-            foreach ( ref b; val )
-                b = rand.uniform!(ubyte)();
-
-            auto res = this.dht.blocking.put(this.test_channel, key, val);
-            test(res.succeeded);
-        }
+        putRecords(this.dht, this.test_channel, num_records);
 
         uint disconnection_count;
         auto getall = GetAll(this.dht);
@@ -232,6 +200,35 @@ public class GetAllConnError : NeoDhtTestCase
         test!("==")(getall.received_keys.length, num_records);
         test(!getall.duplicate);
         test!("==")(disconnection_count, 1);
+    }
+}
+
+/*******************************************************************************
+
+    Helper function to write some records to the specified channel. Random 8K
+    record values are written.
+
+    Params:
+        dht = DHT client instance to perform Puts with
+        channel = channel to write to
+        num_records = the number of records to write. Records are written with
+            keys from 0..num_records
+
+*******************************************************************************/
+
+private void putRecords ( DhtClient dht, cstring channel, size_t num_records )
+{
+    auto rand = new Random;
+
+    ubyte[] val;
+    val.length = 8 * 1024;
+    for ( hash_t key = 0; key < num_records; key++ )
+    {
+        foreach ( ref b; val )
+            b = rand.uniform!(ubyte)();
+
+        auto res = dht.blocking.put(channel, key, val);
+        test(res.succeeded);
     }
 }
 
