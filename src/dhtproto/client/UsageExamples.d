@@ -315,6 +315,8 @@ unittest
             with ( info.Active ) final switch ( info.active )
             {
                 case received:
+                    auto received_record = info.received.value;
+                    goto case;
                 case no_record:
                     this.log.trace(this.msg_buf);
                     break;
@@ -423,6 +425,8 @@ unittest
             with ( info.Active ) final switch ( info.active )
             {
                 case received:
+                    auto received_record = info.received.value;
+                    goto case;
                 case no_record:
                     this.log.trace(this.msg_buf);
                     break;
