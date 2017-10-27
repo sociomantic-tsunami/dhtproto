@@ -39,8 +39,6 @@ public abstract scope class SingleKey : SingleChannel
     import dhtproto.client.legacy.DhtConst;
     import swarm.Const : validateChannelName;
 
-    import ocean.text.convert.Format;
-
     /***************************************************************************
 
         Pointer to the key buffer, provided to the constructor. Used to read
@@ -82,7 +80,7 @@ public abstract scope class SingleKey : SingleChannel
     }
 
     /***************************************************************************
-    
+
         If protocol for derivative request needs any parameters other than
         key, channel name and request code, this method must be overridden to
         read and store those.
@@ -98,7 +96,7 @@ public abstract scope class SingleKey : SingleChannel
         Params:
             channel_name = channel name for request that was read and validated
                 earlier
-        
+
     ***************************************************************************/
 
     final override protected void handleChannelRequest ( cstring channel_name )
