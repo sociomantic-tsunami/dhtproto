@@ -29,9 +29,6 @@ public abstract scope class GetAllProtocol_v0
     /// Mixin the constructor and resources member.
     mixin RequestCore!();
 
-    /// Buffer used to store record values to be sent to the client.
-    private void[]* value_buffer;
-
     /// Batch of records to send.
     private RecordBatcher batcher;
 
@@ -161,7 +158,6 @@ public abstract scope class GetAllProtocol_v0
         this.filter.init(value_filter);
 
         // Acquire required resources.
-        this.value_buffer = this.resources.getVoidBuffer();
         this.compressed_batch = this.resources.getVoidBuffer();
         this.batcher = this.resources.getRecordBatcher();
 
@@ -231,16 +227,16 @@ public abstract scope class GetAllProtocol_v0
         Gets the next record in the iteration, if one exists.
 
         Params:
-            key = receives the key of the next record, if available
-            value = receives the value of the next record, if available
+            dg = called with the key and value of the next record, if available
 
         Returns:
-            true if a record was returned via the out arguments or false if the
-            iteration is finished
+            true if a record was passed to `dg` or false if the iteration is
+            finished
 
     ***************************************************************************/
 
-    abstract protected bool getNext ( out hash_t key, ref void[] value );
+    abstract protected bool getNext (
+        void delegate ( hash_t key, Const!(void)[] value ) dg );
 
     /***************************************************************************
 
@@ -286,44 +282,51 @@ public abstract scope class GetAllProtocol_v0
             uint yield_counter;
 
             // Iterate over the channel and send each record to the client.
-            while ( this.outer.getNext(key, *this.outer.value_buffer) )
+            bool more;
+            do
             {
-                if ( !this.outer.filter.match(*this.outer.value_buffer) )
-                    continue;
+                more = this.outer.getNext(
+                    ( hash_t key, Const!(void)[] value )
+                    {
+                        if ( !this.outer.filter.match(cast(cstring)value) )
+                            return;
 
-                cstring key_slice = (cast(char*)&key)[0..key.sizeof];
-                auto add_result = this.addToBatch(key_slice,
-                    cast(cstring)*this.outer.value_buffer);
+                        cstring key_slice = (cast(char*)&key)[0..key.sizeof];
+                        auto add_result = this.addToBatch(key_slice,
+                            cast(cstring)value);
 
-                // If suspended, wait until resumed.
-                this.suspender.suspendIfRequested();
+                        // If suspended, wait until resumed.
+                        this.suspender.suspendIfRequested();
 
-                with ( RecordBatcher.AddResult ) switch ( add_result )
-                {
-                    case Added:
-                        // Can add more data to the batch
-                        break;
-                    case BatchFull:
-                        // New record does not fit into this batch, send it
-                        // and add the record to the next batch
-                        this.sendBatch();
-                        add_result = this.addToBatch(key_slice,
-                            cast(cstring)*this.outer.value_buffer);
-                        assert(add_result == Added);
-                        break;
-                    case TooBig:
-                        // Impossible to fit the record even in empty batch
-                        log.warn(
-                            "GetAll: Large record 0x{:x16} ({} bytes) skipped.",
-                            key, this.outer.value_buffer.length);
-                        break;
-                    default:
-                        assert(false, "Invalid AddResult in switch");
-                }
+                        with ( RecordBatcher.AddResult ) switch ( add_result )
+                        {
+                            case Added:
+                                // Can add more data to the batch
+                                break;
+                            case BatchFull:
+                                // New record does not fit into this batch, send
+                                // it and add the record to the next batch
+                                this.sendBatch();
+                                add_result = this.addToBatch(key_slice,
+                                    cast(cstring)value);
+                                assert(add_result == Added);
+                                break;
+                            case TooBig:
+                                // Impossible to fit the record even in empty batch
+                                log.warn(
+                                    "GetAll: Large record 0x{:x16} ({} bytes) skipped.",
+                                    key, value.length);
+                                break;
+                            default:
+                                assert(false, "Invalid AddResult in switch");
+                        }
+                    }
+                );
 
                 this.outer.resources.request_event_dispatcher.periodicYield(
                     this.fiber, yield_counter, 10);
             }
+            while ( more );
 
             // Handle the last pending batch at the end of the iteration (does
             // nothing if no records are pending)
