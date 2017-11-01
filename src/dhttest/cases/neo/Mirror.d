@@ -158,6 +158,82 @@ public class MirrorUpdate : NeoDhtTestCase
 
 /*******************************************************************************
 
+    Test case which writes some records, starts a Mirror, waits for the first
+    refresh cycle to complete (returning all records to the client), then kills
+    all connections and checks that the Mirror request successfully reconnects
+    and performs a second refresh cycle.
+
+*******************************************************************************/
+
+public class MirrorConnError : NeoDhtTestCase
+{
+    import ocean.task.Task;
+
+    override public Description description ( )
+    {
+        Description desc;
+        desc.name = "Neo Puts followed by neo Mirror with connection drop";
+        return desc;
+    }
+
+    public override void run ( )
+    {
+        auto task = Task.getThis();
+
+        const num_written = 100;
+        putRecords(this.dht, this.test_channel, num_written);
+
+        DhtClient.Neo.Mirror.Settings mirror_settings;
+        mirror_settings.initial_refresh = true;
+        mirror_settings.periodic_refresh_s = 0;
+
+        uint disconnection_count;
+        auto mirror = Mirror(this.dht);
+        mirror.start(mirror_settings, this.test_channel,
+            ( DhtClient.Neo.Mirror.Notification info,
+                DhtClient.Neo.Mirror.Args args )
+            {
+                with ( info.Active ) switch ( info.active )
+                {
+                    case started:
+                        break;
+
+                    case refreshed:
+                        // After the first refresh is complete, tell the client
+                        // to drop and re-establish all connections.
+                        if ( mirror.refreshed_count == num_written )
+                            this.dht.neo.reconnect();
+
+                        // After the second refresh is complete, stop the
+                        // request.
+                        if ( mirror.refreshed_count == num_written * 2 )
+                            mirror.stop();
+                        break;
+
+                    case node_disconnected:
+                        disconnection_count++;
+                        break;
+
+                    case stopped:
+                        task.resume();
+                        break;
+
+                    default:
+                        break;
+                }
+            }
+        );
+
+        task.suspend();
+        test!("==")(mirror.updated_count, 0);
+        test!("==")(mirror.refreshed_count, num_written * 2);
+        test!("==")(mirror.deleted_count, 0);
+        test!("==")(disconnection_count, 1);
+    }
+}
+
+/*******************************************************************************
+
     Test case which starts an updating mirror then writes some records while
     periodically suspending and resuming the request.
 
