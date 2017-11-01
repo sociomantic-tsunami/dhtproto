@@ -164,6 +164,79 @@ public class GetAllSuspend : NeoDhtTestCase
 
 /*******************************************************************************
 
+    Test case which starts a GetAll then kills all connections and checks that
+    the GetAll request successfully reconnects and continues.
+
+*******************************************************************************/
+
+public class GetAllConnError : NeoDhtTestCase
+{
+    import turtle.env.ControlSocket : sendCommand;
+    import ocean.task.Task;
+    import ocean.io.select.client.TimerEvent;
+    import ocean.math.random.Random;
+    import swarm.neo.client.requests.NotificationFormatter;
+
+    override public Description description ( )
+    {
+        Description desc;
+        desc.name = "Neo Puts followed by neo GetAll with connection drop";
+        return desc;
+    }
+
+    public override void run ( )
+    {
+        auto task = Task.getThis();
+        auto rand = new Random;
+
+        const num_records = 1000;
+        ubyte[] val;
+        val.length = 8 * 1024;
+        for ( hash_t key = 0; key < num_records; key++ )
+        {
+            foreach ( ref b; val )
+                b = rand.uniform!(ubyte)();
+
+            auto res = this.dht.blocking.put(this.test_channel, key, val);
+            test(res.succeeded);
+        }
+
+        uint disconnection_count;
+        auto getall = GetAll(this.dht);
+        getall.start(this.test_channel,
+            ( DhtClient.Neo.GetAll.Notification info,
+                DhtClient.Neo.GetAll.Args args )
+            {
+                with ( info.Active ) switch ( info.active )
+                {
+                    case received:
+                        if ( getall.received_keys.length == num_records / 2 )
+                            this.dht.neo.reconnect();
+                        break;
+
+                    case node_disconnected:
+                        disconnection_count++;
+                        break;
+
+                    case finished:
+                        task.resume();
+                        break;
+
+                    default:
+                        break;
+                }
+            }
+        );
+
+        task.suspend();
+        test!("==")(getall.received_keys.length, num_records);
+        test(!getall.duplicate);
+        test!("==")(disconnection_count, 1);
+    }
+}
+
+/*******************************************************************************
+
     Helper for performing a GetAll request and checking the results. Reduces the
     amount of boiler-plate in each test case.
 
