@@ -402,9 +402,9 @@ public class SchedulingDhtClient : ExtensibleDhtClient!(RequestScheduler)
 
         Params:
             epoll = EpollSelectDispatcher instance to use
-            config = swarm.client.model.IClient.Config instance. (The Config
-                class is designed to be read from an application's config.ini
-                file via ocean.util.config.ConfigFiller.)
+            config = SchedulingDhtClient.Config instance. (The Config class is
+                designed to be read from an application's config.ini file via
+                ocean.util.config.ConfigFiller.)
             neo_config = swarm.neo.client.mixins.ClientCore.Config instance.
                 (The Config class is designed to be read from an application's
                 config.ini file via ocean.util.config.ConfigFiller.)
@@ -414,17 +414,15 @@ public class SchedulingDhtClient : ExtensibleDhtClient!(RequestScheduler)
                 void delegate ( IPAddress node_address, Exception e )
             fiber_stack_size = size (in bytes) of stack of individual connection
                 fibers
-            max_events = limit on the number of events which can be managed
-                by the scheduler at one time. (0 = no limit)
 
     ***************************************************************************/
 
-    public this ( EpollSelectDispatcher epoll, IClient.Config config,
+    public this ( EpollSelectDispatcher epoll,
+        SchedulingDhtClient.Config config,
         Neo.Config neo_config, Neo.DhtConnectionNotifier conn_notifier,
-        size_t fiber_stack_size = IClient.default_fiber_stack_size,
-        uint max_events = 0 )
+        size_t fiber_stack_size = IClient.default_fiber_stack_size )
     {
-        super(epoll, new RequestScheduler(epoll, max_events),
+        super(epoll, new RequestScheduler(epoll, config.scheduler_limit),
             config, neo_config, conn_notifier, fiber_stack_size);
     }
 
