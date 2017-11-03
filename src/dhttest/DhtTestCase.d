@@ -112,7 +112,7 @@ abstract class NeoDhtTestCase : TestCase
     import ocean.core.Enforce;
     import ocean.task.Scheduler;
     import ocean.task.Task;
-    import ocean.util.log.Log;
+    import ocean.util.log.Logger;
     import dhtproto.client.DhtClient;
     import Legacy = dhttest.DhtClient;
     import swarm.neo.authentication.HmacDef: Key;

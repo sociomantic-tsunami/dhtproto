@@ -17,7 +17,7 @@
 module dhtproto.client.request.internal.GetHashRange;
 
 import ocean.transition;
-import ocean.util.log.Log;
+import ocean.util.log.Logger;
 import dhtproto.common.GetHashRange;
 import swarm.neo.client.NotifierTypes;
 

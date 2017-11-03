@@ -12,7 +12,7 @@
 
 module dhtproto.node.neo.request.Mirror;
 
-import ocean.util.log.Log;
+import ocean.util.log.Logger;
 
 version ( UnitTest )
 {
