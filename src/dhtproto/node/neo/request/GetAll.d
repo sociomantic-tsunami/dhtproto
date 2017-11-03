@@ -12,7 +12,7 @@
 
 module dhtproto.node.neo.request.GetAll;
 
-import ocean.util.log.Log;
+import ocean.util.log.Logger;
 
 /// ditto
 public abstract scope class GetAllProtocol_v0

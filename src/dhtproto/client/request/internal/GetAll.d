@@ -13,7 +13,7 @@
 module dhtproto.client.request.internal.GetAll;
 
 import ocean.transition;
-import ocean.util.log.Log;
+import ocean.util.log.Logger;
 
 /*******************************************************************************
 
