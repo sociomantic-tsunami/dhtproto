@@ -44,6 +44,23 @@ public scope class RemoveChannel : Protocol.RemoveChannel
 
     /***************************************************************************
 
+        Checks whether the specified channel is in active use by a listener.
+
+        Params:
+            channel_name = name of channel to be removed
+
+        Returns:
+            true if the channel is actively in use by a listener
+
+    ***************************************************************************/
+
+    override protected bool isChannelListened ( cstring channel_name )
+    {
+        return false;
+    }
+
+    /***************************************************************************
+
         Must remove the specified channel from the storage engine.
         Any failure is considered critical.
 
