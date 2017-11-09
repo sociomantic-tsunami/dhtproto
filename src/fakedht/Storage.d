@@ -267,6 +267,18 @@ class Channel
 
         /***********************************************************************
 
+            Returns:
+                number of registered listeners
+
+        ***********************************************************************/
+
+        public size_t length ( )
+        {
+            return this.listeners.length();
+        }
+
+        /***********************************************************************
+
             Tracks the number of listeners in the sending state, in addition to
             the base class' trigger_() behaviour.
 
@@ -459,6 +471,18 @@ class Channel
     public void listenerFlushed ( )
     {
         this.listeners.listenerFlushed();
+    }
+
+    /***************************************************************************
+
+        Returns:
+            the number of listeners which are currently registered
+
+    ***************************************************************************/
+
+    public size_t registered_listeners ( )
+    {
+        return this.listeners.length;
     }
 
     /***************************************************************************

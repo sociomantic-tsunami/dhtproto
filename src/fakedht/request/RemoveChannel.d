@@ -56,7 +56,10 @@ public scope class RemoveChannel : Protocol.RemoveChannel
 
     override protected bool isChannelListened ( cstring channel_name )
     {
-        return false;
+        if ( auto channel = global_storage.get(channel_name) )
+            return channel.registered_listeners > 0;
+        else
+            return false;
     }
 
     /***************************************************************************
