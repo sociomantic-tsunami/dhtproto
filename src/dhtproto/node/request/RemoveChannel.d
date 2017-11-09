@@ -69,6 +69,37 @@ public abstract scope class RemoveChannel : SingleChannel
 
     /***************************************************************************
 
+        Checks whether it is possible to remove the specified channel.
+
+        Params:
+            channel_name = name of channel to be removed
+
+        Returns:
+            true if it is possible to proceed with request
+
+    ***************************************************************************/
+
+    override protected bool prepareChannel ( cstring channel_name )
+    {
+        return !this.isChannelListened(channel_name);
+    }
+
+    /***************************************************************************
+
+        Checks whether the specified channel is in active use by a listener.
+
+        Params:
+            channel_name = name of channel to be removed
+
+        Returns:
+            true if the channel is actively in use by a listener
+
+    ***************************************************************************/
+
+    abstract protected bool isChannelListened ( cstring channel_name );
+
+    /***************************************************************************
+
         Must remove the specified channel from the storage engine.
         Any failure is considered critical.
 
