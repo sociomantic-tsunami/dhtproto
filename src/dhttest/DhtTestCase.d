@@ -33,6 +33,7 @@ import turtle.TestCase;
 abstract class DhtTestCase : TestCase
 {
     import ocean.core.Test; // makes `test` available in derivatives
+    import ocean.text.convert.Formatter;
     import dhttest.DhtClient;
 
     /***************************************************************************
@@ -64,38 +65,26 @@ abstract class DhtTestCase : TestCase
 
     /***************************************************************************
 
-        Constructor
-
-    ***************************************************************************/
-
-    this ( )
-    {
-        this.test_channel = "test_channel";
-    }
-
-    /***************************************************************************
-
         Creates new DHT client for a test case and proceeds with handshake so
         that client instance will be ready to work by the time `run` methods
         is being run.
+
+        Also sets the name of the test channel for this test.
+
+        Note: all tests are configured to use a different channel. This is
+        because there is no way to stop Listen requests. If all tests operate on
+        the same channel, a bunch of Listen requests will build up on the
+        channel. As an active Listen request prevents RemoveChannel, any test
+        case that uses RemoveChannel would then fail. If each test case uses a
+        different channel, this is not a problem.
 
     ***************************************************************************/
 
     override public void prepare ( )
     {
+        static uint test_counter;
+        this.test_channel = format("test_channel_{}", test_counter++);
         this.dht = new DhtClient;
         this.dht.handshake(10000);
-    }
-
-    /***************************************************************************
-
-        Deletes test channel each time test case finishes to avoid using
-        some state by accident between tests.
-
-    ***************************************************************************/
-
-    override public void cleanup ( )
-    {
-        this.dht.removeChannel(this.test_channel);
     }
 }

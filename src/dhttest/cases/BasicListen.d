@@ -30,21 +30,20 @@ const PRIORITY = 90;
 
 /*******************************************************************************
 
-    Tests the behaviour of a running Listen request when channel is deleted.
+    Tests the behaviour of a running Listen request then removing the channel
+    being listened to.
 
-    When a storage channel is removed, any active Listen requests for that
-    channel are expected to be notified and to send a signal to the client
-    indicating that the request has finished.
+    An active Listen request prevents a channel from being removed.
 
 *******************************************************************************/
 
-class ListenRemovedChannel : DhtTestCase
+class ListenRemoveChannel : DhtTestCase
 {
     override public Description description ( )
     {
         Description desc;
         desc.priority = PRIORITY;
-        desc.name = "Listen stops after removing channel";
+        desc.name = "RemoveChannel is rejected on a listened channel";
         return desc;
     }
 
@@ -57,12 +56,9 @@ class ListenRemovedChannel : DhtTestCase
         test(!listener.finished);
         listener.data.remove(key); // Clear record before calling waitNextEvent()
 
-        this.dht.removeChannel(this.test_channel);
-        listener.waitNextEvent();
-        test(listener.finished);
+        testThrown(this.dht.removeChannel(this.test_channel));
     }
 }
-
 
 /*******************************************************************************
 
