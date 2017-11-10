@@ -43,7 +43,6 @@ public struct GetChannels
     import dhtproto.client.request.GetChannels;
     import dhtproto.common.RequestCodes;
     import dhtproto.client.NotifierTypes;
-    import swarm.util.RecordBatcher;
     import swarm.neo.client.mixins.RequestCore;
     import swarm.neo.client.mixins.AllNodesRequestCore;
     import swarm.neo.client.RequestHandlers;
@@ -201,7 +200,6 @@ private scope class GetChannelsHandler
     import swarm.neo.client.RequestOnConn;
     import swarm.neo.connection.RequestOnConnBase;
     import swarm.neo.client.mixins.AllNodesRequestCore;
-    import swarm.neo.request.RequestEventDispatcher;
     import swarm.neo.request.Command;
 
     import dhtproto.common.GetChannels;
