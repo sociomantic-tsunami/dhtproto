@@ -41,6 +41,7 @@ import dhttest.cases.neo.Mirror;
 import dhttest.cases.neo.GetAll;
 import dhttest.cases.neo.GetChannels;
 import dhttest.cases.neo.Remove;
+import dhttest.cases.neo.RemoveChannel;
 
 /*******************************************************************************
 
