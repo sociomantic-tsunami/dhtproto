@@ -276,9 +276,7 @@ private scope class GetChannelsHandler
 
     private void disconnected ( Exception e )
     {
-        // Notify the user of the disconnection. The user may use the
-        // controller, at this point, but as the request is not active
-        // on this connection, no special behaviour is needed.
+        // Notify the user of the disconnection.
         GetChannels.Notification notification;
         notification.node_disconnected =
             RequestNodeExceptionInfo(this.context.request_id,
