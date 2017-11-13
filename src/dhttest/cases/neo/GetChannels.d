@@ -62,13 +62,10 @@ public class GetChannels : NeoDhtTestCase
 
     override public void cleanup ( )
     {
-        super.cleanup();
-
-        auto legacy_dht = new Legacy.DhtClient;
-        legacy_dht.handshake(10000);
-
         foreach ( channel; this.channels )
-            legacy_dht.removeChannel(channel);
+            this.dht.blocking.removeChannel(channel);
+
+        super.cleanup();
     }
 }
 
@@ -88,7 +85,7 @@ public class GetChannelsRemove : NeoDhtTestCase
     override public Description description ( )
     {
         Description desc;
-        desc.name = "Neo Puts followed by legacy RemoveChannel then neo GetChannels";
+        desc.name = "Neo Puts followed by neo RemoveChannel then neo GetChannels";
         return desc;
     }
 
@@ -102,9 +99,7 @@ public class GetChannelsRemove : NeoDhtTestCase
             test(res.succeeded);
         }
 
-        auto legacy_dht = new Legacy.DhtClient;
-        legacy_dht.handshake(10000);
-        legacy_dht.removeChannel(this.channels[0]);
+        this.dht.blocking.removeChannel(this.channels[0]);
 
         mstring buf;
         mstring[] received_channels;
@@ -118,12 +113,9 @@ public class GetChannelsRemove : NeoDhtTestCase
 
     override public void cleanup ( )
     {
-        super.cleanup();
-
-        auto legacy_dht = new Legacy.DhtClient;
-        legacy_dht.handshake(10000);
-
         foreach ( channel; this.channels )
-            legacy_dht.removeChannel(channel);
+            this.dht.blocking.removeChannel(channel);
+
+        super.cleanup();
     }
 }
