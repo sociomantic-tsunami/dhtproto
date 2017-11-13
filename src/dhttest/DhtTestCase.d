@@ -190,7 +190,7 @@ abstract class NeoDhtTestCase : TestCase
 
     override public void prepare ( )
     {
-        cstring auth_name = "test";
+        cstring auth_name = "admin";
         auto auth_key = Key.init;
         const max_connections = 2;
         this.dht = new DhtClient(theScheduler.epoll, auth_name,
