@@ -518,8 +518,6 @@ public class MirrorRemoveChannel : NeoDhtTestCase
 
     public override void run ( )
     {
-        this.legacyConnect(10000);
-
         auto task = Task.getThis();
 
         DhtClient.Neo.Mirror.Settings mirror_settings;
@@ -529,7 +527,8 @@ public class MirrorRemoveChannel : NeoDhtTestCase
         void putNotifier ( DhtClient.Neo.Put.Notification info,
             Const!(DhtClient.Neo.Put.Args) args ) { }
 
-        void delNotifier ( DhtClient.RequestNotification info ) { }
+        void delNotifier ( DhtClient.Neo.RemoveChannel.Notification info,
+            DhtClient.Neo.RemoveChannel.Args args ) { }
 
         auto mirror = Mirror(this.dht);
         mirror.start(mirror_settings, this.test_channel,
@@ -540,9 +539,8 @@ public class MirrorRemoveChannel : NeoDhtTestCase
                 {
                     case started:
                         // As soon as the mirror is up, remove the channel
-                        this.dht.assign(
-                            this.dht.removeChannel(this.test_channel,
-                                &delNotifier));
+                        this.dht.neo.removeChannel(this.test_channel,
+                            &delNotifier);
                         break;
 
                     case channel_removed:
