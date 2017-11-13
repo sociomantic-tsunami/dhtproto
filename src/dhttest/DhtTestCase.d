@@ -214,12 +214,10 @@ abstract class NeoDhtTestCase : TestCase
 
     override public void cleanup ( )
     {
+        this.dht.blocking.removeChannel(this.test_channel);
+
         this.log.info("Shutting down client -- node connection error expected");
         this.dht.neo.shutdown();
-
-        auto legacy_dht = new Legacy.DhtClient;
-        legacy_dht.handshake(10000);
-        legacy_dht.removeChannel(this.test_channel);
     }
 
     /***************************************************************************
