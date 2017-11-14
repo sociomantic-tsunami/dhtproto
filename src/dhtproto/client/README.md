@@ -56,6 +56,8 @@ The DHT supports the following requests (links to the API modules):
 * [`Mirror`](request/Mirror.d):
   receive a stream of updates (additions, changes, deletions) to records in a
   channel, including a periodic "refresh" of all records in the channel.
+* [`RemoveChannel`](request/RemoveChannel.d):
+  removes a channel from the DHT, discarding all records in it.
 
 ### Assigning Requests
 
