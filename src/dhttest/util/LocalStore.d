@@ -323,6 +323,7 @@ public struct NeoVerifier
 
         this.verifyGetChannels(dht, channel);
         this.verifyGet(dht, channel);
+        this.verifyExists(dht, channel);
         this.verifyGetAll(dht, channel);
         this.verifyGetAllKeysOnly(dht, channel);
         this.verifyGetAllFilter(dht, channel);
@@ -348,9 +349,34 @@ public struct NeoVerifier
         foreach ( k, v; this.local.data )
         {
             void[] buf;
-            auto res = dht.blocking.get(channel.dup, k, buf);
+            auto res = dht.blocking.get(channel, k, buf);
             test(res.succeeded);
             test!("==")(res.value, v);
+        }
+    }
+
+    /***************************************************************************
+
+        Checks for the presence in the DHT of all records in the local store,
+        using DHT Exists requests.
+
+        Params:
+            dht = DHT client to use to perform tests
+            channel = name of channel to compare against in DHT
+
+        Throws:
+            TestException upon verification failure
+
+    ***************************************************************************/
+
+    private void verifyExists ( DhtClient dht, cstring channel )
+    {
+        log.trace("\tVerifying channel with Exists");
+        foreach ( k, v; this.local.data )
+        {
+            auto res = dht.blocking.exists(channel, k);
+            test(res.succeeded);
+            test(res.exists);
         }
     }
 
@@ -400,7 +426,7 @@ public struct NeoVerifier
             }
         }
 
-        dht.neo.getAll(channel.dup, &notifier);
+        dht.neo.getAll(channel, &notifier);
         task.suspend();
 
         test(!duplicate);
@@ -487,7 +513,7 @@ public struct NeoVerifier
 
         DhtClient.Neo.GetAll.Settings settings;
         settings.keys_only = true;
-        dht.neo.getAll(channel.dup, &notifier, settings);
+        dht.neo.getAll(channel, &notifier, settings);
         task.suspend();
 
         test(!duplicate);
@@ -551,7 +577,7 @@ public struct NeoVerifier
 
         DhtClient.Neo.GetAll.Settings settings;
         settings.value_filter = cast(void[])filter;
-        dht.neo.getAll(channel.dup, &notifier, settings);
+        dht.neo.getAll(channel, &notifier, settings);
         task.suspend();
 
         test(!duplicate);
