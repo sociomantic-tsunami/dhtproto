@@ -20,5 +20,6 @@ public enum RequestCode : ubyte
     Get,
     Mirror,
     GetAll,
-    GetChannels
+    GetChannels,
+    Exists
 }
