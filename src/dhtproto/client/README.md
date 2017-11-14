@@ -45,6 +45,8 @@ The DHT supports the following requests (links to the API modules):
   puts a record key and value to a channel.
 * [`Get`](request/Get.d):
   gets a record, specified by its key, from a channel.
+* [`Exists`](request/Exists.d):
+  checks whether a record, specified by its key, exists in a channel.
 * [`GetAll`](request/GetAll.d):
   gets the keys and values of all records in a channel.
 * [`GetChannels`](request/GetChannels.d):
