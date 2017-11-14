@@ -22,6 +22,7 @@ import Get = fakedht.neo.request.Get;
 import Mirror = fakedht.neo.request.Mirror;
 import GetAll = fakedht.neo.request.GetAll;
 import GetChannels = fakedht.neo.request.GetChannels;
+import Exists = fakedht.neo.request.Exists;
 
 /*******************************************************************************
 
@@ -41,4 +42,5 @@ static this ( )
     requests.add(RequestCode.Mirror, "Mirror", &Mirror.handle);
     requests.add(RequestCode.GetAll, "GetAll", &GetAll.handle);
     requests.add(RequestCode.GetChannels, "GetChannels", &GetChannels.handle);
+    requests.add(RequestCode.Exists, "Exists", &Exists.handle);
 }
