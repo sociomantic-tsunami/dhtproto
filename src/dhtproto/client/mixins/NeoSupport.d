@@ -88,6 +88,7 @@ template NeoSupport ( )
         public import Mirror = dhtproto.client.request.Mirror;
         public import GetAll = dhtproto.client.request.GetAll;
         public import GetChannels = dhtproto.client.request.GetChannels;
+        public import Exists = dhtproto.client.request.Exists;
 
         /***********************************************************************
 
@@ -103,6 +104,7 @@ template NeoSupport ( )
             import dhtproto.client.request.internal.Mirror;
             import dhtproto.client.request.internal.GetAll;
             import dhtproto.client.request.internal.GetChannels;
+            import dhtproto.client.request.internal.Exists;
         }
 
         /***********************************************************************
@@ -147,7 +149,7 @@ template NeoSupport ( )
         ***********************************************************************/
 
         public alias RequestStatsTemplate!("Get", "Put", "Mirror", "GetAll",
-            "GetChannels") RequestStats;
+            "GetChannels", "Exists") RequestStats;
 
         /***********************************************************************
 
@@ -251,6 +253,40 @@ template NeoSupport ( )
                 }
             );
 
+            return id;
+        }
+
+        /***********************************************************************
+
+            Assigns an Exists request, checking for the presence of a record in
+            the specified channel.
+            See $(LINK2 dhtproto/client/request/Exists.html, dhtproto.client.request.Exists)
+            for detailed documentation.
+
+            Params:
+                channel = name of the channel to check in
+                key = hash of the record to check for
+                notifier = notifier delegate
+
+            Returns:
+                id of newly assigned request
+
+            Throws:
+                NoMoreRequests if the pool of active requests is full
+
+        ***********************************************************************/
+
+        public RequestId exists ( Options ... ) ( cstring channel, hash_t key,
+            Exists.Notifier notifier, Options options )
+        {
+            auto params = Const!(Internals.Exists.UserSpecifiedParams)(
+                Const!(Exists.Args)(channel, key),
+                Const!(Internals.Exists.UserSpecifiedParams.SerializedNotifier)(
+                    *(cast(Const!(ubyte[notifier.sizeof])*)&notifier)
+                )
+            );
+
+            auto id = this.assign!(Internals.Exists)(params);
             return id;
         }
 
@@ -896,6 +932,145 @@ template NeoSupport ( )
             assert(state != state.None);
 
             res.succeeded = state == state.Succeeded;
+            return res;
+        }
+
+        /***********************************************************************
+
+            Assigns an Exists request and blocks the current Task until the
+            request is completed. See
+            $(LINK2 dhtproto/client/request/Exists.html, dhtproto.client.request.Exists)
+            for detailed documentation.
+
+            Params:
+                channel = name of the channel to check in
+                key = hash of the record to check for
+                user_notifier = notifier delegate
+
+        ***********************************************************************/
+
+        public void exists ( cstring channel, hash_t key,
+            Neo.Exists.Notifier user_notifier )
+        in
+        {
+            assert(user_notifier !is null);
+        }
+        body
+        {
+            auto task = Task.getThis();
+            assert(task, "This method may only be called from inside a Task");
+
+            bool finished;
+
+            void notifier ( Neo.Exists.Notification info, Neo.Exists.Args args )
+            {
+                user_notifier(info, args);
+
+                // All Exists notifications indicate that the request has
+                // finished (no need to switch)
+                finished = true;
+                if ( task.suspended )
+                    task.resume();
+            }
+
+            this.outer.neo.exists(channel, key, &notifier);
+            if ( !finished ) // if request not completed, suspend
+                task.suspend();
+            assert(finished);
+        }
+
+        /***********************************************************************
+
+            Struct returned after an Exists request has finished.
+
+        ***********************************************************************/
+
+        private static struct ExistsResult
+        {
+            /*******************************************************************
+
+                Set to true if no error occurred.
+
+            *******************************************************************/
+
+            bool succeeded;
+
+            /*******************************************************************
+
+                If the request succeeded, stores the result of the request.
+
+            *******************************************************************/
+
+            bool exists;
+        }
+
+        /***********************************************************************
+
+            Assigns an Exists request and blocks the current Task until the
+            request is completed. See
+            $(LINK2 dhtproto/client/request/Exists.html, dhtproto.client.request.Exists)
+            for detailed documentation.
+
+            Note that the API of this method is intentionally minimal (e.g. it
+            provides no detailed feedback about errors to the user). If you need
+            more control, use the method above which works via a notifier
+            callback.
+
+            Params:
+                channel = name of the channel to check in
+                key = hash of the record to check for
+
+            Returns:
+                ExistsResult struct, indicating the result of the request
+
+        ***********************************************************************/
+
+        public ExistsResult exists ( cstring channel, hash_t key )
+        {
+            auto task = Task.getThis();
+            assert(task, "This method may only be called from inside a Task");
+
+            bool finished;
+            ExistsResult res;
+
+            void notifier ( Neo.Exists.Notification info, Neo.Exists.Args args )
+            {
+                with ( info.Active ) switch ( info.active )
+                {
+                    case exists:
+                        res.exists = true;
+                        res.succeeded = true;
+                        break;
+
+                    case no_record:
+                        res.exists = false;
+                        res.succeeded = true;
+                        break;
+
+                    case node_disconnected:
+                    case node_error:
+                    case unsupported:
+                    case no_node:
+                    case wrong_node:
+                    case failure:
+                        res.succeeded = false;
+                        break;
+
+                    default: assert(false);
+                }
+
+                // All Exists notifications indicate that the request has
+                // finished.
+                finished = true;
+                if ( task.suspended )
+                    task.resume();
+            }
+
+            this.outer.neo.exists(channel, key, &notifier);
+            if ( !finished ) // if request not completed, suspend
+                task.suspend();
+            assert(finished);
+
             return res;
         }
 
