@@ -146,8 +146,8 @@ template NeoSupport ( )
 
         ***********************************************************************/
 
-        public alias RequestStatsTemplate!("Get", "Put", "Mirror", "GetAll")
-            RequestStats;
+        public alias RequestStatsTemplate!("Get", "Put", "Mirror", "GetAll",
+            "GetChannels") RequestStats;
 
         /***********************************************************************
 
