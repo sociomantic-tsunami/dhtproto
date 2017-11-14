@@ -246,7 +246,7 @@ public struct Get
                         Notification n;
                         n.wrong_node = RequestNodeInfo(context.request_id,conn.remote_address);
                         Get.notify(context.user_params, n);
-                        break;
+                        return false;
 
                     case Error:
                         context.shared_working.result =
