@@ -477,6 +477,124 @@ unittest
     }
 }
 
+/// Example of neo Exists request usage
+unittest
+{
+    class ExistsExample : ExampleApp
+    {
+        override protected void example ( )
+        {
+            // Assign a neo Exists request. Note that the channel is copied
+            // inside the client -- the user does not need to maintain it after
+            // calling this method.
+            this.dht.neo.exists("channel", 0x1234567812345678,
+                &this.existsNotifier);
+        }
+
+        // Notifier which is called when something of interest happens to
+        // the Exists request. See dhtproto.client.request.Exists for
+        // details of the parameters of the notifier.
+        private void existsNotifier ( DhtClient.Neo.Exists.Notification info,
+            DhtClient.Neo.Exists.Args args )
+        {
+            formatNotification(info, this.msg_buf);
+
+            with ( info.Active ) final switch ( info.active )
+            {
+                case exists:
+                    goto case;
+                case no_record:
+                    this.log.trace(this.msg_buf);
+                    break;
+
+                case failure:
+                case no_node:
+                case node_disconnected:
+                case node_error:
+                case wrong_node:
+                case unsupported:
+                    this.log.error(this.msg_buf);
+                    break;
+
+                mixin(handleInvalidCases);
+            }
+        }
+    }
+}
+
+/// Example of Task-blocking neo Exists request usage with a notifier
+unittest
+{
+    class ExistsExample : ExampleApp
+    {
+        override protected void example ( )
+        {
+            // Perform a blocking neo Exists request. Note that the channel is
+            // copied inside the client -- the user does not need to maintain
+            // it after calling this method.
+            this.dht.blocking.exists("channel", 0x1234567812345678,
+                &this.existsNotifier);
+        }
+
+        // Notifier which is called when something of interest happens to
+        // the Exists request. See dhtproto.client.request.Exists for
+        // details of the parameters of the notifier.
+        private void existsNotifier ( DhtClient.Neo.Exists.Notification info,
+            DhtClient.Neo.Exists.Args args )
+        {
+            formatNotification(info, this.msg_buf);
+
+            with ( info.Active ) final switch ( info.active )
+            {
+                case exists:
+                    goto case;
+                case no_record:
+                    this.log.trace(this.msg_buf);
+                    break;
+
+                case failure:
+                case no_node:
+                case node_disconnected:
+                case node_error:
+                case wrong_node:
+                case unsupported:
+                    this.log.error(this.msg_buf);
+                    break;
+
+                mixin(handleInvalidCases);
+            }
+        }
+    }
+}
+
+/// Example of simple Task-blocking neo Exists request usage without a notifier
+unittest
+{
+    class ExistsExample : ExampleApp
+    {
+        override protected void example ( )
+        {
+            // Perform a blocking neo Exists request and return a result struct
+            // indicating success/failure. Notes:
+            // 1. In a real application, you probably want more information than
+            //    just success/failure and should use the task-blocking method
+            //    with a notifier (see example above).
+            // 2. The channel is copied inside the client -- the user does not
+            //    need to maintain it after calling this method.
+            auto result = this.dht.blocking.exists("channel", 0x1234567812345678);
+            if ( result.succeeded )
+            {
+                if ( result.exists )
+                    this.log.trace("Exists succeeded: record exists");
+                else
+                    this.log.trace("Exists succeeded: no record");
+            }
+            else
+                this.log.error("Exists failed");
+        }
+    }
+}
+
 /// Example of neo Mirror request usage
 unittest
 {
