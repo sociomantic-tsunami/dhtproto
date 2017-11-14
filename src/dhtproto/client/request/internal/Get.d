@@ -124,7 +124,7 @@ public struct Get
         FIXME: Note that the logic for retrying the request on other nodes which
         previously covered the hash has not been properly tested. This will
         require a full neo implementation of the Redistribute request. See
-        https://github.com/sociomantic/dhtnode/issues/624
+        https://github.com/sociomantic-tsunami/dhtnode/issues/21
 
         Params:
             use_node = delegate to get an EventDispatcher for the node with the
@@ -177,7 +177,9 @@ public struct Get
 
         Returns:
             true to try another node, false if finished (the record was fetched
-            or an error occurred)
+            or an error occurred). All error cases abort the request (return
+            false), as it is not possible to know if the node where the error
+            occurred has the record or not.
 
     ***************************************************************************/
 

@@ -111,8 +111,8 @@ public abstract scope class GetProtocol_v0
         Gets a single record from the storage engine.
 
         Params:
-            channel = channel to write to
-            key = key of record to write
+            channel = channel to read from
+            key = key of record to read
             value = buffer to receive record value. If the record does not exist
                 in the storage engine, value.length must be set to 0
 

@@ -8,8 +8,9 @@
            the key of the record to be read.
         2. A request is sent to the selected node, asking for the specified
            record in the specified channel to be returned.
-        3. The request ends when either the record is read from the node or the
-           node could not handle the request due to an error.
+        3. The request ends when either the record is read from the node, is
+           found to not exist, or the node could not handle the request due to
+           an error.
 
     During a data redistribution, more than one node may be responsible for a
     given key. In this case, the node which was most recently reported as being
