@@ -132,6 +132,7 @@ public abstract scope class GetHashRangeProtocol_v0
                 payload.add(max);
             }
         );
+        ed.flush();
 
         while ( true )
         {

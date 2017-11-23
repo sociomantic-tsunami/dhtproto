@@ -72,6 +72,7 @@ public abstract scope class PutProtocol_v0
                 payload.add(response);
             }
         );
+        ed.flush();
     }
 
     /***************************************************************************
