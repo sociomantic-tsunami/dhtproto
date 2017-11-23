@@ -150,6 +150,7 @@ public abstract scope class GetAllProtocol_v0
                     ? RequestStatusCode.Started : RequestStatusCode.Error);
             }
         );
+        this.connection.event_dispatcher.flush();
 
         if ( !ok )
             return;
@@ -395,6 +396,9 @@ public abstract scope class GetAllProtocol_v0
                     payload.addArray(*this.outer.compressed_batch);
                 }
             );
+            // flush() does not suspend the fiber, so is safe to call in a
+            // RequestEventDispatcher-managed request.
+            this.outer.connection.event_dispatcher.flush();
         }
     }
 
