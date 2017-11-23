@@ -322,6 +322,7 @@ private scope class Handler
                 payload.add(GetHashRange.cmd.ver);
             }
         );
+        this.conn.flush();
 
         // Receive status from node and stop the request if not Ok
         auto status = conn.receiveValue!(StatusCode)();
