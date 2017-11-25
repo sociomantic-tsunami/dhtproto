@@ -53,43 +53,50 @@ public abstract scope class GetProtocol_v0
         auto channel = ed.message_parser.getArray!(char)(msg_payload);
         auto key = *ed.message_parser.getValue!(hash_t)(msg_payload);
 
-        MessageType response;
-
-        // Check record key and read from channel, if ok.
-        void[]* value;
-        if ( this.responsibleForKey(key) )
+        void sendResponse ( MessageType status_code,
+            void delegate ( ed.Payload ) extra = null )
         {
-            value = this.resources.getVoidBuffer();
-            if ( this.get(channel, key, *value) )
-                response = value.length
-                    ? MessageType.Got : MessageType.NoRecord;
-            else
-                response = MessageType.Error;
-        }
-        else
-            response = MessageType.WrongNode;
-
-        // Send status code
-        ed.send(
-            ( ed.Payload payload )
-            {
-                payload.add(response);
-            }
-        );
-
-        // Send value, if retrieved
-        if ( response == MessageType.Got )
-        {
-            assert(value !is null);
-            assert(value.length);
-
             ed.send(
                 ( ed.Payload payload )
                 {
-                    payload.addArray(*value);
+                    payload.add(status_code);
                 }
             );
+
+            // TODO: this could be sent in the same message as the status code,
+            // above. (Client would need to be adaptated.)
+            if ( extra !is null )
+                ed.send(extra);
         }
+
+        // Check record key and read from channel, if ok.
+        if ( this.responsibleForKey(key) )
+        {
+            bool sent;
+            auto ok = this.get(channel, key,
+                ( Const!(void)[] value )
+                {
+                    assert(value !is null);
+                    assert(value.length);
+
+                    sendResponse(MessageType.Got,
+                        ( ed.Payload payload )
+                        {
+                            payload.addArray(value);
+                        }
+                    );
+
+                    sent = true;
+                }
+            );
+
+            if ( !sent )
+                sendResponse(ok ? MessageType.NoRecord
+                                : MessageType.Error);
+        }
+        else
+            sendResponse(MessageType.WrongNode);
+
         ed.flush();
     }
 
@@ -114,8 +121,7 @@ public abstract scope class GetProtocol_v0
         Params:
             channel = channel to read from
             key = key of record to read
-            value = buffer to receive record value. If the record does not exist
-                in the storage engine, value.length must be set to 0
+            dg = called with the value of the record, if it exists
 
         Returns:
             true if the operation succeeded (the record was fetched or did not
@@ -123,5 +129,6 @@ public abstract scope class GetProtocol_v0
 
     ***************************************************************************/
 
-    abstract protected bool get ( cstring channel, hash_t key, ref void[] value );
+    abstract protected bool get ( cstring channel, hash_t key,
+        void delegate ( Const!(void)[] value ) dg );
 }

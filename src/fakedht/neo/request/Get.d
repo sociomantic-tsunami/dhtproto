@@ -123,8 +123,7 @@ private scope class GetImpl_v0 : GetProtocol_v0
         Params:
             channel = channel to read from
             key = key of record to read
-            value = buffer to receive record value. If the record does not exist
-                in the storage engine, value.length must be set to 0
+            dg = called with the value of the record, if it exists
 
         Returns:
             true if the operation succeeded (the record was fetched or did not
@@ -132,10 +131,12 @@ private scope class GetImpl_v0 : GetProtocol_v0
 
     ***************************************************************************/
 
-    override protected bool get ( cstring channel, hash_t key, ref void[] value )
+    override protected bool get ( cstring channel, hash_t key,
+        void delegate ( Const!(void)[] value ) dg )
     {
         auto value_in_channel = global_storage.getCreate(channel).get(key);
-        value.copy(value_in_channel);
+        if ( value_in_channel !is null )
+            dg(value_in_channel);
         return true;
     }
 }
