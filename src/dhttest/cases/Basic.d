@@ -18,6 +18,7 @@ module dhttest.cases.Basic;
 
 *******************************************************************************/
 
+import ocean.core.Test;
 import ocean.transition;
 
 import dhttest.DhtTestCase;
