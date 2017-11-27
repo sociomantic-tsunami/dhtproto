@@ -53,7 +53,7 @@ class MyTurtleTests : TurtleRunnerTask!(TestedAppKind.Daemon)
 
 class ExpectRecordChange_Missing : TestCase
 {
-    import ocean.core.Test;
+    import Ocean = ocean.core.Test;
 
     override public Description description ( )
     {
@@ -64,13 +64,13 @@ class ExpectRecordChange_Missing : TestCase
     {
         dht.put("test_channel1", 0xBEE, "bzzzzz"[]);
         dht.expectRecordChange("test_channel2", 0xBEE);
-        test!("==")(dht.get("test_channel2", 0xBEE), "bzzzzz"[]);
+        Ocean.test!("==")(dht.get("test_channel2", 0xBEE), "bzzzzz"[]);
     }
 }
 
 class ExpectRecordChange_Replaced : TestCase
 {
-    import ocean.core.Test;
+    import Ocean = ocean.core.Test;
 
     override public Description description ( )
     {
@@ -82,7 +82,7 @@ class ExpectRecordChange_Replaced : TestCase
         dht.put("test_channel1", 0xBEE, "bzzzzz"[]);
         dht.put("test_channel2", 0xBEE, "meow"[]);
         dht.expectRecordChange("test_channel2", 0xBEE);
-        test!("==")(dht.get("test_channel2", 0xBEE), "bzzzzz"[]);
+        Ocean.test!("==")(dht.get("test_channel2", 0xBEE), "bzzzzz"[]);
     }
 }
 

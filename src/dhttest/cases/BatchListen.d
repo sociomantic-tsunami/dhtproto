@@ -31,6 +31,8 @@ class BatchListenTest : DhtTestCase
 {
     import dhttest.util.Record;
 
+    import ocean.core.Test;
+
     public override Description description ( )
     {
         Description desc;
@@ -60,4 +62,3 @@ class BatchListenTest : DhtTestCase
         }
     }
 }
-
