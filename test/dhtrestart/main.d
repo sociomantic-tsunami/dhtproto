@@ -61,7 +61,7 @@ class RestartWithListeners : TestCase
 {
     import turtle.env.Dht;
 
-    import ocean.core.Test;
+    import Ocean = ocean.core.Test;
     import ocean.task.util.Timer;
 
     override void run ( )
@@ -77,6 +77,6 @@ class RestartWithListeners : TestCase
         dht.put("test_channel1", 0xABCD, "value2");
         wait(100_000); // small delay to ensure fakedht manages to process
                        // `Put` request to "test_channel2"
-        test!("==")(dht.get!(cstring)("test_channel2", 0xABCD), "value2");
+        Ocean.test!("==")(dht.get!(cstring)("test_channel2", 0xABCD), "value2");
     }
 }
