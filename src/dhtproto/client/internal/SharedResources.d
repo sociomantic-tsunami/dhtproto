@@ -137,6 +137,9 @@ public final class SharedResources
 
     public class RequestResources
     {
+        /// Set of acquired buffers
+        private AcquiredArraysOf!(void) acquired_buffers;
+
         /// Set of acquired buffers of NodeHashRange
         private AcquiredArraysOf!(NodeHashRange) acquired_node_hash_range_buffers;
 
@@ -158,6 +161,7 @@ public final class SharedResources
 
         this ( )
         {
+            this.acquired_buffers.initialise(this.outer.buffers);
             this.acquired_node_hash_range_buffers.initialise(this.outer.buffers);
             this.acquired_request_event_dispatcher.initialise(
                 this.outer.request_event_dispatchers);
@@ -175,10 +179,24 @@ public final class SharedResources
 
         ~this ( )
         {
+            this.acquired_buffers.relinquishAll();
             this.acquired_node_hash_range_buffers.relinquishAll();
             this.acquired_request_event_dispatcher.relinquish();
             this.acquired_fibers.relinquishAll();
             this.acquired_record_batches.relinquishAll();
+        }
+
+        /***********************************************************************
+
+            Returns:
+                a pointer to a new chunk of memory (a void[]) to use during the
+                request's lifetime
+
+        ***********************************************************************/
+
+        public void[]* getVoidBuffer ( )
+        {
+            return this.acquired_buffers.acquire();
         }
 
         /***********************************************************************
