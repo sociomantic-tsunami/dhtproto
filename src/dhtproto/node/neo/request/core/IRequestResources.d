@@ -20,6 +20,17 @@ public interface IRequestResources
     import swarm.neo.request.RequestEventDispatcher;
     import swarm.neo.util.MessageFiber;
     import swarm.util.RecordBatcher;
+    import ocean.io.compress.Lzo;
+
+    /***************************************************************************
+
+        Returns:
+            a shared LZO instance
+
+    ***************************************************************************/
+
+    Lzo lzo ( );
+
 
     /***************************************************************************
 
