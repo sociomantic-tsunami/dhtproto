@@ -189,6 +189,18 @@ public final class SharedResources
         /***********************************************************************
 
             Returns:
+                a shared LZO instance
+
+        ***********************************************************************/
+
+        public Lzo lzo ( )
+        {
+            return this.outer.lzo;
+        }
+
+        /***********************************************************************
+
+            Returns:
                 a pointer to a new chunk of memory (a void[]) to use during the
                 request's lifetime
 
