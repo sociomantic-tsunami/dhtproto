@@ -140,6 +140,9 @@ public final class SharedResources
         /// Set of acquired buffers
         private AcquiredArraysOf!(void) acquired_buffers;
 
+        /// Set of acquired arrays of buffer slices
+        private AcquiredArraysOf!(void[]) acquired_buffer_lists;
+
         /// Set of acquired buffers of NodeHashRange
         private AcquiredArraysOf!(NodeHashRange) acquired_node_hash_range_buffers;
 
@@ -162,6 +165,7 @@ public final class SharedResources
         this ( )
         {
             this.acquired_buffers.initialise(this.outer.buffers);
+            this.acquired_buffer_lists.initialise(this.outer.buffers);
             this.acquired_node_hash_range_buffers.initialise(this.outer.buffers);
             this.acquired_request_event_dispatcher.initialise(
                 this.outer.request_event_dispatchers);
@@ -180,6 +184,7 @@ public final class SharedResources
         ~this ( )
         {
             this.acquired_buffers.relinquishAll();
+            this.acquired_buffer_lists.relinquishAll();
             this.acquired_node_hash_range_buffers.relinquishAll();
             this.acquired_request_event_dispatcher.relinquish();
             this.acquired_fibers.relinquishAll();
@@ -209,6 +214,20 @@ public final class SharedResources
         public void[]* getVoidBuffer ( )
         {
             return this.acquired_buffers.acquire();
+        }
+
+        /***********************************************************************
+
+            Returns:
+                a void[] wrapped as an array of void[] (slices). The individual
+                slices that are added to the array should be acquired using
+                getVoidBuffer().
+
+        ***********************************************************************/
+
+        public VoidBufferAsArrayOf!(void[]) getBufferList ( )
+        {
+            return this.acquired_buffer_lists.acquireWrapped();
         }
 
         /***********************************************************************

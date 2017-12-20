@@ -62,8 +62,58 @@ public struct GetChannels
 
     private static struct SharedWorking
     {
+        import ocean.core.array.Mutation : copy;
+        import ocean.core.array.Search : contains;
+        import swarm.neo.util.VoidBufferAsArrayOf;
+
         /// Shared working data required for core all-nodes request behaviour.
         AllNodesRequestSharedWorkingData all_nodes;
+
+        /// Pointer to a list of the channel names that the client has already
+        /// been notified of.
+        VoidBufferAsArrayOf!(void[]) notified_channels;
+
+        /***********************************************************************
+
+            Informs the caller whether the user should be notified about the
+            specified channel name, ensuring that the user is told about each
+            channel only once.
+
+            Params:
+                channel = name of the channel
+                resources = request resource acquirer
+
+            Returns:
+                true if the notifier should be called
+
+        ***********************************************************************/
+
+        bool shouldNotifyChannel ( Const!(void)[] channel,
+            SharedResources.RequestResources resources )
+        {
+            bool already_notified = false;
+
+            // Acquire the array of channel name slices that is shared by all
+            // RoCs, if it's not already acquired.
+            if ( this.notified_channels == typeof(this.notified_channels).init )
+                this.notified_channels = resources.getBufferList();
+            else
+                already_notified =
+                    (this.notified_channels.array().contains(channel) == true);
+
+            // If this channel name has not been seen before, copy it into a new
+            // buffer and add a slice to that buffer to the array of channel
+            // name slices (this.notified_channels).
+            if ( !already_notified )
+            {
+                auto buf = resources.getVoidBuffer();
+                auto void_channel = cast(void[])channel;
+                (*buf).copy(void_channel);
+                this.notified_channels ~= cast(char[])(*buf);
+            }
+
+            return !already_notified;
+        }
     }
 
     /***************************************************************************
@@ -326,10 +376,15 @@ private scope class GetChannelsHandler
             case ChannelName:
                 Const!(void)[] channel;
                 this.conn.message_parser.parseBody(payload, channel);
-                Notification notification;
-                notification.received =
-                    RequestDataInfo(context.request_id, channel);
-                GetChannels.notify(this.context.user_params, notification);
+
+                if ( this.context.shared_working.shouldNotifyChannel(channel,
+                    this.resources) )
+                {
+                    Notification notification;
+                    notification.received =
+                        RequestDataInfo(context.request_id, channel);
+                    GetChannels.notify(this.context.user_params, notification);
+                }
                 break;
 
             case Error:
