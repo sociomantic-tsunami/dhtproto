@@ -58,7 +58,7 @@ public void handle ( Object shared_resources, RequestOnConn connection,
             ed.send(
                 ( ed.Payload payload )
                 {
-                    payload.addConstant(GlobalStatusCode.RequestVersionNotSupported);
+                    payload.addConstant(SupportedStatus.RequestVersionNotSupported);
                 }
             );
             break;

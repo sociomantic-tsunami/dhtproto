@@ -134,7 +134,7 @@ public struct Put
         context.shared_working.result = SharedWorking.Result.Failure;
 
         auto shared_resources = SharedResources.fromObject(
-            context.request_resources.get());
+            context.shared_resources);
         scope acquired_resources = shared_resources.new RequestResources;
 
         if ( context.user_params.args.value.length > MaxRecordSize )

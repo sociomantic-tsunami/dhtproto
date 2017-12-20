@@ -211,7 +211,7 @@ public struct GetHashRange
 private scope class Handler
 {
     import swarm.neo.util.StateMachine;
-    import swarm.neo.request.Command : StatusCode, GlobalStatusCode;
+    import swarm.neo.request.Command : StatusCode, SupportedStatus;
     import swarm.neo.AddrPort;
     import swarm.neo.client.RequestOnConn;
     import dhtproto.common.RequestCodes;
@@ -331,13 +331,13 @@ private scope class Handler
             case RequestStatusCode.Started:
                 break;
 
-            case GlobalStatusCode.RequestNotSupported:
+            case SupportedStatus.RequestNotSupported:
                 log.error("Node {}:{} returned a request not supported status to GetHashRange",
                     this.conn.remote_address.address_bytes,
                     this.conn.remote_address.port);
                 return State.Exit;
 
-            case GlobalStatusCode.RequestVersionNotSupported:
+            case SupportedStatus.RequestVersionNotSupported:
                 log.error("Node {}:{} returned a request version not supported status to GetHashRange",
                     this.conn.remote_address.address_bytes,
                     this.conn.remote_address.port);
@@ -367,7 +367,7 @@ private scope class Handler
             }
         );
         auto shared_resources = SharedResources.fromObject(
-            this.context.request_resources.get());
+            this.context.shared_resources);
         shared_resources.node_hash_ranges.updateNodeHashRange(
             this.conn.remote_address, min, max);
 
@@ -408,7 +408,7 @@ private scope class Handler
                             addr, port, min, max);
 
                         auto shared_resources = SharedResources.fromObject(
-                            this.context.request_resources.get());
+                            this.context.shared_resources);
                         shared_resources.node_hash_ranges.updateNodeHashRange(
                             AddrPort(addr, port), min, max);
                         break;
@@ -419,7 +419,7 @@ private scope class Handler
                             new_min, new_max);
 
                         auto shared_resources = SharedResources.fromObject(
-                            this.context.request_resources.get());
+                            this.context.shared_resources);
                         shared_resources.node_hash_ranges.updateNodeHashRange(
                             this.conn.remote_address, new_min, new_max);
                         break;

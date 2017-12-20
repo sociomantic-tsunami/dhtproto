@@ -1319,7 +1319,8 @@ template NeoSupport ( )
         this.user_conn_notifier = user_conn_notifier;
 
         this.shared_resources = new SharedResources;
-        this.neo = new Neo(config, &this.connNotifier, this.shared_resources);
+        this.neo = new Neo(config,
+            Neo.Settings(&this.connNotifier, this.shared_resources));
         auto node_hash_ranges = new NodeHashRanges(this.neo.connections,
             &this.hashRangeNotifier);
         this.shared_resources.setNodeHashRanges(node_hash_ranges);
@@ -1360,8 +1361,8 @@ template NeoSupport ( )
         this.user_conn_notifier = user_conn_notifier;
 
         this.shared_resources = new SharedResources;
-        this.neo = new Neo(auth_name, auth_key, &this.connNotifier,
-            this.shared_resources);
+        this.neo = new Neo(auth_name, auth_key,
+            Neo.Settings(&this.connNotifier, this.shared_resources));
         auto node_hash_ranges = new NodeHashRanges(this.neo.connections,
             &this.hashRangeNotifier);
         this.shared_resources.setNodeHashRanges(node_hash_ranges);

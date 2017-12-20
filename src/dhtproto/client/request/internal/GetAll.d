@@ -122,7 +122,7 @@ public struct GetAll
         auto context = GetAll.getContext(context_blob);
 
         auto shared_resources = SharedResources.fromObject(
-            context.request_resources.get());
+            context.shared_resources);
         scope acquired_resources = shared_resources.new RequestResources;
 
         scope handler = new GetAllHandler(conn, context, acquired_resources);
