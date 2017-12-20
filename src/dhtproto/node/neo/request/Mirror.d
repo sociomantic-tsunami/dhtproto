@@ -314,7 +314,8 @@ public abstract scope class MirrorProtocol_v0
         ChannelRemoved = 2,
         PeriodicRefresh = 3,
         RefreshQueueEmptied = 4,
-        QueueOverflowNotification = 5
+        QueueOverflowNotification = 5,
+        ResumeAfterSuspension = 6
     }
 
     /// If true, the request, upon starting, will immediately send all records
@@ -615,7 +616,10 @@ public abstract scope class MirrorProtocol_v0
         public this ( )
         {
             this.fiber = this.outer.resources.getFiber(&this.fiberMethod);
-            this.suspender = DelayedSuspender(this.fiber);
+            this.suspender = DelayedSuspender(
+                this.outer.resources.request_event_dispatcher,
+                this.outer.connection.event_dispatcher,
+                this.fiber, NodeFiberResumeCode.ResumeAfterSuspension);
         }
 
         /***********************************************************************
@@ -1004,7 +1008,10 @@ public abstract scope class MirrorProtocol_v0
         public this ( )
         {
             this.fiber = this.outer.resources.getFiber(&this.fiberMethod);
-            this.suspender = DelayedSuspender(this.fiber);
+            this.suspender = DelayedSuspender(
+                this.outer.resources.request_event_dispatcher,
+                this.outer.connection.event_dispatcher,
+                this.fiber, NodeFiberResumeCode.ResumeAfterSuspension);
         }
 
         /***********************************************************************

@@ -259,6 +259,9 @@ public abstract scope class GetAllProtocol_v0
         /// suspended.
         public DelayedSuspender suspender;
 
+        /// Fiber resume code used to resume DelayedSuspender.
+        private const ResumeAfterSuspension = 1;
+
         /***********************************************************************
 
             Constructor. Gets a fiber from the shared resources.
@@ -268,7 +271,10 @@ public abstract scope class GetAllProtocol_v0
         public this ( )
         {
             this.fiber = this.outer.resources.getFiber(&this.fiberMethod);
-            this.suspender = DelayedSuspender(this.fiber);
+            this.suspender = DelayedSuspender(
+                this.outer.resources.request_event_dispatcher,
+                this.outer.connection.event_dispatcher,
+                this.fiber, ResumeAfterSuspension);
         }
 
         /***********************************************************************
