@@ -25,6 +25,7 @@ public abstract scope class MirrorProtocol_v0
     import swarm.neo.node.RequestOnConn;
     import swarm.neo.connection.RequestOnConnBase;
     import swarm.neo.request.RequestEventDispatcher;
+    import swarm.neo.util.Batch;
     import swarm.neo.util.MessageFiber;
     import dhtproto.common.Mirror;
     import dhtproto.node.neo.request.core.Mixins;
@@ -247,6 +248,17 @@ public abstract scope class MirrorProtocol_v0
     /// Queue of refreshed records.
     private Queue!(hash_t) refresh_queue;
 
+    /// Batch of refreshed records. (Refreshed records are sent in batches as an
+    /// optimisation, as they always occur in floods. For the client, handling a
+    /// batch of records is much more efficient than handling a stream of
+    /// individual records, as it reduces the number of fiber switches.)
+    private BatchWriter!(hash_t, void[]) refresh_batch;
+
+    /// Backing array for the batch writer.
+    // FIXME: We only need to store this array slice separately here as the
+    // batch writer has no way of returning a reference to it.
+    private void[]* refresh_batch_buffer;
+
     /// Struct wrapping fields and logic for counting queue overflows and
     /// deciding when to notify the client that overflows have occurred.
     private struct UpdateQueueOverflows
@@ -383,6 +395,10 @@ public abstract scope class MirrorProtocol_v0
         this.value_buffer = this.resources.getVoidBuffer();
         this.update_queue.initialise(*this.resources.getVoidBuffer());
         this.refresh_queue.initialise(*this.resources.getVoidBuffer());
+        const max_batch_size = 64 * 1024; // TODO: read from config
+        this.refresh_batch_buffer = this.resources.getVoidBuffer();
+        this.refresh_batch.initialise(this.refresh_batch_buffer,
+            max_batch_size);
 
         // Start the three fibers which form the request handling logic.
         scope writer_ = new Writer;
@@ -732,7 +748,9 @@ public abstract scope class MirrorProtocol_v0
 
         /***********************************************************************
 
-            Sends the next element in the refresh queue.
+            Adds the next element in the refresh queue to the output batch and
+            sends the batch either when it is full or the refresh queue is
+            empty.
 
         ***********************************************************************/
 
@@ -743,17 +761,40 @@ public abstract scope class MirrorProtocol_v0
         }
         body
         {
+            void sendBatch ( )
+            {
+                this.outer.resources.request_event_dispatcher.send(this.fiber,
+                    ( RequestOnConnBase.EventDispatcher.Payload payload )
+                    {
+                        payload.addConstant(MessageType.RecordRefreshBatch);
+                        // TODO send compressed
+                        payload.addArray(*this.outer.refresh_batch_buffer);
+                    }
+                );
+            }
+
             auto key = this.outer.refresh_queue.pop();
+
             if ( this.outer.getRecordValue(key,
                 *this.outer.value_buffer) !is null )
             {
-                this.sendRecordRefreshed(key, *this.outer.value_buffer);
+                this.outer.refresh_batch.add(key, *this.outer.value_buffer,
+                    &sendBatch);
             }
             // else: the record no longer exists; just ignore
 
-            // Let the refresh fiber know when the refresh queue is emptied.
             if ( this.outer.refresh_queue.length == 0 )
+            {
+                // Send any pending batch.
+                if ( this.outer.refresh_batch.get().length )
+                {
+                    sendBatch();
+                    this.outer.refresh_batch.clear();
+                }
+
+                // Let the refresh fiber know when the refresh queue is emptied.
                 this.outer.periodic_refresh.queueFlushed();
+            }
         }
 
         /***********************************************************************
@@ -773,29 +814,6 @@ public abstract scope class MirrorProtocol_v0
                 ( RequestOnConnBase.EventDispatcher.Payload payload )
                 {
                     payload.addConstant(MessageType.RecordChanged);
-                    payload.add(key);
-                    payload.addArray(value);
-                }
-            );
-        }
-
-        /***********************************************************************
-
-            Sends a message to the client, informing it that a record value has
-            been refreshed.
-
-            Params:
-                key = key of record which was refreshed
-                value = value of record
-
-        ***********************************************************************/
-
-        private void sendRecordRefreshed ( hash_t key, Const!(void)[] value )
-        {
-            this.outer.resources.request_event_dispatcher.send(this.fiber,
-                ( RequestOnConnBase.EventDispatcher.Payload payload )
-                {
-                    payload.addConstant(MessageType.RecordRefresh);
                     payload.add(key);
                     payload.addArray(value);
                 }

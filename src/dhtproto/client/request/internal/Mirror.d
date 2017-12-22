@@ -375,6 +375,8 @@ private scope class MirrorHandler
 
     private class Reader
     {
+        import swarm.neo.util.Batch;
+
         /// Fiber.
         private MessageFiber fiber;
 
@@ -404,7 +406,7 @@ private scope class MirrorHandler
                 auto msg = this.outer.resources.request_event_dispatcher.receive(
                     this.fiber,
                     Message(MessageType.RecordChanged),
-                    Message(MessageType.RecordRefresh),
+                    Message(MessageType.RecordRefreshBatch),
                     Message(MessageType.RecordDeleted),
                     Message(MessageType.ChannelRemoved),
                     Message(MessageType.UpdateOverflow));
@@ -427,13 +429,11 @@ private scope class MirrorHandler
                         this.recordDeleted(key);
                         break;
 
-                    case RecordRefresh:
-                        auto key = *this.outer.conn.message_parser.
-                            getValue!(hash_t)(msg.payload);
-                        auto value = this.outer.conn.message_parser.
+                    case RecordRefreshBatch:
+                        auto batch = this.outer.conn.message_parser.
                             getArray!(void)(msg.payload);
 
-                        this.recordRefreshed(key, value);
+                        this.recordRefreshedBatch(batch);
                         break;
 
                     case ChannelRemoved:
@@ -493,20 +493,24 @@ private scope class MirrorHandler
 
         /***********************************************************************
 
-            Notifies the user that a record has been refreshed.
+            Notifies the user of a batch of refreshed records.
 
             Params:
-                key = key of record which was refreshed
-                value = value of refreshed record
+                batch_data = batch of refreshed records
 
         ***********************************************************************/
 
-        private void recordRefreshed ( hash_t key, Const!(void)[] value )
+        private void recordRefreshedBatch ( Const!(void)[] batch_data )
         {
-            Mirror.Notification n;
-            n.refreshed = RequestRecordInfo(
-                this.outer.context.request_id, key, value);
-            this.notify(n);
+            // TODO receive compressed batch
+            scope batch = new BatchReader!(hash_t, Const!(void)[])(batch_data);
+            foreach ( key, value; batch )
+            {
+                Mirror.Notification n;
+                n.refreshed = RequestRecordInfo(
+                    this.outer.context.request_id, key, value);
+                this.notify(n);
+            }
         }
 
         /***********************************************************************
