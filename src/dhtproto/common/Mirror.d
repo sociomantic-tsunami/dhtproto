@@ -55,7 +55,8 @@ public enum MessageType : ubyte
     // Message types sent from the node to the client:
     RecordChanged,  // Sent by the node when it sends a record value
     RecordDeleted,  // Sent by the node when it sends the key of a deleted record
-    RecordRefresh,  // Sent by the node when it sends a record value
+    RecordRefreshBatch, // Sent by the node when it sends a batch of refreshed
+                        // records
     ChannelRemoved, // Sent when the channel being consumed is removed
     UpdateOverflow  // Sent when the queue of updates overflows
 }
