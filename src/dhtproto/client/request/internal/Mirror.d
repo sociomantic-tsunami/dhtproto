@@ -183,6 +183,9 @@ private scope class MirrorHandler
     /// Controller fiber instance.
     private Controller controller;
 
+    /// Batch decompression buffer.
+    private void[]* decompress_buffer;
+
     /***************************************************************************
 
         Constructor.
@@ -326,6 +329,8 @@ private scope class MirrorHandler
 
     private void handle ( )
     {
+        this.decompress_buffer = this.resources.getVoidBuffer();
+
         scope reader_ = new Reader;
         scope controller_ = new Controller;
 
@@ -502,8 +507,9 @@ private scope class MirrorHandler
 
         private void recordRefreshedBatch ( Const!(void)[] batch_data )
         {
-            // TODO receive compressed batch
-            scope batch = new BatchReader!(hash_t, Const!(void)[])(batch_data);
+            scope batch = new BatchReader!(hash_t, Const!(void)[])(
+                this.outer.resources.lzo, batch_data,
+                *this.outer.decompress_buffer);
             foreach ( key, value; batch )
             {
                 Mirror.Notification n;

@@ -254,10 +254,8 @@ public abstract scope class MirrorProtocol_v0
     /// individual records, as it reduces the number of fiber switches.)
     private BatchWriter!(hash_t, void[]) refresh_batch;
 
-    /// Backing array for the batch writer.
-    // FIXME: We only need to store this array slice separately here as the
-    // batch writer has no way of returning a reference to it.
-    private void[]* refresh_batch_buffer;
+    /// Batch compression buffer.
+    private void[]* compress_buffer;
 
     /// Struct wrapping fields and logic for counting queue overflows and
     /// deciding when to notify the client that overflows have occurred.
@@ -396,9 +394,9 @@ public abstract scope class MirrorProtocol_v0
         this.update_queue.initialise(*this.resources.getVoidBuffer());
         this.refresh_queue.initialise(*this.resources.getVoidBuffer());
         const max_batch_size = 64 * 1024; // TODO: read from config
-        this.refresh_batch_buffer = this.resources.getVoidBuffer();
-        this.refresh_batch.initialise(this.refresh_batch_buffer,
+        this.refresh_batch.initialise(this.resources.getVoidBuffer(),
             max_batch_size);
+        this.compress_buffer = this.resources.getVoidBuffer();
 
         // Start the three fibers which form the request handling logic.
         scope writer_ = new Writer;
@@ -767,8 +765,10 @@ public abstract scope class MirrorProtocol_v0
                     ( RequestOnConnBase.EventDispatcher.Payload payload )
                     {
                         payload.addConstant(MessageType.RecordRefreshBatch);
-                        // TODO send compressed
-                        payload.addArray(*this.outer.refresh_batch_buffer);
+                        this.outer.refresh_batch.getCompressed(
+                            this.outer.resources.lzo, *this.outer.compress_buffer
+                        );
+                        payload.addArray(*this.outer.compress_buffer);
                     }
                 );
             }
