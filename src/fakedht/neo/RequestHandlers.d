@@ -22,6 +22,7 @@ import fakedht.neo.request.Put;
 import fakedht.neo.request.Get;
 import fakedht.neo.request.Mirror;
 import fakedht.neo.request.GetAll;
+import fakedht.neo.request.Remove;
 import fakedht.neo.request.GetChannels;
 import fakedht.neo.request.Exists;
 
@@ -43,6 +44,7 @@ static this ( )
     requests.add(Command(RequestCode.Get, 0), "Get", GetImpl_v0.classinfo);
     requests.add(Command(RequestCode.Mirror, 0), "Mirror", MirrorImpl_v0.classinfo);
     requests.add(Command(RequestCode.GetAll, 0), "GetAll", GetAllImpl_v0.classinfo);
+    requests.add(Command(RequestCode.Remove, 0), "Remove", RemoveImpl_v0.classinfo);
     requests.add(Command(RequestCode.GetChannels, 0),
         "GetChannels", GetChannelsImpl_v0.classinfo);
     requests.add(Command(RequestCode.Exists, 0),
