@@ -453,15 +453,26 @@ class Channel
         Params:
             key = key of the record to remove
 
+        Returns:
+            true if the record existed or false if it did not
+
     ***************************************************************************/
 
-    public void remove ( cstring key )
+    public bool remove ( cstring key )
+    out ( existed )
     {
+        assert((key in this.data) is null);
+    }
+    body
+    {
+        auto existed = (key in this.data) !is null;
         this.data.remove(idup(key));
 
         this.listeners.trigger(Listeners.Listener.Code.Deletion, key);
         if (Task.getThis() !is null)
             this.listeners.waitUntilFlushed();
+
+        return existed;
     }
 
     /***************************************************************************
@@ -470,11 +481,11 @@ class Channel
 
     ***************************************************************************/
 
-    public void remove ( hash_t key )
+    public bool remove ( hash_t key )
     {
         mstring key_str;
         sformat(key_str, "{:x16}", key);
-        this.remove(key_str);
+        return this.remove(key_str);
     }
 
     /***************************************************************************
