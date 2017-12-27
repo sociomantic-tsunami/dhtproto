@@ -21,5 +21,6 @@ public enum RequestCode : ubyte
     Mirror,
     GetAll,
     GetChannels,
-    Exists
+    Exists,
+    Remove
 }
