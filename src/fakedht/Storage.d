@@ -466,6 +466,19 @@ class Channel
 
     /***************************************************************************
 
+        Ditto
+
+    ***************************************************************************/
+
+    public void remove ( hash_t key )
+    {
+        mstring key_str;
+        sformat(key_str, "{:x16}", key);
+        this.remove(key_str);
+    }
+
+    /***************************************************************************
+
         Registers a listener with the channel. The dataReady() method of the
         given listener may be called when data is put to the channel.
 
