@@ -47,6 +47,8 @@ The DHT supports the following requests (links to the API modules):
   gets a record, specified by its key, from a channel.
 * [`Exists`](request/Exists.d):
   checks whether a record, specified by its key, exists in a channel.
+* [`Remove`](request/Remove.d):
+  removes a record, specified by its key, from a channel.
 * [`GetAll`](request/GetAll.d):
   gets the keys and values of all records in a channel.
 * [`GetChannels`](request/GetChannels.d):
