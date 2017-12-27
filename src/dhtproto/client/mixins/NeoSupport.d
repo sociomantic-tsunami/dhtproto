@@ -85,6 +85,7 @@ template NeoSupport ( )
 
         public import Put = dhtproto.client.request.Put;
         public import Get = dhtproto.client.request.Get;
+        public import Remove = dhtproto.client.request.Remove;
         public import Mirror = dhtproto.client.request.Mirror;
         public import GetAll = dhtproto.client.request.GetAll;
         public import GetChannels = dhtproto.client.request.GetChannels;
@@ -101,6 +102,7 @@ template NeoSupport ( )
             import dhtproto.client.request.internal.GetHashRange;
             import dhtproto.client.request.internal.Put;
             import dhtproto.client.request.internal.Get;
+            import dhtproto.client.request.internal.Remove;
             import dhtproto.client.request.internal.Mirror;
             import dhtproto.client.request.internal.GetAll;
             import dhtproto.client.request.internal.GetChannels;
@@ -287,6 +289,40 @@ template NeoSupport ( )
             );
 
             auto id = this.assign!(Internals.Exists)(params);
+            return id;
+        }
+
+        /***********************************************************************
+
+            Assigns a Remove request, removing a record from the specified
+            channel.
+            See $(LINK2 dhtproto/client/request/Remove.html, dhtproto.client.request.Remove)
+            for detailed documentation.
+
+            Params:
+                channel = name of the channel to remove a record from
+                key = hash of the record to remove
+                notifier = notifier delegate
+
+            Returns:
+                id of newly assigned request
+
+            Throws:
+                NoMoreRequests if the pool of active requests is full
+
+        ***********************************************************************/
+
+        public RequestId remove ( cstring channel, hash_t key,
+            Remove.Notifier notifier )
+        {
+            auto params = Const!(Internals.Remove.UserSpecifiedParams)(
+                Const!(Remove.Args)(channel, key),
+                Const!(Internals.Remove.UserSpecifiedParams.SerializedNotifier)(
+                    *(cast(Const!(ubyte[notifier.sizeof])*)&notifier)
+                )
+            );
+
+            auto id = this.assign!(Internals.Remove)(params);
             return id;
         }
 
@@ -1071,6 +1107,151 @@ template NeoSupport ( )
                 task.suspend();
             assert(finished);
 
+            return res;
+        }
+
+        /***********************************************************************
+
+            Assigns a Remove request and blocks the current Task until the
+            request is completed. See
+            $(LINK2 dhtproto/client/request/Remove.html, dhtproto.client.request.Remove)
+            for detailed documentation.
+
+            Params:
+                channel = name of the channel to remove a record from
+                key = hash of the record to remove
+                user_notifier = notifier delegate
+
+        ***********************************************************************/
+
+        public void remove ( cstring channel, hash_t key,
+            Neo.Remove.Notifier user_notifier )
+        in
+        {
+            assert(user_notifier !is null);
+        }
+        body
+        {
+            auto task = Task.getThis();
+            assert(task, "This method may only be called from inside a Task");
+
+            bool finished;
+
+            void notifier ( Neo.Remove.Notification info,
+                Const!(Neo.Remove.Args) args )
+            {
+                user_notifier(info, args);
+
+                // All Remove notifications indicate that the request has
+                // finished (no need to switch)
+                finished = true;
+                if ( task.suspended )
+                    task.resume();
+            }
+
+            this.outer.neo.remove(channel, key, &notifier);
+            if ( !finished ) // if request not completed, suspend
+                task.suspend();
+            assert(finished);
+        }
+
+        /***********************************************************************
+
+            Struct returned after a Remove request has finished.
+
+        ***********************************************************************/
+
+        private static struct RemoveResult
+        {
+            /*******************************************************************
+
+                Set to true if no error occurred.
+
+            *******************************************************************/
+
+            bool succeeded;
+
+            /*******************************************************************
+
+                Set to true if the record existed.
+
+            *******************************************************************/
+
+            bool existed;
+        }
+
+        /***********************************************************************
+
+            Assigns a Remove request and blocks the current Task until the
+            request is completed. See
+            $(LINK2 dhtproto/client/request/Remove.html, dhtproto.client.request.Remove)
+            for detailed documentation.
+
+            Note that the API of this method is intentionally minimal (e.g. it
+            provides no detailed feedback about errors to the user). If you need
+            more control, use the method above which works via a notifier
+            callback.
+
+            Params:
+                channel = name of the channel to remove a record from
+                key = hash of the record to remove
+
+            Returns:
+                RemoveResult struct, indicating the result of the request
+
+        ***********************************************************************/
+
+        public RemoveResult remove ( cstring channel, hash_t key )
+        {
+            auto task = Task.getThis();
+            assert(task, "This method may only be called from inside a Task");
+
+            enum FinishedStatus
+            {
+                None,
+                Succeeded,
+                Failed
+            }
+
+            RemoveResult res;
+            FinishedStatus state;
+
+            void notifier ( Neo.Remove.Notification info,
+                Const!(Neo.Remove.Args) args )
+            {
+                with ( info.Active ) switch ( info.active )
+                {
+                    case removed:
+                        res.existed = true;
+                        goto case no_record;
+
+                    case no_record:
+                        state = state.Succeeded;
+                        if ( task.suspended )
+                            task.resume();
+                        break;
+
+                    case node_disconnected:
+                    case node_error:
+                    case unsupported:
+                    case no_node:
+                    case wrong_node:
+                    case failure:
+                        state = state.Failed;
+                        if ( task.suspended )
+                            task.resume();
+                        break;
+
+                    default: assert(false);
+                }
+            }
+
+            this.outer.neo.remove(channel, key, &notifier);
+            if ( state == state.None ) // if request not completed, suspend
+                task.suspend();
+            assert(state != state.None);
+
+            res.succeeded = state == state.Succeeded;
             return res;
         }
 
