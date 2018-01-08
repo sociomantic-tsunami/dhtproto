@@ -45,14 +45,6 @@ public abstract scope class GetChannelsProtocol_v0
     {
         this.connection = connection;
 
-        // Send status code
-        this.connection.event_dispatcher.send(
-            ( RequestOnConnBase.EventDispatcher.Payload payload )
-            {
-                payload.addConstant(RequestStatusCode.Started);
-            }
-        );
-
         auto channel_buf = this.resources.getVoidBuffer();
 
         foreach ( channel; this )

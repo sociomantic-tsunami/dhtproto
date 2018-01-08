@@ -152,6 +152,7 @@ private scope class GetChannelsHandler
     import swarm.neo.connection.RequestOnConnBase;
     import swarm.neo.client.mixins.AllNodesRequestCore;
     import swarm.neo.request.RequestEventDispatcher;
+    import swarm.neo.request.Command;
 
     import dhtproto.common.GetChannels;
     import dhtproto.client.request.GetChannels;
@@ -194,7 +195,7 @@ private scope class GetChannelsHandler
     public void run ( )
     {
         auto initialiser = createAllNodesRequestInitialiser!(GetChannels)(
-            this.conn, this.context, &this.fillPayload, &this.handleStatusCode);
+            this.conn, this.context, &this.fillPayload, &this.handleSupportedCode);
         auto request = createAllNodesRequest!(GetChannels)(this.conn, this.context,
             &this.connect, &this.disconnected, initialiser, &this.handle);
         request.run();
@@ -256,50 +257,29 @@ private scope class GetChannelsHandler
     /***************************************************************************
 
         HandleStatusCode policy, called from AllNodesRequestInitialiser
-        template to decide how to handle the status code received from the node.
+        template to decide how to handle the supported code received from the
+        node.
 
         Params:
-            status = status code received from the node in response to the
+            code = supported code received from the node in response to the
                 initial message
 
         Returns:
-            true to continue handling the request (OK status); false to abort
-            (error status)
+            true to continue handling the request (supported); false to abort
+            (unsupported)
 
     ***************************************************************************/
 
-    private bool handleStatusCode ( ubyte status )
+    private bool handleSupportedCode ( ubyte code )
     {
-        auto getchannels_status = cast(RequestStatusCode)status;
-
-        if ( GetChannels.handleGlobalStatusCodes(getchannels_status,
+        auto supported = cast(SupportedStatus)code;
+        if ( !GetChannels.handleSupportedCodes(supported,
             this.context, this.conn.remote_address) )
         {
-            return false; // Global code, e.g. request/version not supported
+            return false; // Request/version not supported.
         }
 
-        // GetChannels-specific codes
-        with ( RequestStatusCode ) switch ( getchannels_status )
-        {
-            case Started:
-                // Expected "request started" code
-                return true;
-
-            case Error:
-                // The node returned an error code. Notify the user and
-                // end the request.
-                GetChannels.Notification n;
-                n.node_error = RequestNodeInfo(
-                    this.context.request_id, conn.remote_address);
-                GetChannels.notify(this.context.user_params, n);
-                return false;
-
-            default:
-                // Treat unknown codes as internal errors.
-                goto case Error;
-        }
-
-        assert(false);
+        return true;
     }
 
     /***************************************************************************
@@ -351,6 +331,15 @@ private scope class GetChannelsHandler
                     RequestDataInfo(context.request_id, channel);
                 GetChannels.notify(this.context.user_params, notification);
                 break;
+
+            case Error:
+                // The node returned an error code. Notify the user and
+                // end the request.
+                GetChannels.Notification n;
+                n.node_error = RequestNodeInfo(
+                    this.context.request_id, this.conn.remote_address);
+                GetChannels.notify(this.context.user_params, n);
+                return true;
 
             case Finished:
                 return true;

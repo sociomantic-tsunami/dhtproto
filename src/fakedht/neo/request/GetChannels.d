@@ -39,16 +39,23 @@ public void handle ( Object shared_resources, RequestOnConn connection,
     Command.Version cmdver, Const!(void)[] msg_payload )
 {
     auto resources = new SharedResources;
+    auto ed = connection.event_dispatcher;
 
     switch ( cmdver )
     {
         case 0:
+            ed.send(
+                ( ed.Payload payload )
+                {
+                    payload.addConstant(SupportedStatus.RequestSupported);
+                }
+            );
+
             scope rq = new GetChannelsImpl_v0(resources);
             rq.handle(connection, msg_payload);
             break;
 
         default:
-            auto ed = connection.event_dispatcher;
             ed.send(
                 ( ed.Payload payload )
                 {
