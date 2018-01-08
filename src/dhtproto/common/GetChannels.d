@@ -16,24 +16,6 @@ import swarm.neo.request.Command;
 
 /*******************************************************************************
 
-    Status code enum. Sent from the node to the client.
-
-*******************************************************************************/
-
-public enum RequestStatusCode : StatusCode
-{
-    /// Invalid, default value
-    None,
-
-    /// Request successfully started
-    Started,
-
-    /// Internal node error occurred
-    Error
-}
-
-/*******************************************************************************
-
     Message type enum. Each message sent between the client and the node as part
     of a GetChannels request is prepended by a type indicator.
 
@@ -44,6 +26,7 @@ public enum MessageType : ubyte
     None,       // Invalid, default value
 
     // Message types sent from the node to the client:
+    Error,          // Internal node error
     ChannelName,    // Sent by the node when it sends a channel name
     Finished        // Send by the node when the request is finished
 }
