@@ -54,16 +54,16 @@ public abstract scope class PutProtocol_v0
         auto key = *ed.message_parser.getValue!(hash_t)(msg_payload);
         auto value = ed.message_parser.getArray!(void)(msg_payload);
 
-        RequestStatusCode response;
+        MessageType response;
 
         // Check record key and write to channel, if ok.
         if ( this.responsibleForKey(key) )
         {
             response = this.put(channel, key, value)
-                ? RequestStatusCode.Put : RequestStatusCode.Error;
+                ? MessageType.Put : MessageType.Error;
         }
         else
-            response = RequestStatusCode.WrongNode;
+            response = MessageType.WrongNode;
 
         // Send status code
         ed.send(

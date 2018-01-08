@@ -187,19 +187,26 @@ public struct Put
             );
             conn.flush();
 
-            // Receive status from node
-            auto status = conn.receiveValue!(StatusCode)();
-            if ( !Put.handleGlobalStatusCodes(status, context,
+            // Receive supported code from node
+            auto supported = conn.receiveValue!(SupportedStatus)();
+            if ( !Put.handleSupportedCodes(supported, context,
                 conn.remote_address) )
             {
-                switch ( status )
+                // Request not supported; abort further handling.
+                context.shared_working.result = SharedWorking.Result.Error;
+            }
+            else
+            {
+                // Request supported; read result code from node.
+                auto result = conn.receiveValue!(MessageType)();
+                switch ( result )
                 {
-                    case RequestStatusCode.Put:
+                    case MessageType.Put:
                         context.shared_working.result =
                             SharedWorking.Result.Success;
                         break;
 
-                    case RequestStatusCode.WrongNode:
+                    case MessageType.WrongNode:
                         context.shared_working.result =
                             SharedWorking.Result.Error;
 
@@ -210,7 +217,7 @@ public struct Put
                         Put.notify(context.user_params, n);
                         break;
 
-                    case RequestStatusCode.Error:
+                    case MessageType.Error:
                         context.shared_working.result =
                             SharedWorking.Result.Error;
 
@@ -222,10 +229,10 @@ public struct Put
                         break;
 
                     default:
-                        log.warn("Received unknown status code {} from node "
+                        log.warn("Received unknown message code {} from node "
                             ~ "in response to Put request. Treating as "
-                            ~ "Error.", status);
-                        goto case RequestStatusCode.Error;
+                            ~ "Error.", result);
+                        goto case MessageType.Error;
                 }
             }
         }
