@@ -200,19 +200,20 @@ public struct Get
             );
             conn.flush();
 
-            // Receive status from node
-            auto status = conn.receiveValue!(StatusCode)();
-            if ( Get.handleGlobalStatusCodes(status, context,
+            // Receive supported code from node
+            auto supported = conn.receiveValue!(SupportedStatus)();
+            if ( !Get.handleSupportedCodes(supported, context,
                 conn.remote_address) )
             {
-                // Global codes (not supported / version not supported)
+                // Request not supported; abort further handling.
                 context.shared_working.result = SharedWorking.Result.Error;
                 return false;
             }
             else
             {
-                // Get-specific codes
-                with ( RequestStatusCode ) switch ( status )
+                // Request supported; read result code from node.
+                auto result = conn.receiveValue!(MessageType)();
+                with ( MessageType ) switch ( result )
                 {
                     case Got:
                         context.shared_working.result =
@@ -261,9 +262,9 @@ public struct Get
                         return false;
 
                     default:
-                        log.warn("Received unknown status code {} from node "
+                        log.warn("Received unknown message code {} from node "
                             ~ "in response to Get request. Treating as "
-                            ~ "Error.", status);
+                            ~ "Error.", result);
                         goto case Error;
                 }
             }

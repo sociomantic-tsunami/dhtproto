@@ -12,15 +12,13 @@
 
 module dhtproto.common.Get;
 
-import swarm.neo.request.Command;
-
 /*******************************************************************************
 
-    Status code enum. Sent from the node to the client.
+    Message type enum. Sent from the node to the client.
 
 *******************************************************************************/
 
-public enum RequestStatusCode : StatusCode
+public enum MessageType : ubyte
 {
     /// Invalid, default value
     None,

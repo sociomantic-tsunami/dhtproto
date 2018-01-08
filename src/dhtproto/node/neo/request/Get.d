@@ -53,7 +53,7 @@ public abstract scope class GetProtocol_v0
         auto channel = ed.message_parser.getArray!(char)(msg_payload);
         auto key = *ed.message_parser.getValue!(hash_t)(msg_payload);
 
-        RequestStatusCode response;
+        MessageType response;
 
         // Check record key and read from channel, if ok.
         void[]* value;
@@ -62,12 +62,12 @@ public abstract scope class GetProtocol_v0
             value = this.resources.getVoidBuffer();
             if ( this.get(channel, key, *value) )
                 response = value.length
-                    ? RequestStatusCode.Got : RequestStatusCode.NoRecord;
+                    ? MessageType.Got : MessageType.NoRecord;
             else
-                response = RequestStatusCode.Error;
+                response = MessageType.Error;
         }
         else
-            response = RequestStatusCode.WrongNode;
+            response = MessageType.WrongNode;
 
         // Send status code
         ed.send(
@@ -78,7 +78,7 @@ public abstract scope class GetProtocol_v0
         );
 
         // Send value, if retrieved
-        if ( response == RequestStatusCode.Got )
+        if ( response == MessageType.Got )
         {
             assert(value !is null);
             assert(value.length);
