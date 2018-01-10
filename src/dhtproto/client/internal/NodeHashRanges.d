@@ -113,6 +113,64 @@ public final class NodeHashRanges : NodeHashRangesBase
     /***************************************************************************
 
         Helper encapsulating the node-selection logic required by requests that
+        remove a single record from the DHT. Namely:
+
+            During a data redistribution, more than one node may be responsible
+            for a given key. In this case, the node that was least recently
+            reported as being responsible for the key is queried first, followed
+            by others (in order) until the record is either removed from or does
+            not exist on all nodes, or an error occurs. The reason for removing
+            from the *least* recently responsible nodes first is to avoid
+            getting into inconsistent states if an error occurs while removing.
+            (If an error occurred when removing the record from the most
+            recently responsible node first, subsequent read requests would
+            fetch the removed record from older nodes, and the old value could
+            be forwarded from an older node, undoing the removal.)
+
+        TODO: test the logic for retrying the request on other nodes which
+        previously covered the hash. This will require a full neo implementation
+        of the Redistribute request. See
+        https://github.com/sociomantic-tsunami/dhtnode/issues/21
+
+        Params:
+            h = hash to query
+            node_hash_ranges = buffer to receive hash range information of
+                nodes which cover the specified hash
+            use_node = delegate to call to gain access to a request-on-conn to
+                communicate with the selected node
+            remove = delegate to communicate with the selected node (over the
+                request-on-conn provided by use_node). Should return true if the
+                removal succeeded or false on error
+
+    ***************************************************************************/
+
+    public void removeFromNodes ( hash_t h,
+        VoidBufferAsArrayOf!(NodeHashRange) node_hash_ranges, UseNodeDg use_node,
+        bool delegate ( RequestOnConn.EventDispatcher ) remove )
+    {
+        auto nodes = this.getNodesForHash(h, node_hash_ranges);
+        if ( nodes.length == 0 )
+            return;
+
+        foreach_reverse ( node_hash_range; nodes.array() )
+        {
+            bool continue_to_next_node;
+            use_node(node_hash_range.addr,
+                ( RequestOnConn.EventDispatcher conn )
+                {
+                    continue_to_next_node = remove(conn);
+                }
+            );
+
+            // If an error occurred, don't try more nodes
+            if ( !continue_to_next_node )
+                break;
+        }
+    }
+
+    /***************************************************************************
+
+        Helper encapsulating the node-selection logic required by requests that
         put a single record to the DHT. Namely:
 
             During a data redistribution, more than one node may be responsible
