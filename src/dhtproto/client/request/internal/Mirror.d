@@ -299,6 +299,18 @@ private scope class MirrorHandler
             return false; // Request/version not supported
         }
 
+        return true;
+    }
+
+    /***************************************************************************
+
+        Handler policy, called from AllNodesRequest template to run the
+        request's main handling logic.
+
+    ***************************************************************************/
+
+    private void handle ( )
+    {
         // Handle initial started/error message from node.
         auto msg = conn.receiveValue!(MessageType)();
         with ( MessageType ) switch ( msg )
@@ -314,25 +326,13 @@ private scope class MirrorHandler
                 n.node_error = RequestNodeInfo(
                     this.context.request_id, conn.remote_address);
                 Mirror.notify(this.context.user_params, n);
-                return false;
+                return;
 
             default:
                 // Treat unknown/unexpected codes as node errors.
                 goto case Error;
         }
 
-        return true;
-    }
-
-    /***************************************************************************
-
-        Handler policy, called from AllNodesRequest template to run the
-        request's main handling logic.
-
-    ***************************************************************************/
-
-    private void handle ( )
-    {
         this.decompress_buffer = this.resources.getVoidBuffer();
 
         scope reader_ = new Reader;
