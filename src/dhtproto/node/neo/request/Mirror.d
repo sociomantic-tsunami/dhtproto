@@ -383,7 +383,7 @@ public abstract scope class MirrorProtocol_v0
             ( RequestOnConnBase.EventDispatcher.Payload payload )
             {
                 payload.addConstant(ok
-                    ? RequestStatusCode.Started : RequestStatusCode.Error);
+                    ? MessageType.Started : MessageType.Error);
             }
         );
 

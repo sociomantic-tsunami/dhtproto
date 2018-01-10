@@ -312,7 +312,13 @@ public class MirrorSuspend : NeoDhtTestCase
 
                     case updated:
                         if ( info.updated.key in received_keys )
+                        {
+                            Stdout.formatln("Duplicate key - {} - received!", info.updated.key);
+                            foreach ( k, v; received_keys )
+                                Stdout.format("{}, ", k);
+                            Stdout.newline().flush();
                             duplicate = true;
+                        }
 
                         received_keys[info.updated.key] = true;
                         // Stop mirroring after the updates have been received
@@ -351,6 +357,7 @@ public class MirrorSuspend : NeoDhtTestCase
         test!("==")(mirror.deleted_count, 0);
     }
 }
+import ocean.io.Stdout;
 
 /*******************************************************************************
 

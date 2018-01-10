@@ -163,6 +163,7 @@ private scope class MirrorHandler
     import swarm.neo.client.mixins.SuspendableRequestCore;
     import swarm.neo.request.RequestEventDispatcher;
     import swarm.neo.util.MessageFiber;
+    import swarm.neo.request.Command;
 
     import dhtproto.common.Mirror;
     import dhtproto.client.request.Mirror;
@@ -215,7 +216,7 @@ private scope class MirrorHandler
     {
         auto request = createSuspendableRequest!(Mirror)(this.conn, this.context,
             &this.connect, &this.disconnected, &this.fillPayload,
-            &this.handleStatusCode, &this.handle);
+            &this.handleSupportedCode, &this.handle);
         request.run();
     }
 
@@ -276,48 +277,29 @@ private scope class MirrorHandler
     /***************************************************************************
 
         HandleStatusCode policy, called from SuspendableRequestInitialiser
-        template to decide how to handle the status code received from the node.
+        template to decide how to handle the supported code received from the
+        node.
 
         Params:
-            status = status code received from the node in response to the
+            code = supported code received from the node in response to the
                 initial message
 
         Returns:
-            true to continue handling the request (OK status); false to abort
-            (error status)
+            true to continue handling the request (supported); false to abort
+            (unsupported)
 
     ***************************************************************************/
 
-    private bool handleStatusCode ( ubyte status )
+    private bool handleSupportedCode ( ubyte code )
     {
-        auto getall_status = cast(RequestStatusCode)status;
-
-        if ( Mirror.handleGlobalStatusCodes(getall_status, this.context,
-            this.conn.remote_address) )
-            return false; // Global code, e.g. request/version not supported
-
-        // Mirror-specific codes
-        with ( RequestStatusCode ) switch ( getall_status )
+        auto supported = cast(SupportedStatus)code;
+        if ( !Mirror.handleSupportedCodes(supported,
+            this.context, this.conn.remote_address) )
         {
-            case Started:
-                // Expected "request started" code
-                return true;
-
-            case Error:
-                // The node returned an error code. Notify the user and
-                // end the request.
-                Mirror.Notification n;
-                n.node_error = RequestNodeInfo(
-                    this.context.request_id, conn.remote_address);
-                Mirror.notify(this.context.user_params, n);
-                return false;
-
-            default:
-                // Treat unknown codes as internal errors.
-                goto case Error;
+            return false; // Request/version not supported
         }
 
-        assert(false);
+        return true;
     }
 
     /***************************************************************************
@@ -329,6 +311,28 @@ private scope class MirrorHandler
 
     private void handle ( )
     {
+        // Handle initial started/error message from node.
+        auto msg = conn.receiveValue!(MessageType)();
+        with ( MessageType ) switch ( msg )
+        {
+            case Started:
+                // Expected "request started" code. Continue handling request.
+                break;
+
+            case Error:
+                // The node returned an error code. Notify the user and end the
+                // request.
+                Mirror.Notification n;
+                n.node_error = RequestNodeInfo(
+                    this.context.request_id, conn.remote_address);
+                Mirror.notify(this.context.user_params, n);
+                return;
+
+            default:
+                // Treat unknown/unexpected codes as node errors.
+                goto case Error;
+        }
+
         this.decompress_buffer = this.resources.getVoidBuffer();
 
         scope reader_ = new Reader;
