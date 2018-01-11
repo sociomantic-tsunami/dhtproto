@@ -13,11 +13,12 @@
 module fakedht.neo.RequestHandlers;
 
 import swarm.neo.node.ConnectionHandler;
+import swarm.neo.request.Command;
 
 import dhtproto.common.RequestCodes;
 
 import GetHashRange = fakedht.neo.request.GetHashRange;
-import Put = fakedht.neo.request.Put;
+import fakedht.neo.request.Put;
 import Get = fakedht.neo.request.Get;
 import Mirror = fakedht.neo.request.Mirror;
 import GetAll = fakedht.neo.request.GetAll;
@@ -37,7 +38,7 @@ public ConnectionHandler.RequestMap requests;
 static this ( )
 {
     requests.add(RequestCode.GetHashRange, "GetHashRange", &GetHashRange.handle);
-    requests.add(RequestCode.Put, "Put", &Put.handle);
+    requests.add(Command(RequestCode.Put, 0), "Put", PutImpl_v0.classinfo);
     requests.add(RequestCode.Get, "Get", &Get.handle);
     requests.add(RequestCode.Mirror, "Mirror", &Mirror.handle);
     requests.add(RequestCode.GetAll, "GetAll", &GetAll.handle);
