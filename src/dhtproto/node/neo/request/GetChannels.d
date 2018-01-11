@@ -12,8 +12,10 @@
 
 module dhtproto.node.neo.request.GetChannels;
 
+import swarm.neo.node.IRequestHandler;
+
 /// ditto
-public abstract scope class GetChannelsProtocol_v0
+public abstract class GetChannelsProtocol_v0 : IRequestHandler
 {
     import swarm.neo.node.RequestOnConn;
     import swarm.neo.connection.RequestOnConnBase;
@@ -22,29 +24,47 @@ public abstract scope class GetChannelsProtocol_v0
     import ocean.core.Array : copy;
     import ocean.transition;
 
-    /// Mixin the constructor and resources member.
-    mixin RequestCore!();
-
-    /// Connection to the client.
-    private RequestOnConn connection;
-
     /***************************************************************************
 
-        Request handler. Responds to the client with a status code and sends the
-        list of channels.
-
-        Params:
-            connection = connection to client
-            msg_payload = initial message read from client to begin the request
-                (the request code and version are assumed to be extracted)
+        Mixin the initialiser and the connection and resources members.
 
     ***************************************************************************/
 
-    final public void handle ( RequestOnConn connection,
-        Const!(void)[] msg_payload )
-    {
-        this.connection = connection;
+    mixin IRequestHandlerRequestCore!();
 
+    /***************************************************************************
+
+        Called by the connection handler immediately after the request code and
+        version have been parsed from a message received over the connection.
+        Allows the request handler to process the remainder of the incoming
+        message, before the connection handler sends the supported code back to
+        the client.
+
+        Note: the initial payload is a slice of the connection's read buffer.
+        This means that when the request-on-conn fiber suspends, the contents of
+        the buffer (hence the slice) may change. It is thus *absolutely
+        essential* that this method does not suspend the fiber. (This precludes
+        all I/O operations on the connection.)
+
+        Params:
+            init_payload = initial message payload read from the connection
+
+    ***************************************************************************/
+
+    public void preSupportedCodeSent ( Const!(void)[] init_payload )
+    {
+        // Nothing more to parse from the payload.
+    }
+
+    /***************************************************************************
+
+        Called by the connection handler after the supported code has been sent
+        back to the client.
+
+    ***************************************************************************/
+
+    public void postSupportedCodeSent ( )
+    {
         auto channel_buf = this.resources.getVoidBuffer();
 
         foreach ( channel; this )
