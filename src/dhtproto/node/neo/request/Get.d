@@ -12,46 +12,76 @@
 
 module dhtproto.node.neo.request.Get;
 
+import swarm.neo.node.IRequestHandler;
+
 /*******************************************************************************
 
     v0 Get request protocol.
 
 *******************************************************************************/
 
-public abstract scope class GetProtocol_v0
+public abstract class GetProtocol_v0 : IRequestHandler
 {
     import swarm.neo.node.RequestOnConn;
     import dhtproto.common.Get;
     import dhtproto.node.neo.request.core.Mixins;
 
     import ocean.transition;
+    import ocean.core.array.Mutation : copy;
 
     /***************************************************************************
 
-        Mixin the constructor and resources member.
+        Mixin the initialiser and the connection and resources members.
 
     ***************************************************************************/
 
-    mixin RequestCore!();
+    mixin IRequestHandlerRequestCore!();
+
+    /// Name of channel to read from.
+    private void[]* channel;
+
+    /// Key to be read.
+    private hash_t key;
 
     /***************************************************************************
 
-        Request handler. Reads the record to be put from the client, adds it to
-        the storage engine, and responds to the client with a status code.
+        Called by the connection handler immediately after the request code and
+        version have been parsed from a message received over the connection.
+        Allows the request handler to process the remainder of the incoming
+        message, before the connection handler sends the supported code back to
+        the client.
+
+        Note: the initial payload is a slice of the connection's read buffer.
+        This means that when the request-on-conn fiber suspends, the contents of
+        the buffer (hence the slice) may change. It is thus *absolutely
+        essential* that this method does not suspend the fiber. (This precludes
+        all I/O operations on the connection.)
 
         Params:
-            connection = connection to client
-            msg_payload = initial message read from client to begin the request
-                (the request code and version are assumed to be extracted)
+            init_payload = initial message payload read from the connection
 
     ***************************************************************************/
 
-    final public void handle ( RequestOnConn connection, Const!(void)[] msg_payload )
+    public void preSupportedCodeSent ( Const!(void)[] init_payload )
     {
-        auto ed = connection.event_dispatcher();
+        auto ed = this.connection.event_dispatcher();
 
-        auto channel = ed.message_parser.getArray!(char)(msg_payload);
-        auto key = *ed.message_parser.getValue!(hash_t)(msg_payload);
+        this.channel = this.resources.getVoidBuffer();
+        (*this.channel).copy(ed.message_parser.getArray!(char)(init_payload));
+        enableStomping(*this.channel);
+        this.key = *ed.message_parser.getValue!(hash_t)(init_payload);
+    }
+
+    /***************************************************************************
+
+        Called by the connection handler after the supported code has been sent
+        back to the client.
+
+    ***************************************************************************/
+
+    public void postSupportedCodeSent ( )
+    {
+        auto ed = this.connection.event_dispatcher();
 
         void sendResponse ( MessageType status_code,
             void delegate ( ed.Payload ) extra = null )
@@ -70,10 +100,10 @@ public abstract scope class GetProtocol_v0
         }
 
         // Check record key and read from channel, if ok.
-        if ( this.responsibleForKey(key) )
+        if ( this.responsibleForKey(this.key) )
         {
             bool sent;
-            auto ok = this.get(channel, key,
+            auto ok = this.get(cast(char[])*this.channel, this.key,
                 ( Const!(void)[] value )
                 {
                     assert(value !is null);
