@@ -72,7 +72,7 @@ struct DHT
 
     public Channel get (cstring channel_name)
     {
-        auto channel = channel_name in this.channels;
+        auto channel = channel_name in (&this).channels;
         if (channel is null)
             return null;
         return *channel;
@@ -93,7 +93,7 @@ struct DHT
 
     public Channel getVerify ( cstring channel_name )
     {
-        auto channel = channel_name in this.channels;
+        auto channel = channel_name in (&this).channels;
         enforce!(MissingChannelException)(channel !is null, idup(channel_name));
         return *channel;
     }
@@ -112,11 +112,11 @@ struct DHT
 
     public Channel getCreate (cstring channel_name)
     {
-        auto channel = channel_name in this.channels;
+        auto channel = channel_name in (&this).channels;
         if (channel is null)
         {
-            this.channels[idup(channel_name)] = new Channel;
-            channel = channel_name in this.channels;
+            (&this).channels[idup(channel_name)] = new Channel;
+            channel = channel_name in (&this).channels;
         }
         return *channel;
     }
@@ -132,11 +132,11 @@ struct DHT
 
     public void remove (cstring channel_name)
     {
-        auto channel = this.get(channel_name);
+        auto channel = (&this).get(channel_name);
         if (channel !is null)
         {
             channel.listeners.trigger(DhtListener.Code.Finish, "");
-            this.channels.remove(idup(channel_name));
+            (&this).channels.remove(idup(channel_name));
         }
     }
 
@@ -148,10 +148,10 @@ struct DHT
 
     public void clear ( )
     {
-        auto names = this.channels.keys;
+        auto names = (&this).channels.keys;
         foreach (name; names)
         {
-            auto channel = this.getVerify(name);
+            auto channel = (&this).getVerify(name);
             channel.data = null;
         }
     }
@@ -167,7 +167,7 @@ struct DHT
 
     public void dropAllListeners ( )
     {
-        foreach (channel; this.channels)
+        foreach (channel; (&this).channels)
         {
             channel.listeners = channel.new Listeners;
         }
@@ -184,7 +184,7 @@ struct DHT
     {
         istring[] result;
 
-        foreach (key, value; this.channels)
+        foreach (key, value; (&this).channels)
             result ~= key;
 
         return result;
