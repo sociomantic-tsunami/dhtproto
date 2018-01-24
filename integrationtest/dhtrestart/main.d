@@ -47,8 +47,7 @@ version ( UnitTest ) { }
 else
 int main ( istring[] args )
 {
-    auto runner = new TurtleRunner!(DhtRestartTests)("dhtapp", "",
-        "dhtrestart");
+    auto runner = new TurtleRunner!(DhtRestartTests)("dhtapp", "");
     return runner.main(args);
 }
 

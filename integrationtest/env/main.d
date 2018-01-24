@@ -23,8 +23,7 @@ version ( UnitTest ) { }
 else
 int main ( istring[] args )
 {
-    auto runner = new TurtleRunner!(MyTurtleTests)("dhtapp", "",
-        "turtle");
+    auto runner = new TurtleRunner!(MyTurtleTests)("dhtapp", "");
     return runner.main(args);
 }
 
