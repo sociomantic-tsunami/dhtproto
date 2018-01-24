@@ -12,7 +12,7 @@
 
 *******************************************************************************/
 
-module test.dhtrestart.main;
+module integrationtest.dhtrestart.main;
 
 import ocean.transition;
 
@@ -43,6 +43,8 @@ class DhtRestartTests : TurtleRunnerTask!(TestedAppKind.Daemon)
     }
 }
 
+version ( UnitTest ) { }
+else
 int main ( istring[] args )
 {
     auto runner = new TurtleRunner!(DhtRestartTests)("dhtapp", "",
