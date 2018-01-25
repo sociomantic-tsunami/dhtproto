@@ -11,7 +11,7 @@
 
 *******************************************************************************/
 
-module test.env.main;
+module integrationtest.env.main;
 
 import ocean.transition;
 
@@ -19,10 +19,11 @@ import turtle.runner.Runner;
 import turtle.TestCase;
 import turtle.env.Dht;
 
+version ( UnitTest ) {}
+else
 int main ( istring[] args )
 {
-    auto runner = new TurtleRunner!(MyTurtleTests)("dhtapp", "",
-        "turtle");
+    auto runner = new TurtleRunner!(MyTurtleTests)("dhtapp", "");
     return runner.main(args);
 }
 
