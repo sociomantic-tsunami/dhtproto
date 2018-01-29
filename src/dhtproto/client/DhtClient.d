@@ -1401,7 +1401,7 @@ unittest
         class DummyStore : RequestQueueDiskOverflow.IRequestStore
         {
             ubyte[] store ( IRequestParams params ) { return null; }
-            void restore ( ubyte[] stored ) { }
+            void restore ( void[] stored ) { }
         }
 
         auto dht = new ExtensibleDhtClient!(DhtClient.RequestQueueDiskOverflow)

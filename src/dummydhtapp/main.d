@@ -63,6 +63,8 @@ DhtClient             dht;
 
 *******************************************************************************/
 
+version ( UnitTest ) { }
+else
 void main ( istring[] args )
 {
     if (args.length > 1 && args[1] == "--message")

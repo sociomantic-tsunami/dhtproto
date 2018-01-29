@@ -58,6 +58,7 @@ public class DhtNode
 
     import dhtproto.client.legacy.DhtConst;
     import swarm.node.connection.ConnectionHandler;
+    import swarm.neo.AddrPort;
 
     import fakedht.Storage;
 
@@ -68,7 +69,7 @@ public class DhtNode
 
     ***************************************************************************/
 
-    private bool log_errors = true;
+    public bool log_errors = true;
 
     /***************************************************************************
 
@@ -94,18 +95,6 @@ public class DhtNode
 
     /***************************************************************************
 
-        After this method is called, node will stop logging unhandled exceptions
-        as part of the test suite trace.
-
-    ***************************************************************************/
-
-    public void ignoreErrors ( )
-    {
-        this.log_errors = false;
-    }
-
-    /***************************************************************************
-
         Override of standard `stopListener` to also clean fake node listener
         data in global storage.
 
@@ -126,7 +115,7 @@ public class DhtNode
 
     override public void shutdown ( )
     {
-        this.ignoreErrors();
+        this.log_errors = false;
     }
 
     /***************************************************************************

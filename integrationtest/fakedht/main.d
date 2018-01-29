@@ -10,12 +10,14 @@
 
 *******************************************************************************/
 
-module test.fakedht.main;
+module integrationtest.fakedht.main;
 
 import turtle.runner.Runner;
 import dhttest.TestRunner;
 import ocean.transition;
 
+version ( UnitTest ) { }
+else
 int main ( istring[] args )
 {
     auto runner = new TurtleRunner!(DhtTestRunner)("fakedht", "dhttest.cases.neo");
