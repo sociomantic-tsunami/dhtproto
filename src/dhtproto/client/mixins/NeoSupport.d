@@ -1175,10 +1175,9 @@ template NeoSupport ( )
                         if (this.state == State.Stopped)
                             break;
 
-                        // Otherwise flag an error and finish.
-                        this.state = State.Finished;
+                        // Otherwise flag an error and allow the request to
+                        // finish normally.
                         this.error = true;
-                        this.task.resume();
                         break;
 
                     case received_key:
@@ -1355,10 +1354,9 @@ template NeoSupport ( )
                         if (this.state == State.Stopped)
                             break;
 
-                        // Otherwise flag an error and finish.
-                        this.state = State.Finished;
+                        // Otherwise flag an error and allow the request to
+                        // finish normally.
                         this.error = true;
-                        this.task.resume();
                         break;
 
                     default: assert(false);
