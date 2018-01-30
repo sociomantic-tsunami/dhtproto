@@ -53,7 +53,7 @@ public class MirrorRemove : NeoDhtTestCase
         auto mirror = Mirror(this.dht);
         mirror.start(mirror_settings, this.test_channel,
             ( DhtClient.Neo.Mirror.Notification info,
-                DhtClient.Neo.Mirror.Args args )
+                Const!(DhtClient.Neo.Mirror.Args) args )
             {
                 with ( info.Active ) switch ( info.active )
                 {
@@ -117,13 +117,13 @@ public class MirrorUpdate : NeoDhtTestCase
         mirror_settings.periodic_refresh_s = 0;
 
         void putNotifier ( DhtClient.Neo.Put.Notification info,
-            DhtClient.Neo.Put.Args args ) { }
+            Const!(DhtClient.Neo.Put.Args) args ) { }
 
         const num_written = 100;
         auto mirror = Mirror(this.dht);
         mirror.start(mirror_settings, this.test_channel,
             ( DhtClient.Neo.Mirror.Notification info,
-                DhtClient.Neo.Mirror.Args args )
+                Const!(DhtClient.Neo.Mirror.Args) args )
             {
                 with ( info.Active ) switch ( info.active )
                 {
@@ -191,7 +191,7 @@ public class MirrorConnError : NeoDhtTestCase
         auto mirror = Mirror(this.dht);
         mirror.start(mirror_settings, this.test_channel,
             ( DhtClient.Neo.Mirror.Notification info,
-                DhtClient.Neo.Mirror.Args args )
+                Const!(DhtClient.Neo.Mirror.Args) args )
             {
                 with ( info.Active ) switch ( info.active )
                 {
@@ -281,7 +281,7 @@ public class MirrorSuspend : NeoDhtTestCase
                 {
                     this.dht.neo.put(this.test_channel, key++, value,
                         ( DhtClient.Neo.Put.Notification info,
-                            DhtClient.Neo.Put.Args args )
+                            Const!(DhtClient.Neo.Put.Args) args )
                         {
                             if ( info.active == info.active.success )
                                 num_written++;
@@ -299,7 +299,7 @@ public class MirrorSuspend : NeoDhtTestCase
 
         mirror.start(mirror_settings, this.test_channel,
             ( DhtClient.Neo.Mirror.Notification info,
-                DhtClient.Neo.Mirror.Args args )
+                Const!(DhtClient.Neo.Mirror.Args) args )
             {
                 with ( info.Active ) switch ( info.active )
                 {
@@ -386,7 +386,7 @@ public class MirrorRefresh : NeoDhtTestCase
         auto mirror = Mirror(this.dht);
         mirror.start(mirror_settings, this.test_channel,
             ( DhtClient.Neo.Mirror.Notification info,
-                DhtClient.Neo.Mirror.Args args )
+                Const!(DhtClient.Neo.Mirror.Args) args )
             {
                 with ( info.Active ) switch ( info.active )
                 {
@@ -458,7 +458,7 @@ public class MirrorRefreshSuspend : NeoDhtTestCase
         bool received_while_suspended;
         mirror.start(mirror_settings, this.test_channel,
             ( DhtClient.Neo.Mirror.Notification info,
-                DhtClient.Neo.Mirror.Args args )
+                Const!(DhtClient.Neo.Mirror.Args) args )
             {
                 with ( info.Active ) switch ( info.active )
                 {
@@ -536,14 +536,14 @@ public class MirrorRemoveChannel : NeoDhtTestCase
         mirror_settings.periodic_refresh_s = 0;
 
         void putNotifier ( DhtClient.Neo.Put.Notification info,
-            DhtClient.Neo.Put.Args args ) { }
+            Const!(DhtClient.Neo.Put.Args) args ) { }
 
         void delNotifier ( DhtClient.RequestNotification info ) { }
 
         auto mirror = Mirror(this.dht);
         mirror.start(mirror_settings, this.test_channel,
             ( DhtClient.Neo.Mirror.Notification info,
-                DhtClient.Neo.Mirror.Args args )
+                Const!(DhtClient.Neo.Mirror.Args) args )
             {
                 with ( info.Active ) switch ( info.active )
                 {
@@ -735,7 +735,7 @@ private struct Mirror
     ***************************************************************************/
 
     private void counterNotifier ( DhtClient.Neo.Mirror.Notification info,
-        DhtClient.Neo.Mirror.Args args )
+        Const!(DhtClient.Neo.Mirror.Args) args )
     {
         with ( info.Active ) switch ( info.active )
         {

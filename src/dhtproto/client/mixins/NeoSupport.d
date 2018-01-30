@@ -716,7 +716,7 @@ template NeoSupport ( )
 
             bool finished;
 
-            void notifier ( Neo.Put.Notification info, Neo.Put.Args args )
+            void notifier ( Neo.Put.Notification info, Const!(Neo.Put.Args) args )
             {
                 user_notifier(info, args);
 
@@ -787,7 +787,7 @@ template NeoSupport ( )
 
             FinishedStatus state;
 
-            void notifier ( Neo.Put.Notification info, Neo.Put.Args args )
+            void notifier ( Neo.Put.Notification info, Const!(Neo.Put.Args) args )
             {
                 with ( info.Active ) switch ( info.active )
                 {
@@ -850,7 +850,7 @@ template NeoSupport ( )
 
             bool finished;
 
-            void notifier ( Neo.Get.Notification info, Neo.Get.Args args )
+            void notifier ( Neo.Get.Notification info, Const!(Neo.Get.Args) args )
             {
                 user_notifier(info, args);
 
@@ -932,7 +932,7 @@ template NeoSupport ( )
             GetResult res;
             FinishedStatus state;
 
-            void notifier ( Neo.Get.Notification info, Neo.Get.Args args )
+            void notifier ( Neo.Get.Notification info, Const!(Neo.Get.Args) args )
             {
                 with ( info.Active ) switch ( info.active )
                 {
@@ -998,7 +998,8 @@ template NeoSupport ( )
 
             bool finished;
 
-            void notifier ( Neo.Exists.Notification info, Neo.Exists.Args args )
+            void notifier ( Neo.Exists.Notification info,
+                Const!(Neo.Exists.Args) args )
             {
                 user_notifier(info, args);
 
@@ -1069,7 +1070,7 @@ template NeoSupport ( )
             bool finished;
             ExistsResult res;
 
-            void notifier ( Neo.Exists.Notification info, Neo.Exists.Args args )
+            void notifier ( Neo.Exists.Notification info, Const!(Neo.Exists.Args) args )
             {
                 with ( info.Active ) switch ( info.active )
                 {
@@ -1321,7 +1322,7 @@ template NeoSupport ( )
             *******************************************************************/
 
             private void notifier ( Neo.GetAll.Notification info,
-                Neo.GetAll.Args args )
+                Const!(Neo.GetAll.Args) args )
             {
                 with ( info.Active ) switch ( info.active )
                 {
@@ -1505,7 +1506,7 @@ template NeoSupport ( )
             *******************************************************************/
 
             private void notifier ( Neo.GetChannels.Notification info,
-                Neo.GetChannels.Args args )
+                Const!(Neo.GetChannels.Args) args )
             {
                 with ( info.Active ) switch ( info.active )
                 {
