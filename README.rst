@@ -20,9 +20,9 @@ Dependencies
 ==========  =======
 Dependency  Version
 ==========  =======
-ocean       v3.1.4
-swarm       v4.0.x
-turtle      v8.0.x
+ocean       v4.0.x
+swarm       v5.0.x
+turtle      v9.0.x
 ==========  =======
 
 Versioning
