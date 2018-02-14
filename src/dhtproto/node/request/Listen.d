@@ -19,6 +19,8 @@ module dhtproto.node.request.Listen;
 *******************************************************************************/
 
 import ocean.transition;
+import ocean.core.Traits;
+import ocean.io.select.client.model.ISelectClient;
 
 import dhtproto.node.request.model.SingleChannel;
 
@@ -91,7 +93,17 @@ public abstract scope class Listen : SingleChannel
             }
             finally
             {
-                this.reader.fiber.epoll.unregister(disconnect_detector);
+                // deprecated: in next major, only the else branch should be
+                // left (starting from major that supports at least ocean v4.1.0).
+                static if (hasMethod!(typeof(this.reader.fiber.epoll),
+                                  "unregister", int delegate(ISelectClient, bool)))
+                {
+                    this.reader.fiber.epoll.unregister(disconnect_detector, true);
+                }
+                else
+                {
+                    this.reader.fiber.epoll.unregister(disconnect_detector);
+                }
             }
 
             if (disconnect_detector.disconnected)
