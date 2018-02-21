@@ -235,6 +235,33 @@ public class ExtensibleMirror
     }
 }
 
+version ( UnitTest )
+{
+    import dhtproto.client.legacy.internal.helper.Mirror;
+}
+
+// Check that ExtensibleMirror compiles with Mirror implementation and plugins
+unittest
+{
+    static struct Record
+    {
+        ulong update_time;
+        hash_t id;
+        size_t count;
+    }
+
+    alias ExtensibleMirror!(SchedulingDhtClient, Mirror!(SchedulingDhtClient),
+        RawRecordDeserializer!(Record), DeserializedRecordCache!(Record))
+        ExampleMirror;
+
+    istring channel = "channel";
+    auto deserializer = new RawRecordDeserializer!(Record);
+    auto cache = new DeserializedRecordCache!(Record)(100);
+    auto mirror = new ExampleMirror(
+        new SchedulingDhtClient(new EpollSelectDispatcher), channel, 100, 2,
+        null, null, deserializer, cache);
+}
+
 import dhtproto.client.legacy.internal.helper.ChannelMirror;
 
 /*******************************************************************************
