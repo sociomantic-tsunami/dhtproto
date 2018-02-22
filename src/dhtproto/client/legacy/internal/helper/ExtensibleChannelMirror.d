@@ -29,7 +29,7 @@ module dhtproto.client.legacy.internal.helper.ExtensibleChannelMirror;
 
 import ocean.transition;
 
-import dhtproto.client.legacy.internal.helper.ChannelMirror;
+import dhtproto.client.legacy.internal.helper.mirror.model.MirrorBase;
 import dhtproto.client.DhtClient;
 
 /*******************************************************************************
@@ -59,13 +59,15 @@ import dhtproto.client.DhtClient;
     Template_Params:
         Dht = type of dht client (must be derived from DhtClient and contain the
             RequestScheduler plugin)
+        MirrorImpl = type of channel mirror implementation; must be derived from
+            MirrorBase!(Dht)
         Plugins = variadic list of record-handling plugins to be called (*in the
             order specified*) when records are received by the mirror
 
 *******************************************************************************/
 
-public class ExtensibleChannelMirror ( Dht : DhtClient, Plugins ... )
-    : ChannelMirror!(Dht)
+public class ExtensibleMirror
+    ( Dht : DhtClient, MirrorImpl : MirrorBase!(Dht), Plugins ... ) : MirrorImpl
 {
     import ocean.core.Exception;
     import ocean.core.Traits : ctfe_i2a;
@@ -231,6 +233,27 @@ public class ExtensibleChannelMirror ( Dht : DhtClient, Plugins ... )
 
         return code;
     }
+}
+
+import dhtproto.client.legacy.internal.helper.ChannelMirror;
+
+/*******************************************************************************
+
+    Extensible channel mirror class template based on the ChannelMirror
+    implementation.
+
+    Params:
+        Dht = type of dht client (must be derived from DhtClient and contain the
+            RequestScheduler plugin)
+        Plugins = variadic list of record-handling plugins to be called (*in the
+            order specified*) when records are received by the mirror
+
+*******************************************************************************/
+
+public template ExtensibleChannelMirror ( Dht : DhtClient, Plugins ... )
+{
+    alias ExtensibleMirror!(Dht, ChannelMirror!(Dht), Plugins)
+        ExtensibleChannelMirror;
 }
 
 version ( UnitTest )
