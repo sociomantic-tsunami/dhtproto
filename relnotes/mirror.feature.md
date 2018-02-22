@@ -20,3 +20,21 @@ Notes:
   expected to have any effect on applications, but is a noteworthy change in
   behaviour.
 
+### Extensible channel mirror works with new channel mirror class
+
+`dhtproto.client.legacy.internal.helper.ExtensibleChannelMirror`
+
+The new template -- `ExtensibleMirror` -- allows the extensible mirror
+functionality to be used with the new `Mirror` class. Usage like:
+```D
+alias ExtensibleChannelMirror!(SchedulingDhtClient,
+    RawRecordDeserializer!(Record), DeserializedRecordCache!(Record))
+    ExampleMirror;
+```
+should be changed to
+```D
+alias ExtensibleMirror!(SchedulingDhtClient, Mirror!(SchedulingDhtClient),
+    RawRecordDeserializer!(Record), DeserializedRecordCache!(Record))
+    ExampleMirror;
+```
+
