@@ -16,24 +16,6 @@ import swarm.neo.request.Command;
 
 /*******************************************************************************
 
-    Status code enum. Sent from the node to the client.
-
-*******************************************************************************/
-
-public enum RequestStatusCode : StatusCode
-{
-    /// Invalid, default value
-    None,
-
-    /// GetAll started
-    Started,
-
-    /// Internal node error occurred
-    Error
-}
-
-/*******************************************************************************
-
     Message type enum. Each message sent between the client and the node as part
     of a GetAll request is prepended by a type indicator.
 
@@ -53,6 +35,8 @@ public enum MessageType : ubyte
                     // sent by the client to acknowledge the request finishing
 
     // Message types sent from the node to the client:
+    Started,        // Request handling beginning
+    Error,          // Internal node error occurred; request not being handled
     RecordBatch,    // Sent by the node when it sends a batch of records
     Finished        // Send by the node when the iteration is finished
 }
