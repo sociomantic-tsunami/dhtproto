@@ -20,7 +20,7 @@ import dhtproto.common.RequestCodes;
 import GetHashRange = fakedht.neo.request.GetHashRange;
 import fakedht.neo.request.Put;
 import fakedht.neo.request.Get;
-import Mirror = fakedht.neo.request.Mirror;
+import fakedht.neo.request.Mirror;
 import GetAll = fakedht.neo.request.GetAll;
 import fakedht.neo.request.GetChannels;
 import Exists = fakedht.neo.request.Exists;
@@ -40,7 +40,7 @@ static this ( )
     requests.add(RequestCode.GetHashRange, "GetHashRange", &GetHashRange.handle);
     requests.add(Command(RequestCode.Put, 0), "Put", PutImpl_v0.classinfo);
     requests.add(Command(RequestCode.Get, 0), "Get", GetImpl_v0.classinfo);
-    requests.add(RequestCode.Mirror, "Mirror", &Mirror.handle);
+    requests.add(Command(RequestCode.Mirror, 0), "Mirror", MirrorImpl_v0.classinfo);
     requests.add(RequestCode.GetAll, "GetAll", &GetAll.handle);
     requests.add(Command(RequestCode.GetChannels, 0),
         "GetChannels", GetChannelsImpl_v0.classinfo);
