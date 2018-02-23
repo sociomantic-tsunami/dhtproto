@@ -12,10 +12,11 @@
 
 module dhtproto.node.neo.request.GetAll;
 
+import swarm.neo.node.IRequestHandler;
 import ocean.util.log.Logger;
 
 /// ditto
-public abstract scope class GetAllProtocol_v0
+public abstract class GetAllProtocol_v0 : IRequestHandler
 {
     import swarm.neo.node.RequestOnConn;
     import swarm.neo.connection.RequestOnConnBase;
@@ -26,8 +27,13 @@ public abstract scope class GetAllProtocol_v0
     import dhtproto.node.neo.request.core.Mixins;
     import ocean.transition;
 
-    /// Mixin the constructor and resources member.
-    mixin RequestCore!();
+    /***************************************************************************
+
+        Mixin the initialiser and the connection and resources members.
+
+    ***************************************************************************/
+
+    mixin IRequestHandlerRequestCore!();
 
     /// Batch of records to send.
     private RecordBatcher batcher;
@@ -109,54 +115,71 @@ public abstract scope class GetAllProtocol_v0
     /// Value filter.
     private ValueFilter filter;
 
+    /// If true, the request should be started in the suspended state.
+    bool start_suspended;
+
+    /// Return value of startIteration() or continueIteration().
+    private bool initialised_ok;
+
     /***************************************************************************
 
-        Request handler. Reads the initial message from the client, responds to
-        the client with a status code, and starts the request handling fibers.
+        Called by the connection handler immediately after the request code and
+        version have been parsed from a message received over the connection.
+        Allows the request handler to process the remainder of the incoming
+        message, before the connection handler sends the supported code back to
+        the client.
+
+        Note: the initial payload is a slice of the connection's read buffer.
+        This means that when the request-on-conn fiber suspends, the contents of
+        the buffer (hence the slice) may change. It is thus *absolutely
+        essential* that this method does not suspend the fiber. (This precludes
+        all I/O operations on the connection.)
 
         Params:
-            connection = connection to client
-            msg_payload = initial message read from client to begin the request
-                (the request code and version are assumed to be extracted)
+            init_payload = initial message payload read from the connection
 
     ***************************************************************************/
 
-    final public void handle ( RequestOnConn connection,
-        Const!(void)[] msg_payload )
+    public void preSupportedCodeSent ( Const!(void)[] init_payload )
     {
-        this.connection = connection;
-
-        // Parse initial message from client.
-        bool start_suspended;
-        cstring channel;
         bool continuing;
         hash_t continue_from;
+        cstring channel;
         Const!(void)[] value_filter;
-        this.connection.event_dispatcher.message_parser.parseBody(msg_payload,
-            start_suspended, channel, continuing, continue_from, this.keys_only,
-            value_filter);
+        this.connection.event_dispatcher.message_parser.parseBody(init_payload,
+            this.start_suspended, channel, continuing, continue_from,
+            this.keys_only, value_filter);
 
-        bool ok;
         if ( continuing )
-            ok = this.continueIteration(channel, continue_from);
+            this.initialised_ok = this.continueIteration(channel, continue_from);
         else
-            ok = this.startIteration(channel);
+            this.initialised_ok = this.startIteration(channel);
 
+        // Set up filtering.
+        this.filter.init(value_filter);
+    }
+
+    /***************************************************************************
+
+        Called by the connection handler after the supported code has been sent
+        back to the client.
+
+    ***************************************************************************/
+
+    public void postSupportedCodeSent ( )
+    {
         // Send status code
         this.connection.event_dispatcher.send(
             ( RequestOnConnBase.EventDispatcher.Payload payload )
             {
-                payload.addConstant(ok
-                    ? RequestStatusCode.Started : RequestStatusCode.Error);
+                payload.addConstant(this.initialised_ok
+                    ? MessageType.Started : MessageType.Error);
             }
         );
         this.connection.event_dispatcher.flush();
 
-        if ( !ok )
+        if ( !this.initialised_ok )
             return;
-
-        // Set up filtering.
-        this.filter.init(value_filter);
 
         // Acquire required resources.
         this.compressed_batch = this.resources.getVoidBuffer();
@@ -179,7 +202,7 @@ public abstract scope class GetAllProtocol_v0
             this.controller = null;
         }
 
-        if ( start_suspended )
+        if ( this.start_suspended )
             this.writer.suspender.requestSuspension();
 
         this.controller.fiber.start();

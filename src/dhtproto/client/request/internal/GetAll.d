@@ -167,6 +167,7 @@ private scope class GetAllHandler
     import swarm.neo.connection.RequestOnConnBase;
     import swarm.neo.client.mixins.AllNodesRequestCore;
     import swarm.neo.client.mixins.SuspendableRequestCore;
+    import swarm.neo.request.Command;
     import swarm.neo.request.RequestEventDispatcher;
     import swarm.neo.util.MessageFiber;
     import swarm.util.RecordBatcher;
@@ -234,7 +235,7 @@ private scope class GetAllHandler
     {
         auto request = createSuspendableRequest!(GetAll)(this.conn, this.context,
             &this.connect, &this.disconnected, &this.fillPayload,
-            &this.handleStatusCode, &this.handle);
+            &this.handleSupportedCode, &this.handle);
         request.run();
     }
 
@@ -307,36 +308,39 @@ private scope class GetAllHandler
     /***************************************************************************
 
         HandleStatusCode policy, called from SuspendableRequestInitialiser
-        template to decide how to handle the status code received from the node.
+        template to decide how to handle the supported code received from the
+        node.
 
         Params:
-            status = status code received from the node in response to the
+            code = supported code received from the node in response to the
                 initial message
 
         Returns:
-            true to continue handling the request (OK status); false to abort
-            (error status)
+            true to continue handling the request (supported); false to abort
+            (unsupported)
 
     ***************************************************************************/
 
-    private bool handleStatusCode ( ubyte status )
+    private bool handleSupportedCode ( ubyte status )
     {
-        auto getall_status = cast(RequestStatusCode)status;
+        auto supported = cast(SupportedStatus)status;
+        if ( !GetAll.handleSupportedCodes(supported,
+            this.context, this.conn.remote_address) )
+        {
+            return false; // Request/version not supported
+        }
 
-        if ( GetAll.handleGlobalStatusCodes(getall_status, this.context,
-            this.conn.remote_address) )
-            return false; // Global code, e.g. request/version not supported
-
-        // GetAll-specific codes
-        with ( RequestStatusCode ) switch ( getall_status )
+        // Handle initial started/error message from node.
+        auto msg = conn.receiveValue!(MessageType)();
+        with ( MessageType ) switch ( msg )
         {
             case Started:
-                // Expected "request started" code
-                return true;
+                // Expected "request started" code. Continue handling request.
+                break;
 
             case Error:
-                // The node returned an error code. Notify the user and
-                // end the request.
+                // The node returned an error code. Notify the user and end the
+                // request.
                 GetAll.Notification n;
                 n.node_error = RequestNodeInfo(
                     this.context.request_id, conn.remote_address);
@@ -344,11 +348,11 @@ private scope class GetAllHandler
                 return false;
 
             default:
-                // Treat unknown codes as internal errors.
+                // Treat unknown/unexpected codes as node errors.
                 goto case Error;
         }
 
-        assert(false);
+        return true;
     }
 
     /***************************************************************************
