@@ -28,52 +28,13 @@ import ocean.transition;
 
 /*******************************************************************************
 
-    The request handler for the table of handlers. When called, runs in a fiber
-    that can be controlled via `connection`.
-
-    Params:
-        shared_resources = an opaque object containing resources owned by the
-            node which are required by the request
-        connection  = performs connection socket I/O and manages the fiber
-        cmdver      = the version number of the Consume command as specified by
-                      the client
-        msg_payload = the payload of the first message of this request
-
-*******************************************************************************/
-
-public void handle ( Object shared_resources, RequestOnConn connection,
-    Command.Version cmdver, Const!(void)[] msg_payload )
-{
-    auto resources = new SharedResources;
-
-    switch ( cmdver )
-    {
-        case 0:
-            scope rq = new MirrorImpl_v0(resources);
-            rq.handle(connection, msg_payload);
-            break;
-
-        default:
-            auto ed = connection.event_dispatcher;
-            ed.send(
-                ( ed.Payload payload )
-                {
-                    payload.addConstant(SupportedStatus.RequestVersionNotSupported);
-                }
-            );
-            break;
-    }
-}
-
-/*******************************************************************************
-
     Fake node implementation of the v0 Mirror request protocol.
 
 *******************************************************************************/
 
 import fakedht.Storage; // DhtListener
 
-private scope class MirrorImpl_v0 : MirrorProtocol_v0, DhtListener
+public class MirrorImpl_v0 : MirrorProtocol_v0, DhtListener
 {
     import fakedht.Storage;
     import ocean.core.array.Mutation : copy;
@@ -87,20 +48,6 @@ private scope class MirrorImpl_v0 : MirrorProtocol_v0, DhtListener
 
     /// List of keys to visit during an iteration.
     private istring[] iterate_keys;
-
-    /***************************************************************************
-
-        Constructor.
-
-        Params:
-            shared_resources = DHT request resources getter
-
-    ***************************************************************************/
-
-    public this ( IRequestResources resources )
-    {
-        super(resources);
-    }
 
     /***************************************************************************
 
