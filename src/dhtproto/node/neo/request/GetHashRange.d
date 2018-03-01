@@ -13,6 +13,7 @@
 module dhtproto.node.neo.request.GetHashRange;
 
 import swarm.neo.AddrPort;
+import swarm.neo.node.IRequestHandler;
 
 /*******************************************************************************
 
@@ -45,7 +46,7 @@ public struct HashRangeUpdate
 
 *******************************************************************************/
 
-public abstract scope class GetHashRangeProtocol_v0
+public abstract scope class GetHashRangeProtocol_v0 : IRequestHandler
 {
     import swarm.neo.node.RequestOnConn;
     import dhtproto.common.GetHashRange;
@@ -53,13 +54,8 @@ public abstract scope class GetHashRangeProtocol_v0
 
     import ocean.transition;
 
-    /***************************************************************************
-
-        Mixin the constructor and resources member.
-
-    ***************************************************************************/
-
-    mixin RequestCore!();
+    /// Mixin the initialiser and the connection and resources members.
+    mixin IRequestHandlerRequestCore!();
 
     /***************************************************************************
 
@@ -84,31 +80,37 @@ public abstract scope class GetHashRangeProtocol_v0
 
     /***************************************************************************
 
-        Request-on-conn, to get the event dispatcher and control the fiber.
+        Called by the connection handler immediately after the request code and
+        version have been parsed from a message received over the connection.
+        Allows the request handler to process the remainder of the incoming
+        message, before the connection handler sends the supported code back to
+        the client.
+
+        Note: the initial payload is a slice of the connection's read buffer.
+        This means that when the request-on-conn fiber suspends, the contents of
+        the buffer (hence the slice) may change. It is thus *absolutely
+        essential* that this method does not suspend the fiber. (This precludes
+        all I/O operations on the connection.)
+
+        Params:
+            init_payload = initial message payload read from the connection
 
     ***************************************************************************/
 
-    private RequestOnConn connection;
+    public void preSupportedCodeSent ( Const!(void)[] init_payload )
+    {
+        // Nothing more to parse from the payload.
+    }
 
     /***************************************************************************
 
-        Request handler. Informs the client of the node's current hash range,
-        then suspends, waiting for updates to the hash range of this node or
-        information about other nodes' hash ranges. When updates are available,
-        the request is resumed and a message is sent to the client (one per
-        update), forwarding the hash range update.
-
-        Params:
-            connection = connection to client
-            msg_payload = initial message read from client to begin the request
-                (the request code and version are assumed to be extracted)
+        Called by the connection handler after the supported code has been sent
+        back to the client.
 
     ***************************************************************************/
 
-    final public void handle ( RequestOnConn connection, Const!(void)[] msg_payload )
+    public void postSupportedCodeSent ( )
     {
-        this.connection = connection;
-
         hash_t min, max;
         this.getCurrentHashRange(min, max);
 
@@ -116,15 +118,8 @@ public abstract scope class GetHashRangeProtocol_v0
         scope ( exit )
             this.unregisterForHashRangeUpdates();
 
-        // Send Started status code and current hash range
+        // Send current hash range
         auto ed = this.connection.event_dispatcher();
-        ed.send(
-            ( ed.Payload payload )
-            {
-                payload.addConstant(RequestStatusCode.Started);
-            }
-        );
-
         ed.send(
             ( ed.Payload payload )
             {
