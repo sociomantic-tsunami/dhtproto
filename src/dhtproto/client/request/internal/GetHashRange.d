@@ -18,7 +18,6 @@ module dhtproto.client.request.internal.GetHashRange;
 
 import ocean.transition;
 import ocean.util.log.Logger;
-import dhtproto.common.GetHashRange;
 import swarm.neo.client.NotifierTypes;
 
 /*******************************************************************************
@@ -91,7 +90,10 @@ public struct GetHashRange
 {
     import dhtproto.common.RequestCodes;
     import swarm.neo.client.mixins.RequestCore;
+    import swarm.neo.client.mixins.AllNodesRequestCore;
     import swarm.neo.client.Connection;
+
+    import dhtproto.client.internal.SharedResources;
 
     import ocean.io.select.protocol.generic.ErrnoIOException: IOError;
 
@@ -105,7 +107,8 @@ public struct GetHashRange
 
     private static struct SharedWorking
     {
-        // Dummy (not required by this request)
+        /// Shared working data required for core all-nodes request behaviour.
+        AllNodesRequestSharedWorkingData all_nodes;
     }
 
     /***************************************************************************
@@ -154,31 +157,13 @@ public struct GetHashRange
     }
     body
     {
-        scope h = new Handler(conn, context_blob);
+        auto context = GetHashRange.getContext(context_blob);
 
-        do
-        {
-            try
-            {
-                h.run(h.State.EstablishingConnection);
-            }
-            // As this request is fundamental to the DHT client, we always
-            // retry after errors.
-            catch (IOError e)
-            {
-                log.error("I/O error: {} @ {}:{}", getMsg(e), e.file, e.line);
-            }
-            catch (Connection.ConnectionClosedException e)
-            {
-                // Connection deliberately shut down -- no need to log.
-            }
-            catch (Exception e)
-            {
-                log.error("{} error: {} @ {}:{}", e.classinfo.name,
-                    getMsg(e), e.file, e.line);
-            }
-        }
-        while ( true ); // always try again
+        auto shared_resources = SharedResources.fromObject(
+            context.shared_resources);
+        scope handler = new GetHashRangeHandler(conn, context,
+            shared_resources);
+        handler.run();
     }
 
     /***************************************************************************
@@ -208,229 +193,195 @@ public struct GetHashRange
 
 *******************************************************************************/
 
-private scope class Handler
+private scope class GetHashRangeHandler
 {
-    import swarm.neo.util.StateMachine;
-    import swarm.neo.request.Command : StatusCode, SupportedStatus;
-    import swarm.neo.AddrPort;
+    import swarm.neo.request.Command;
+    import swarm.neo.client.Connection;
     import swarm.neo.client.RequestOnConn;
-    import dhtproto.common.RequestCodes;
+    import swarm.neo.connection.RequestOnConnBase;
+    import swarm.neo.client.mixins.AllNodesRequestCore;
+    import swarm.neo.request.RequestEventDispatcher;
+    import swarm.neo.AddrPort;
+
+    import dhtproto.common.GetHashRange;
     import dhtproto.client.internal.SharedResources;
 
-    /***************************************************************************
-
-        Mixin core of state machine.
-
-    ***************************************************************************/
-
-    mixin(genStateMachine([
-        "EstablishingConnection",
-        "Initialising",
-        "Receiving"
-    ]));
-
-    /***************************************************************************
-
-        Event dispatcher for this connection.
-
-    ***************************************************************************/
-
+    /// Request-on-conn event dispatcher.
     private RequestOnConn.EventDispatcherAllNodes conn;
 
-    /***************************************************************************
+    /// Request context.
+    private GetHashRange.Context* context;
 
-        Deserialized request context. Empty, but has methods which are used.
-
-    ***************************************************************************/
-
-    public GetHashRange.Context* context;
+    /// Client shared resources. (Note that, unlike many requests, this is not
+    /// a resource acquirer. This request does not acquire any resources.)
+    private SharedResources resources;
 
     /***************************************************************************
 
         Constructor.
 
         Params:
-            conn = Event dispatcher for this connection
-            context_blob = serialized request context
+            conn = request-on-conn event dispatcher to communicate with node
+            context = deserialised request context
+            resources = client shared resources
 
     ***************************************************************************/
 
     public this ( RequestOnConn.EventDispatcherAllNodes conn,
-                  void[] context_blob )
+        GetHashRange.Context* context, SharedResources resources )
     {
         this.conn = conn;
-        this.context = GetHashRange.getContext(context_blob);
+        this.context = context;
+        this.resources = resources;
     }
 
     /***************************************************************************
 
-        Waits for the connection to be established if it is down.
-
-        Next state:
-            - Initialising (once connection is established)
-
-        Returns:
-            next state
+        Main request handling entry point.
 
     ***************************************************************************/
 
-    private State stateEstablishingConnection ( )
+    public void run ( )
     {
-        while (true)
-        {
-            switch (this.conn.waitForReconnect())
-            {
-                case conn.FiberResumeCodeReconnected:
-                case 0: // The connection is already up
-                    return State.Initialising;
-
-                default:
-                    assert(false,
-                        typeof(this).stringof ~ ".stateWaitingForReconnect: " ~
-                        "Unexpected fiber resume code when reconnecting");
-            }
-        }
+        auto initialiser = createAllNodesRequestInitialiser!(GetHashRange)(
+            this.conn, this.context, &this.fillPayload,
+            &this.handleSupportedCode);
+        auto request = createAllNodesRequest!(GetHashRange)(this.conn,
+            this.context, &this.connect, &this.disconnected, initialiser,
+            &this.handle);
+        request.run();
     }
 
     /***************************************************************************
 
-        Sends the request code, version, etc. to the node to begin the request,
-        then receives the status code and hash range from the node.
-
-        Next state:
-            - Receiving (once the request is initialised)
-            - Exit, if the node returns an error status
+        Connect policy, called from AllNodesRequest template to ensure the
+        connection to the node is up.
 
         Returns:
-            next state
+            true to continue handling the request; false to abort
 
     ***************************************************************************/
 
-    private State stateInitialising ( )
-    in
+    private bool connect ( )
     {
-        // stateWaitingForReconnect should guarantee we're already connected
-        assert(this.conn.waitForReconnect() == 0);
+        return allNodesRequestConnector(this.conn);
     }
-    body
+
+    /***************************************************************************
+
+        Disconnected policy, called from AllNodesRequest template when an I/O
+        error occurs on the connection.
+
+        Params:
+            e = exception indicating error which occurred on the connection
+
+    ***************************************************************************/
+
+    private void disconnected ( Exception e )
     {
-        // Send request info to node
-        this.conn.send(
-            ( conn.Payload payload )
-            {
-                payload.add(GetHashRange.cmd.code);
-                payload.add(GetHashRange.cmd.ver);
-            }
-        );
-        this.conn.flush();
+        // Log errors, except when the connection was deliberately shut down.
+        if ( cast(Connection.ConnectionClosedException)e is null )
+            log.error("I/O error: {} @ {}:{}", e.message, e.file, e.line);
+    }
 
-        // Receive status from node and stop the request if not Ok
-        auto status = conn.receiveValue!(StatusCode)();
-        switch ( status )
-        {
-            case RequestStatusCode.Started:
-                break;
+    /***************************************************************************
 
-            case SupportedStatus.RequestNotSupported:
-                log.error("Node {}:{} returned a request not supported status to GetHashRange",
-                    this.conn.remote_address.address_bytes,
-                    this.conn.remote_address.port);
-                return State.Exit;
+        FillPayload policy, called from AllNodesRequestInitialiser template
+        to add request-specific data to the initial message payload send to the
+        node to begin the request.
 
-            case SupportedStatus.RequestVersionNotSupported:
-                log.error("Node {}:{} returned a request version not supported status to GetHashRange",
-                    this.conn.remote_address.address_bytes,
-                    this.conn.remote_address.port);
-                return State.Exit;
+        Params:
+            payload = message payload to be filled
 
-            case RequestStatusCode.Error:
-                log.error("Node {}:{} returned an error status to GetHashRange",
-                    this.conn.remote_address.address_bytes,
-                    this.conn.remote_address.port);
-                return State.Exit;
+    ***************************************************************************/
 
-            default:
-                log.error("Node {}:{} returned an unknown status code {} to GetHashRange",
-                    this.conn.remote_address.address_bytes,
-                    this.conn.remote_address.port, status);
-                return State.Exit;
-        }
+    private void fillPayload ( RequestOnConnBase.EventDispatcher.Payload payload )
+    {
+        // Nothing more to add. (Request code and version already added.)
+    }
 
+    /***************************************************************************
+
+        HandleStatusCode policy, called from AllNodesRequestInitialiser
+        template to decide how to handle the status code received from the node.
+
+        Params:
+            supported = supported code received from the node in response to the
+                initial message
+
+        Returns:
+            true to continue handling the request (supported); false to abort
+            (unsupported)
+
+    ***************************************************************************/
+
+    private bool handleSupportedCode ( ubyte code )
+    {
+        auto supported = cast(SupportedStatus)code;
+        return GetHashRange.handleSupportedCodes(supported,
+            this.context, this.conn.remote_address);
+    }
+
+    /***************************************************************************
+
+        Handler policy, called from AllNodesRequest template to run the
+        request's main handling logic.
+
+    ***************************************************************************/
+
+    private void handle ( )
+    {
         // Receive and store node's current hash range
         hash_t min, max;
         this.conn.receive(
-            ( in void[] const_payload )
+            ( in void[] payload )
             {
-                Const!(void)[] payload = const_payload;
-                min = *this.conn.message_parser.getValue!(hash_t)(payload);
-                max = *this.conn.message_parser.getValue!(hash_t)(payload);
+                Const!(void)[] payload_slice = payload;
+                min = *this.conn.message_parser.getValue!(hash_t)(payload_slice);
+                max = *this.conn.message_parser.getValue!(hash_t)(payload_slice);
             }
         );
-        auto shared_resources = SharedResources.fromObject(
-            this.context.shared_resources);
-        shared_resources.node_hash_ranges.updateNodeHashRange(
+        this.resources.node_hash_ranges.updateNodeHashRange(
             this.conn.remote_address, min, max);
 
-        return State.Receiving;
-    }
-
-    /***************************************************************************
-
-        Default running state. Receives and handles hash-range update messages
-        from the node.
-
-        Next state:
-            - Receiving again
-
-        Returns:
-            next state
-
-    ***************************************************************************/
-
-    private State stateReceiving ( )
-    {
-        bool msg_error;
-        this.conn.receive(
-            ( in void[] const_payload )
-            {
-                Const!(void)[] payload = const_payload;
-
-                auto msg_type =
-                    *this.conn.message_parser.getValue!(MessageType)(payload);
-
-                with ( MessageType ) switch ( msg_type )
+        while ( true )
+        {
+            this.conn.receive(
+                ( in void[] payload )
                 {
-                    case NewNode:
-                        typeof(AddrPort.naddress) addr;
-                        typeof(AddrPort.nport) port;
-                        hash_t min, max;
-                        this.conn.message_parser.parseBody(payload,
-                            addr, port, min, max);
+                    Const!(void)[] payload_slice = payload;
+                    auto msg_type = *this.conn.message_parser.
+                        getValue!(MessageType)(payload_slice);
 
-                        auto shared_resources = SharedResources.fromObject(
-                            this.context.shared_resources);
-                        shared_resources.node_hash_ranges.updateNodeHashRange(
-                            AddrPort(addr, port), min, max);
-                        break;
+                    with ( MessageType ) switch ( msg_type )
+                    {
+                        case NewNode:
+                            typeof(AddrPort.naddress) addr;
+                            typeof(AddrPort.nport) port;
+                            hash_t min, max;
+                            this.conn.message_parser.parseBody(payload_slice,
+                                addr, port, min, max);
 
-                    case ChangeHashRange:
-                        hash_t new_min, new_max;
-                        this.conn.message_parser.parseBody(payload,
-                            new_min, new_max);
+                            this.resources.node_hash_ranges.updateNodeHashRange(
+                                AddrPort(addr, port), min, max);
+                            break;
 
-                        auto shared_resources = SharedResources.fromObject(
-                            this.context.shared_resources);
-                        shared_resources.node_hash_ranges.updateNodeHashRange(
-                            this.conn.remote_address, new_min, new_max);
-                        break;
+                        case ChangeHashRange:
+                            hash_t new_min, new_max;
+                            this.conn.message_parser.parseBody(payload_slice,
+                                new_min, new_max);
 
-                    default:
-                        log.error("Unknown message code {} received", msg_type);
-                        this.conn.shutdownWithProtocolError("Message parsing error");
+                            this.resources.node_hash_ranges.updateNodeHashRange(
+                                this.conn.remote_address, new_min, new_max);
+                            break;
+
+                        default:
+                            log.error("Unknown message code {} received", msg_type);
+                            throw this.conn.shutdownWithProtocolError(
+                                "Message parsing error");
+                    }
                 }
-            }
-        );
-
-        return State.Receiving;
+            );
+        }
     }
 }

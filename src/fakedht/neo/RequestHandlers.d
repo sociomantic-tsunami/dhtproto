@@ -17,7 +17,7 @@ import swarm.neo.request.Command;
 
 import dhtproto.common.RequestCodes;
 
-import GetHashRange = fakedht.neo.request.GetHashRange;
+import fakedht.neo.request.GetHashRange;
 import fakedht.neo.request.Put;
 import fakedht.neo.request.Get;
 import fakedht.neo.request.Mirror;
@@ -37,7 +37,8 @@ public ConnectionHandler.RequestMap requests;
 
 static this ( )
 {
-    requests.add(RequestCode.GetHashRange, "GetHashRange", &GetHashRange.handle);
+    requests.add(Command(RequestCode.GetHashRange, 0), "GetHashRange",
+        GetHashRangeImpl_v0.classinfo);
     requests.add(Command(RequestCode.Put, 0), "Put", PutImpl_v0.classinfo);
     requests.add(Command(RequestCode.Get, 0), "Get", GetImpl_v0.classinfo);
     requests.add(Command(RequestCode.Mirror, 0), "Mirror", MirrorImpl_v0.classinfo);

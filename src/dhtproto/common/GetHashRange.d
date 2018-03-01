@@ -16,24 +16,6 @@ import swarm.neo.request.Command;
 
 /*******************************************************************************
 
-    Status code enum. Sent from the node to the client.
-
-*******************************************************************************/
-
-public enum RequestStatusCode : StatusCode
-{
-    /// Invalid, default value
-    None,
-
-    /// GetHashRange started
-    Started,
-
-    /// Internal node error occurred
-    Error
-}
-
-/*******************************************************************************
-
     Message type enum. Each message sent between the node and the client as part
     of a GetHashRange request is prepended by a type indicator.
 
