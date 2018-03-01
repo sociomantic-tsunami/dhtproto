@@ -26,22 +26,10 @@
 
 module dhtproto.client.UsageExamples;
 
-
-/// Mixin helper for the SmartUnion's final switch handlers. It inserts
-/// case none: assert(false); in D2 and default: assert(false); in D1
-/// TODO: This should be replaced with the
-/// `ocean.core.SmartUnion.handleInvalidCases`, available in ocean v3.5.x and
-/// later (not yet released).
-const handleInvalidCases = "case none: assert(false);" ~
-    // The D2 build makes sure all enum cases are covered so in fact we don't
-    // need a default. However, D1 emits a compiler warning if a switch
-    // has no default so we add a default here just to avoid the warning.
-    "version (D_Version2){} else {default: assert(false);}";
-
 version ( UnitTest )
 {
     import ocean.transition;
-
+    import ocean.core.SmartUnion;
     import ocean.util.app.DaemonApp;
 
     // DaemonApp class showing typical neo DHT client initialisation. The class
@@ -163,7 +151,7 @@ version ( UnitTest )
                     this.log.error(this.msg_buf);
                     break;
 
-                mixin(handleInvalidCases);
+                mixin(typeof(info).handleInvalidCases);
             }
         }
     }
@@ -217,7 +205,7 @@ unittest
                     this.log.error(this.msg_buf);
                     break;
 
-                mixin(handleInvalidCases);
+                mixin(typeof(info).handleInvalidCases);
             }
         }
     }
@@ -261,7 +249,7 @@ unittest
                     this.log.error(this.msg_buf);
                     break;
 
-                mixin(handleInvalidCases);
+                mixin(typeof(info).handleInvalidCases);
             }
         }
     }
@@ -331,7 +319,7 @@ unittest
                     this.log.error(this.msg_buf);
                     break;
 
-                mixin(handleInvalidCases);
+                mixin(typeof(info).handleInvalidCases);
             }
         }
     }
@@ -394,7 +382,7 @@ unittest
                     this.log.error(this.msg_buf);
                     break;
 
-                mixin(handleInvalidCases);
+                mixin(typeof(info).handleInvalidCases);
             }
         }
     }
@@ -441,7 +429,7 @@ unittest
                     this.log.error(this.msg_buf);
                     break;
 
-                mixin(handleInvalidCases);
+                mixin(typeof(info).handleInvalidCases);
             }
         }
     }
@@ -516,7 +504,7 @@ unittest
                     this.log.error(this.msg_buf);
                     break;
 
-                mixin(handleInvalidCases);
+                mixin(typeof(info).handleInvalidCases);
             }
         }
     }
@@ -561,7 +549,7 @@ unittest
                     this.log.error(this.msg_buf);
                     break;
 
-                mixin(handleInvalidCases);
+                mixin(typeof(info).handleInvalidCases);
             }
         }
     }
@@ -633,7 +621,7 @@ unittest
                     this.log.error(this.msg_buf);
                     break;
 
-                mixin(handleInvalidCases);
+                mixin(typeof(info).handleInvalidCases);
             }
         }
     }
@@ -677,7 +665,7 @@ unittest
                     this.log.error(this.msg_buf);
                     break;
 
-                mixin(handleInvalidCases);
+                mixin(typeof(info).handleInvalidCases);
             }
         }
     }
@@ -775,7 +763,7 @@ unittest
                     this.log.error(this.msg_buf);
                     break;
 
-                mixin(handleInvalidCases);
+                mixin(typeof(info).handleInvalidCases);
             }
         }
 
@@ -848,7 +836,7 @@ unittest
                     this.log.error(this.msg_buf);
                     break;
 
-                mixin(handleInvalidCases);
+                mixin(typeof(info).handleInvalidCases);
             }
         }
     }
