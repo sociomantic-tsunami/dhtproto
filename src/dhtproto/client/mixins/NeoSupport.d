@@ -90,6 +90,7 @@ template NeoSupport ( )
         public import GetAll = dhtproto.client.request.GetAll;
         public import GetChannels = dhtproto.client.request.GetChannels;
         public import Exists = dhtproto.client.request.Exists;
+        public import RemoveChannel = dhtproto.client.request.RemoveChannel;
 
         /***********************************************************************
 
@@ -107,6 +108,7 @@ template NeoSupport ( )
             import dhtproto.client.request.internal.GetAll;
             import dhtproto.client.request.internal.GetChannels;
             import dhtproto.client.request.internal.Exists;
+            import dhtproto.client.request.internal.RemoveChannel;
         }
 
         /***********************************************************************
@@ -151,7 +153,7 @@ template NeoSupport ( )
         ***********************************************************************/
 
         public alias RequestStatsTemplate!("Get", "Put", "Mirror", "GetAll",
-            "GetChannels", "Exists") RequestStats;
+            "GetChannels", "Exists", "RemoveChannel") RequestStats;
 
         /***********************************************************************
 
@@ -452,6 +454,40 @@ template NeoSupport ( )
             );
 
             auto id = this.assign!(Internals.GetChannels)(params);
+            return id;
+        }
+
+        /***********************************************************************
+
+            Assigns a RemoveChannel request to delete the specified channel from
+            the DHT.
+
+            See $(LINK2 dhtproto/client/request/RemoveChannel.html, dhtproto.client.request.RemoveChannel)
+            for detailed documentation.
+
+            Params:
+                channel = name of channel to remove
+                notifier = notifier delegate
+
+            Returns:
+                id of newly assigned request
+
+            Throws:
+                NoMoreRequests if the pool of active requests is full
+
+        ***********************************************************************/
+
+        public RequestId removeChannel ( cstring channel,
+            RemoveChannel.Notifier notifier )
+        {
+            auto params = Const!(Internals.RemoveChannel.UserSpecifiedParams)(
+                Const!(RemoveChannel.Args)(channel),
+                Const!(Internals.RemoveChannel.UserSpecifiedParams.SerializedNotifier)(
+                    *(cast(Const!(ubyte[notifier.sizeof])*)&notifier)
+                )
+            );
+
+            auto id = this.assign!(Internals.RemoveChannel)(params);
             return id;
         }
 
@@ -1608,6 +1644,92 @@ template NeoSupport ( )
             res.neo = this.outer.neo;
             res.channel_name = &channel_buffer;
 
+            return res;
+        }
+
+        /***********************************************************************
+
+            Struct returned after a RemoveChannel request has finished.
+
+        ***********************************************************************/
+
+        private struct RemoveChannelResult
+        {
+            /*******************************************************************
+
+                Set to true if the channel was removed from the DHT or did not
+                exist. False if an error occurred.
+
+            *******************************************************************/
+
+            bool succeeded;
+        }
+
+        /***********************************************************************
+
+            Assigns a RemoveChannel request and blocks the current Task until
+            the request is completed. See
+            $(LINK2 dhtproto/client/request/RemoveChannel.html, dhtproto.client.request.RemoveChannel)
+            for detailed documentation.
+
+            Note that the API of this method is intentionally minimal (e.g. it
+            provides no detailed feedback about errors to the user). If you need
+            more control, use the method above which works via a notifier
+            callback.
+
+            Params:
+                channel = name of the channel to remove
+
+            Returns:
+                RemoveChannelResult struct, indicating the result of the request
+
+        ***********************************************************************/
+
+        public RemoveChannelResult removeChannel ( cstring channel )
+        {
+            auto task = Task.getThis();
+            assert(task !is null, "This method may only be called from inside a Task");
+
+            enum FinishedStatus
+            {
+                None,
+                Succeeded,
+                Failed
+            }
+
+            FinishedStatus state;
+
+            void notifier ( Neo.RemoveChannel.Notification info,
+                Neo.RemoveChannel.Args args )
+            {
+                with ( info.Active ) final switch ( info.active )
+                {
+                    case finished:
+                        state = state.Succeeded;
+                        if ( task.suspended )
+                            task.resume();
+                        break;
+
+                    case not_permitted:
+                    case node_disconnected:
+                    case node_error:
+                    case unsupported:
+                        state = state.Failed;
+                        if ( task.suspended )
+                            task.resume();
+                        break;
+
+                    mixin(typeof(info).handleInvalidCases);
+                }
+            }
+
+            this.outer.neo.removeChannel(channel, &notifier);
+            if ( state == state.None ) // if request not completed, suspend
+                task.suspend();
+            assert(state != state.None);
+
+            RemoveChannelResult res;
+            res.succeeded = state == state.Succeeded;
             return res;
         }
     }
