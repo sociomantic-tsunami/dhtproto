@@ -789,7 +789,7 @@ template NeoSupport ( )
 
             void notifier ( Neo.Put.Notification info, Const!(Neo.Put.Args) args )
             {
-                with ( info.Active ) switch ( info.active )
+                with ( info.Active ) final switch ( info.active )
                 {
                     case success:
                         state = state.Succeeded;
@@ -809,7 +809,7 @@ template NeoSupport ( )
                             task.resume();
                         break;
 
-                    default: assert(false);
+                    mixin(typeof(info).handleInvalidCases);
                 }
             }
 
@@ -934,7 +934,7 @@ template NeoSupport ( )
 
             void notifier ( Neo.Get.Notification info, Const!(Neo.Get.Args) args )
             {
-                with ( info.Active ) switch ( info.active )
+                with ( info.Active ) final switch ( info.active )
                 {
                     case received:
                         value.copy(info.received.value);
@@ -952,13 +952,14 @@ template NeoSupport ( )
                     case unsupported:
                     case no_node:
                     case wrong_node:
+                    case timed_out:
                     case failure:
                         state = state.Failed;
                         if ( task.suspended )
                             task.resume();
                         break;
 
-                    default: assert(false);
+                    mixin(typeof(info).handleInvalidCases);
                 }
             }
 
@@ -1072,7 +1073,7 @@ template NeoSupport ( )
 
             void notifier ( Neo.Exists.Notification info, Const!(Neo.Exists.Args) args )
             {
-                with ( info.Active ) switch ( info.active )
+                with ( info.Active ) final switch ( info.active )
                 {
                     case exists:
                         res.exists = true;
@@ -1093,7 +1094,7 @@ template NeoSupport ( )
                         res.succeeded = false;
                         break;
 
-                    default: assert(false);
+                    mixin(typeof(info).handleInvalidCases);
                 }
 
                 // All Exists notifications indicate that the request has
@@ -1324,7 +1325,7 @@ template NeoSupport ( )
             private void notifier ( Neo.GetAll.Notification info,
                 Const!(Neo.GetAll.Args) args )
             {
-                with ( info.Active ) switch ( info.active )
+                with ( info.Active ) final switch ( info.active )
                 {
                     case received:
                         // Ignore all received value on user break.
@@ -1350,6 +1351,8 @@ template NeoSupport ( )
                         this.task.resume();
                         break;
 
+                    case suspended: // Unexepected (unsupported by blocking API)
+                    case resumed: // Unexepected (unsupported by blocking API)
                     case node_disconnected:
                     case node_error:
                     case unsupported:
@@ -1370,7 +1373,7 @@ template NeoSupport ( )
                         // Irrelevant.
                         break;
 
-                    default: assert(false);
+                    mixin(typeof(info).handleInvalidCases);
                 }
             }
 
@@ -1508,7 +1511,7 @@ template NeoSupport ( )
             private void notifier ( Neo.GetChannels.Notification info,
                 Const!(Neo.GetChannels.Args) args )
             {
-                with ( info.Active ) switch ( info.active )
+                with ( info.Active ) final switch ( info.active )
                 {
                     case received:
                         // Ignore all received value on user break.
@@ -1541,7 +1544,7 @@ template NeoSupport ( )
                         this.error = true;
                         break;
 
-                    default: assert(false);
+                    mixin(typeof(info).handleInvalidCases);
                 }
             }
 
@@ -1741,7 +1744,7 @@ template NeoSupport ( )
     private void connNotifier ( Neo.ConnNotification info )
     {
         Neo.DhtConnNotification n;
-        with ( info.Active ) switch ( info.active )
+        with ( info.Active ) final switch ( info.active )
         {
             case connected:
                 n.connected = NodeInfo(info.connected.node_addr);
@@ -1751,8 +1754,7 @@ template NeoSupport ( )
                     info.error_while_connecting.node_addr,
                     info.error_while_connecting.e);
                 break;
-            default:
-                assert(false);
+            mixin(typeof(info).handleInvalidCases);
         }
 
         this.user_conn_notifier(n);
