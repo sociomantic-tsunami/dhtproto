@@ -27,6 +27,8 @@ import ocean.task.Scheduler;
 import ocean.task.util.Timer;
 import ocean.text.convert.Formatter;
 
+import swarm.Const : NodeItem;
+
 /*******************************************************************************
 
     Aliases to exceptions thrown on illegal operations with dht storage
