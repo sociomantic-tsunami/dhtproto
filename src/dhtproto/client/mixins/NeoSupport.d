@@ -775,7 +775,7 @@ template NeoSupport ( )
 
         ***********************************************************************/
 
-        private static struct PutResult
+        private struct PutResult
         {
             /*******************************************************************
 
@@ -909,7 +909,7 @@ template NeoSupport ( )
 
         ***********************************************************************/
 
-        private static struct GetResult
+        private struct GetResult
         {
             /*******************************************************************
 
@@ -1058,7 +1058,7 @@ template NeoSupport ( )
 
         ***********************************************************************/
 
-        private static struct ExistsResult
+        private struct ExistsResult
         {
             /*******************************************************************
 
@@ -1198,7 +1198,7 @@ template NeoSupport ( )
 
         ***********************************************************************/
 
-        private static struct RemoveResult
+        private struct RemoveResult
         {
             /*******************************************************************
 
