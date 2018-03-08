@@ -271,24 +271,15 @@ public class MirrorSuspend : NeoDhtTestCase
             }
         );
 
-        // Timer which puts every 1ms
+        // Timer which puts every 1ms, until `end_after_updates` records have
+        // been put.
         hash_t key;
         ubyte[] value;
         value.length = 16 * 1024;
         scope put_timer = new TimerEvent(
             {
-                if ( num_written < end_after_updates )
-                {
-                    this.dht.neo.put(this.test_channel, key++, value,
-                        ( DhtClient.Neo.Put.Notification info,
-                            Const!(DhtClient.Neo.Put.Args) args )
-                        {
-                            if ( info.active == info.active.success )
-                                num_written++;
-                        }
-                    );
-                }
-                return num_written < end_after_updates;
+                this.dht.neo.put(this.test_channel, key++, value, null);
+                return ++num_written < end_after_updates;
             }
         );
         put_timer.set(0, 1, 0, 1);
