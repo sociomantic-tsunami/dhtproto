@@ -1,4 +1,4 @@
-## Neo Exists request
+### Neo Exists request
 
 `dhtproto.client.DhtClient`, `dhtproto.client.request.Exists`
 
