@@ -23,7 +23,6 @@ public final class SharedResources
     import ocean.util.container.pool.FreeList;
     import ocean.core.TypeConvert : downcast;
     import ocean.io.compress.Lzo;
-    import swarm.neo.request.RequestEventDispatcher;
     import swarm.neo.util.MessageFiber;
     import swarm.neo.util.VoidBufferAsArrayOf;
     import swarm.util.RecordBatcher;
@@ -33,9 +32,6 @@ public final class SharedResources
 
     /// Free list of recycled buffers
     private FreeList!(ubyte[]) buffers;
-
-    /// Free list of RequestEventDispatcher instances
-    private FreeList!(RequestEventDispatcher) request_event_dispatchers;
 
     /// Free list of MessageFiber instances
     private FreeList!(MessageFiber) fibers;
@@ -76,7 +72,6 @@ public final class SharedResources
     this ( )
     {
         this.buffers = new FreeList!(ubyte[]);
-        this.request_event_dispatchers = new FreeList!(RequestEventDispatcher);
         this.fibers = new FreeList!(MessageFiber);
         this.record_batches = new FreeList!(RecordBatch);
     }
@@ -146,10 +141,6 @@ public final class SharedResources
         /// Set of acquired buffers of NodeHashRange
         private AcquiredArraysOf!(NodeHashRange) acquired_node_hash_range_buffers;
 
-        /// Acquired RequestEventDispatcher singleton
-        private AcquiredSingleton!(RequestEventDispatcher)
-            acquired_request_event_dispatcher;
-
         /// Set of acquired fibers
         private Acquired!(MessageFiber) acquired_fibers;
 
@@ -167,8 +158,6 @@ public final class SharedResources
             this.acquired_buffers.initialise(this.outer.buffers);
             this.acquired_buffer_lists.initialise(this.outer.buffers);
             this.acquired_node_hash_range_buffers.initialise(this.outer.buffers);
-            this.acquired_request_event_dispatcher.initialise(
-                this.outer.request_event_dispatchers);
             this.acquired_fibers.initialise(this.outer.buffers,
                 this.outer.fibers);
             this.acquired_record_batches.initialise(this.outer.buffers,
@@ -186,7 +175,6 @@ public final class SharedResources
             this.acquired_buffers.relinquishAll();
             this.acquired_buffer_lists.relinquishAll();
             this.acquired_node_hash_range_buffers.relinquishAll();
-            this.acquired_request_event_dispatcher.relinquish();
             this.acquired_fibers.relinquishAll();
             this.acquired_record_batches.relinquishAll();
         }
@@ -288,24 +276,6 @@ public final class SharedResources
                 new RecordBatch(this.outer.lzo()));
             batch.clear();
             return batch;
-        }
-
-        /***********************************************************************
-
-            Returns:
-                pointer to singleton RequestEventDispatcher instance
-
-        ***********************************************************************/
-
-        public RequestEventDispatcher* request_event_dispatcher ( )
-        {
-            return this.acquired_request_event_dispatcher.acquire(
-                new RequestEventDispatcher,
-                ( RequestEventDispatcher* dispatcher )
-                {
-                    dispatcher.reset();
-                }
-            );
         }
     }
 }

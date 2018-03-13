@@ -38,7 +38,7 @@ import turtle.env.model.Registry;
 public abstract class Node ( NodeType, istring id ) : ITurtleEnv
 {
     import swarm.Const : NodeItem;
-    import swarm.neo.IPAddress;
+    import swarm.neo.AddrPort;
     import ocean.io.device.File;
     import ocean.core.Buffer;
     import turtle.env.Shell;

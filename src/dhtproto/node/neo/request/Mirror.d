@@ -41,6 +41,9 @@ public abstract class MirrorProtocol_v0 : IRequestHandler
 
     mixin IRequestHandlerRequestCore!();
 
+    /// Request event dispatcher.
+    private RequestEventDispatcher request_event_dispatcher;
+
     /// Buffer used to store record values to be sent to the client.
     private void[]* value_buffer;
 
@@ -429,6 +432,8 @@ public abstract class MirrorProtocol_v0 : IRequestHandler
         scope controller_ = new Controller;
         scope periodic_refresh_ = new PeriodicRefresh;
 
+        this.request_event_dispatcher.initialise(&this.resources.getVoidBuffer);
+
         // Note: we store refs to the scope instances in class fields as a
         // convenience to be able to access them from each other (e.g. the
         // writer needs to access the controller and vice-versa). It's normally
@@ -456,7 +461,7 @@ public abstract class MirrorProtocol_v0 : IRequestHandler
         this.periodic_refresh.fiber.start();
         this.controller.fiber.start();
         this.writer.fiber.start();
-        this.resources.request_event_dispatcher.eventLoop(
+        this.request_event_dispatcher.eventLoop(
             this.connection.event_dispatcher);
     }
 
@@ -494,7 +499,7 @@ public abstract class MirrorProtocol_v0 : IRequestHandler
         }
 
         if ( this.writer.suspended_waiting_for_events )
-            this.resources.request_event_dispatcher.signal(
+            this.request_event_dispatcher.signal(
                 this.connection.event_dispatcher, resume_code);
     }
 
@@ -522,7 +527,7 @@ public abstract class MirrorProtocol_v0 : IRequestHandler
         assert(pushed);
 
         if ( this.writer.suspended_waiting_for_events )
-            this.resources.request_event_dispatcher.signal(
+            this.request_event_dispatcher.signal(
                 this.connection.event_dispatcher,
                 NodeFiberResumeCode.PushedToQueue);
     }
@@ -537,7 +542,7 @@ public abstract class MirrorProtocol_v0 : IRequestHandler
     final protected void channelRemoved ( )
     {
         if ( this.writer.suspended_waiting_for_events )
-            this.resources.request_event_dispatcher.signal(
+            this.request_event_dispatcher.signal(
                 this.connection.event_dispatcher,
                 NodeFiberResumeCode.ChannelRemoved);
     }
@@ -657,7 +662,7 @@ public abstract class MirrorProtocol_v0 : IRequestHandler
         {
             this.fiber = this.outer.resources.getFiber(&this.fiberMethod);
             this.suspender = DelayedSuspender(
-                this.outer.resources.request_event_dispatcher,
+                &this.outer.request_event_dispatcher,
                 this.outer.connection.event_dispatcher,
                 this.fiber, NodeFiberResumeCode.ResumeAfterSuspension);
         }
@@ -688,7 +693,7 @@ public abstract class MirrorProtocol_v0 : IRequestHandler
             // The request is now finished. Inform client of this and ignore any
             // further incoming control messages.
             this.outer.has_ended = true;
-            this.outer.resources.request_event_dispatcher.send(this.fiber,
+            this.outer.request_event_dispatcher.send(this.fiber,
                 ( RequestOnConnBase.EventDispatcher.Payload payload )
                 {
                     payload.addCopy(MessageType.ChannelRemoved);
@@ -696,15 +701,15 @@ public abstract class MirrorProtocol_v0 : IRequestHandler
             );
 
             // Wait for ACK from client
-            this.outer.resources.request_event_dispatcher.receive(this.fiber,
+            this.outer.request_event_dispatcher.receive(this.fiber,
                 Message(MessageType.Ack));
 
             // It's no longer valid to handle control messages.
-            this.outer.resources.request_event_dispatcher.abort(
+            this.outer.request_event_dispatcher.abort(
                 this.outer.controller.fiber);
 
             // Cancel the periodic refresher.
-            this.outer.resources.request_event_dispatcher.abort(
+            this.outer.request_event_dispatcher.abort(
                 this.outer.periodic_refresh.fiber);
         }
 
@@ -730,7 +735,7 @@ public abstract class MirrorProtocol_v0 : IRequestHandler
                 if ( this.outer.refresh_queue.length )
                     this.sendQueuedRefresh();
 
-                this.outer.resources.request_event_dispatcher.periodicYield(
+                this.outer.request_event_dispatcher.periodicYield(
                     this.fiber, this.yield_counter, 10);
             }
         }
@@ -787,7 +792,7 @@ public abstract class MirrorProtocol_v0 : IRequestHandler
         {
             void sendBatch ( )
             {
-                this.outer.resources.request_event_dispatcher.send(this.fiber,
+                this.outer.request_event_dispatcher.send(this.fiber,
                     ( RequestOnConnBase.EventDispatcher.Payload payload )
                     {
                         payload.addCopy(MessageType.RecordRefreshBatch);
@@ -836,7 +841,7 @@ public abstract class MirrorProtocol_v0 : IRequestHandler
 
         private void sendRecordChanged ( hash_t key, Const!(void)[] value )
         {
-            this.outer.resources.request_event_dispatcher.send(this.fiber,
+            this.outer.request_event_dispatcher.send(this.fiber,
                 ( RequestOnConnBase.EventDispatcher.Payload payload )
                 {
                     payload.addCopy(MessageType.RecordChanged);
@@ -858,7 +863,7 @@ public abstract class MirrorProtocol_v0 : IRequestHandler
 
         private void sendRecordDeleted ( hash_t key )
         {
-            this.outer.resources.request_event_dispatcher.send(this.fiber,
+            this.outer.request_event_dispatcher.send(this.fiber,
                 ( RequestOnConnBase.EventDispatcher.Payload payload )
                 {
                     payload.addCopy(MessageType.RecordDeleted);
@@ -880,7 +885,7 @@ public abstract class MirrorProtocol_v0 : IRequestHandler
             if ( !this.outer.update_queue_overflows.notification_pending() )
                 return;
 
-            this.outer.resources.request_event_dispatcher.send(this.fiber,
+            this.outer.request_event_dispatcher.send(this.fiber,
                 ( RequestOnConnBase.EventDispatcher.Payload payload )
                 {
                     payload.addCopy(MessageType.UpdateOverflow);
@@ -902,7 +907,7 @@ public abstract class MirrorProtocol_v0 : IRequestHandler
             scope ( exit )
                 this.suspended_waiting_for_events = false;
 
-            auto event = this.outer.resources.request_event_dispatcher.nextEvent(this.fiber,
+            auto event = this.outer.request_event_dispatcher.nextEvent(this.fiber,
                 Signal(NodeFiberResumeCode.PushedToQueue),
                 Signal(NodeFiberResumeCode.QueueOverflowNotification),
                 Signal(NodeFiberResumeCode.ChannelRemoved));
@@ -963,7 +968,7 @@ public abstract class MirrorProtocol_v0 : IRequestHandler
             {
                 // Receive message from client.
                 auto message =
-                    this.outer.resources.request_event_dispatcher.receive(
+                    this.outer.request_event_dispatcher.receive(
                         this.fiber,
                         Message(MessageType.Suspend), Message(MessageType.Resume),
                         Message(MessageType.Stop));
@@ -973,7 +978,7 @@ public abstract class MirrorProtocol_v0 : IRequestHandler
 
                 // Send ACK. The protocol guarantees that the client will not
                 // send any further messages until it has received the ACK.
-                this.outer.resources.request_event_dispatcher.send(this.fiber,
+                this.outer.request_event_dispatcher.send(this.fiber,
                     ( RequestOnConnBase.EventDispatcher.Payload payload )
                     {
                         payload.addCopy(MessageType.Ack);
@@ -994,9 +999,9 @@ public abstract class MirrorProtocol_v0 : IRequestHandler
                         stopped = true;
 
                         // End both other fibers. The request is finished.
-                        this.outer.resources.request_event_dispatcher.abort(
+                        this.outer.request_event_dispatcher.abort(
                             this.outer.writer.fiber);
-                        this.outer.resources.request_event_dispatcher.abort(
+                        this.outer.request_event_dispatcher.abort(
                             this.outer.periodic_refresh.fiber);
                         break;
                     default:
@@ -1053,7 +1058,7 @@ public abstract class MirrorProtocol_v0 : IRequestHandler
         {
             this.fiber = this.outer.resources.getFiber(&this.fiberMethod);
             this.suspender = DelayedSuspender(
-                this.outer.resources.request_event_dispatcher,
+                &this.outer.request_event_dispatcher,
                 this.outer.connection.event_dispatcher,
                 this.fiber, NodeFiberResumeCode.ResumeAfterSuspension);
         }
@@ -1080,7 +1085,7 @@ public abstract class MirrorProtocol_v0 : IRequestHandler
                 {
                     if ( this.waiting_for == WaitingFor.Timer )
                     {
-                        this.outer.resources.request_event_dispatcher.signal(
+                        this.outer.request_event_dispatcher.signal(
                             this.outer.connection.event_dispatcher,
                             NodeFiberResumeCode.PeriodicRefresh);
                     }
@@ -1097,7 +1102,7 @@ public abstract class MirrorProtocol_v0 : IRequestHandler
             {
                 // Wait for the timer to fire.
                 this.waiting_for = WaitingFor.Timer;
-                this.outer.resources.request_event_dispatcher.nextEvent(
+                this.outer.request_event_dispatcher.nextEvent(
                     this.fiber,
                     Signal(NodeFiberResumeCode.PeriodicRefresh));
                 this.waiting_for = WaitingFor.Nothing;
@@ -1128,7 +1133,7 @@ public abstract class MirrorProtocol_v0 : IRequestHandler
                 if ( this.outer.refresh_queue.isFull() )
                 {
                     this.waiting_for = WaitingFor.QueueEmptied;
-                    this.outer.resources.request_event_dispatcher.nextEvent(
+                    this.outer.request_event_dispatcher.nextEvent(
                         this.fiber,
                         Signal(NodeFiberResumeCode.RefreshQueueEmptied));
                     this.waiting_for = WaitingFor.Nothing;
@@ -1152,7 +1157,7 @@ public abstract class MirrorProtocol_v0 : IRequestHandler
         {
             if ( this.waiting_for == WaitingFor.QueueEmptied )
             {
-                this.outer.resources.request_event_dispatcher.signal(
+                this.outer.request_event_dispatcher.signal(
                     this.outer.connection.event_dispatcher,
                     NodeFiberResumeCode.RefreshQueueEmptied);
             }

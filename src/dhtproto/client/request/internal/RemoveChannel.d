@@ -71,19 +71,6 @@ public struct RemoveChannel
 
     /***************************************************************************
 
-        Data which each request-on-conn needs while it is progress. An instance
-        of this struct is stored per connection on which the request runs and is
-        passed to the request handler.
-
-    ***************************************************************************/
-
-    private static struct Working
-    {
-        // Dummy struct.
-    }
-
-    /***************************************************************************
-
         Request core. Mixes in the types `NotificationInfo`, `Notifier`,
         `Params`, `Context` plus the static constants `request_type` and
         `request_code`.
@@ -91,7 +78,7 @@ public struct RemoveChannel
     ***************************************************************************/
 
     mixin RequestCore!(RequestType.AllNodes, RequestCode.RemoveChannel, 0, Args,
-        SharedWorking, Working, Notification);
+        SharedWorking, Notification);
 
     /***************************************************************************
 
@@ -101,13 +88,11 @@ public struct RemoveChannel
             conn = request-on-conn event dispatcher
             context_blob = untyped chunk of data containing the serialized
                 context of the request which is to be handled
-            working_blob = untyped chunk of data containing the serialized
-                working data for the request on this connection
 
     ***************************************************************************/
 
     public static void handler ( RequestOnConn.EventDispatcherAllNodes conn,
-        void[] context_blob, void[] working_blob )
+        void[] context_blob )
     {
         auto context = RemoveChannel.getContext(context_blob);
 
@@ -127,13 +112,10 @@ public struct RemoveChannel
         Params:
             context_blob = untyped chunk of data containing the serialized
                 context of the request which is finishing
-            working_data_iter = iterator over the stored working data associated
-                with each connection on which this request was run
 
     ***************************************************************************/
 
-    public static void all_finished_notifier ( void[] context_blob,
-        IRequestWorkingData working_data_iter )
+    public static void all_finished_notifier ( void[] context_blob )
     {
         auto context = RemoveChannel.getContext(context_blob);
         Notification n;
@@ -202,7 +184,7 @@ private scope class RemoveChannelHandler
     public void run ( )
     {
         auto initialiser = createAllNodesRequestInitialiser!(RemoveChannel)(
-            this.conn, this.context, &this.fillPayload, &this.handleSupportedCode);
+            this.conn, this.context, &this.fillPayload);
         auto request = createAllNodesRequest!(RemoveChannel)(this.conn, this.context,
             &this.connect, &this.disconnected, initialiser, &this.handle);
         request.run();
@@ -257,28 +239,6 @@ private scope class RemoveChannelHandler
     private void fillPayload ( RequestOnConnBase.EventDispatcher.Payload payload )
     {
         payload.addArray(this.context.user_params.args.channel);
-    }
-
-    /***************************************************************************
-
-        HandleStatusCode policy, called from AllNodesRequestInitialiser
-        template to decide how to handle the status code received from the node.
-
-        Params:
-            supported = supported code received from the node in response to the
-                initial message
-
-        Returns:
-            true to continue handling the request (supported); false to abort
-            (unsupported)
-
-    ***************************************************************************/
-
-    private bool handleSupportedCode ( ubyte code )
-    {
-        auto supported = cast(SupportedStatus)code;
-        return RemoveChannel.handleSupportedCodes(supported,
-            this.context, this.conn.remote_address);
     }
 
     /***************************************************************************

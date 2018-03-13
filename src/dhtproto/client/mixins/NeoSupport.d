@@ -204,11 +204,7 @@ template NeoSupport ( )
             Put.Notifier notifier )
         {
             auto params = Const!(Internals.Put.UserSpecifiedParams)(
-                Const!(Put.Args)(channel, key, value),
-                Const!(Internals.Put.UserSpecifiedParams.SerializedNotifier)(
-                    *(cast(Const!(ubyte[notifier.sizeof])*)&notifier)
-                )
-            );
+                Const!(Put.Args)(channel, key, value), notifier);
 
             auto id = this.assign!(Internals.Put)(params);
             return id;
@@ -241,11 +237,7 @@ template NeoSupport ( )
             Get.Notifier notifier, Options options )
         {
             auto params = Const!(Internals.Get.UserSpecifiedParams)(
-                Const!(Get.Args)(channel, key),
-                Const!(Internals.Get.UserSpecifiedParams.SerializedNotifier)(
-                    *(cast(Const!(ubyte[notifier.sizeof])*)&notifier)
-                )
-            );
+                Const!(Get.Args)(channel, key), notifier);
 
             auto id = this.assign!(Internals.Get)(params);
 
@@ -284,11 +276,7 @@ template NeoSupport ( )
             Exists.Notifier notifier, Options options )
         {
             auto params = Const!(Internals.Exists.UserSpecifiedParams)(
-                Const!(Exists.Args)(channel, key),
-                Const!(Internals.Exists.UserSpecifiedParams.SerializedNotifier)(
-                    *(cast(Const!(ubyte[notifier.sizeof])*)&notifier)
-                )
-            );
+                Const!(Exists.Args)(channel, key), notifier);
 
             auto id = this.assign!(Internals.Exists)(params);
             return id;
@@ -318,11 +306,7 @@ template NeoSupport ( )
             Remove.Notifier notifier )
         {
             auto params = Const!(Internals.Remove.UserSpecifiedParams)(
-                Const!(Remove.Args)(channel, key),
-                Const!(Internals.Remove.UserSpecifiedParams.SerializedNotifier)(
-                    *(cast(Const!(ubyte[notifier.sizeof])*)&notifier)
-                )
-            );
+                Const!(Remove.Args)(channel, key), notifier);
 
             auto id = this.assign!(Internals.Remove)(params);
             return id;
@@ -367,11 +351,7 @@ template NeoSupport ( )
                 Const!(Mirror.Args)(
                     channel,
                     settings
-                ),
-                Const!(Internals.Mirror.UserSpecifiedParams.SerializedNotifier)(
-                    *(cast(Const!(ubyte[notifier.sizeof])*)&notifier)
-                )
-            );
+                ), notifier);
 
             auto id = this.assign!(Internals.Mirror)(params);
             return id;
@@ -416,11 +396,7 @@ template NeoSupport ( )
                 Const!(GetAll.Args)(
                     channel,
                     settings
-                ),
-                Const!(Internals.GetAll.UserSpecifiedParams.SerializedNotifier)(
-                    *(cast(Const!(ubyte[notifier.sizeof])*)&notifier)
-                )
-            );
+                ), notifier);
 
             auto id = this.assign!(Internals.GetAll)(params);
             return id;
@@ -447,11 +423,7 @@ template NeoSupport ( )
         public RequestId getChannels ( GetChannels.Notifier notifier )
         {
             auto params = Const!(Internals.GetChannels.UserSpecifiedParams)(
-                Const!(GetChannels.Args)(),
-                Const!(Internals.GetChannels.UserSpecifiedParams.SerializedNotifier)(
-                    *(cast(Const!(ubyte[notifier.sizeof])*)&notifier)
-                )
-            );
+                Const!(GetChannels.Args)(), notifier);
 
             auto id = this.assign!(Internals.GetChannels)(params);
             return id;
@@ -481,11 +453,7 @@ template NeoSupport ( )
             RemoveChannel.Notifier notifier )
         {
             auto params = Const!(Internals.RemoveChannel.UserSpecifiedParams)(
-                Const!(RemoveChannel.Args)(channel),
-                Const!(Internals.RemoveChannel.UserSpecifiedParams.SerializedNotifier)(
-                    *(cast(Const!(ubyte[notifier.sizeof])*)&notifier)
-                )
-            );
+                Const!(RemoveChannel.Args)(channel), notifier);
 
             auto id = this.assign!(Internals.RemoveChannel)(params);
             return id;

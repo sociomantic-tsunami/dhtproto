@@ -70,16 +70,6 @@ public interface IRequestResources
 
     /***************************************************************************
 
-        Returns:
-            pointer to singleton (one per request) RequestEventDispatcher
-            instance
-
-    ***************************************************************************/
-
-    RequestEventDispatcher* request_event_dispatcher ( );
-
-    /***************************************************************************
-
         Gets a periodically firing timer.
 
         Params:

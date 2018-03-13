@@ -94,19 +94,6 @@ public struct Exists
 
     /***************************************************************************
 
-        Data which each request-on-conn needs while it is progress. An instance
-        of this struct is stored per connection on which the request runs and is
-        passed to the request handler.
-
-    ***************************************************************************/
-
-    private static struct Working
-    {
-        // Dummy (not required by this request)
-    }
-
-    /***************************************************************************
-
         Request core. Mixes in the types `NotificationInfo`, `Notifier`,
         `Params`, `Context` plus the static constants `request_type` and
         `request_code`.
@@ -114,7 +101,7 @@ public struct Exists
     ***************************************************************************/
 
     mixin RequestCore!(RequestType.SingleNode, RequestCode.Exists, 0, Args,
-        SharedWorking, Working, Notification);
+        SharedWorking, Notification);
 
     /***************************************************************************
 
@@ -130,13 +117,10 @@ public struct Exists
                 specified address
             context_blob = untyped chunk of data containing the serialized
                 context of the request which is to be handled
-            working_blob = untyped chunk of data containing the serialized
-                working data for the request on this connection
 
     ***************************************************************************/
 
-    public static void handler ( UseNodeDg use_node, void[] context_blob,
-        void[] working_blob )
+    public static void handler ( UseNodeDg use_node, void[] context_blob )
     {
         auto context = Exists.getContext(context_blob);
         context.shared_working.result = SharedWorking.Result.Failure;
@@ -276,13 +260,10 @@ public struct Exists
         Params:
             context_blob = untyped chunk of data containing the serialized
                 context of the request which is finishing
-            working_data_iter = iterator over the stored working data associated
-                with each connection on which this request was run
 
     ***************************************************************************/
 
-    public static void all_finished_notifier ( void[] context_blob,
-        IRequestWorkingData working_data_iter )
+    public static void all_finished_notifier ( void[] context_blob )
     {
         auto context = Exists.getContext(context_blob);
 

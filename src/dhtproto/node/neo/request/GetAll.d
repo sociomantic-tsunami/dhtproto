@@ -35,6 +35,9 @@ public abstract class GetAllProtocol_v0 : IRequestHandler
 
     mixin IRequestHandlerRequestCore!();
 
+    /// Request event dispatcher.
+    private RequestEventDispatcher request_event_dispatcher;
+
     /// Batch of records to send.
     private RecordBatcher batcher;
 
@@ -189,6 +192,8 @@ public abstract class GetAllProtocol_v0 : IRequestHandler
         scope writer_ = new Writer;
         scope controller_ = new Controller;
 
+        this.request_event_dispatcher.initialise(&this.resources.getVoidBuffer);
+
         // Note: we store refs to the scope instances in class fields as a
         // convenience to be able to access them from each other (e.g. the
         // writer needs to access the controller and vice-versa). It's normally
@@ -207,7 +212,7 @@ public abstract class GetAllProtocol_v0 : IRequestHandler
 
         this.controller.fiber.start();
         this.writer.fiber.start();
-        this.resources.request_event_dispatcher.eventLoop(
+        this.request_event_dispatcher.eventLoop(
             this.connection.event_dispatcher);
     }
 
@@ -295,7 +300,7 @@ public abstract class GetAllProtocol_v0 : IRequestHandler
         {
             this.fiber = this.outer.resources.getFiber(&this.fiberMethod);
             this.suspender = DelayedSuspender(
-                this.outer.resources.request_event_dispatcher,
+                &this.outer.request_event_dispatcher,
                 this.outer.connection.event_dispatcher,
                 this.fiber, ResumeAfterSuspension);
         }
@@ -353,7 +358,7 @@ public abstract class GetAllProtocol_v0 : IRequestHandler
                     }
                 );
 
-                this.outer.resources.request_event_dispatcher.periodicYield(
+                this.outer.request_event_dispatcher.periodicYield(
                     this.fiber, yield_counter, 10);
             }
             while ( more );
@@ -365,7 +370,7 @@ public abstract class GetAllProtocol_v0 : IRequestHandler
             // The request is now finished. Inform client of this and ignore any
             // further incoming control messages.
             this.outer.has_ended = true;
-            this.outer.resources.request_event_dispatcher.send(this.fiber,
+            this.outer.request_event_dispatcher.send(this.fiber,
                 ( RequestOnConnBase.EventDispatcher.Payload payload )
                 {
                     payload.addCopy(MessageType.Finished);
@@ -373,11 +378,11 @@ public abstract class GetAllProtocol_v0 : IRequestHandler
             );
 
             // Wait for ACK from client
-            this.outer.resources.request_event_dispatcher.receive(this.fiber,
+            this.outer.request_event_dispatcher.receive(this.fiber,
                 Message(MessageType.Ack));
 
             // It's no longer valid to handle control messages.
-            this.outer.resources.request_event_dispatcher.abort(
+            this.outer.request_event_dispatcher.abort(
                 this.outer.controller.fiber);
         }
 
@@ -418,7 +423,7 @@ public abstract class GetAllProtocol_v0 : IRequestHandler
             if ( this.outer.compressed_batch.length == 0 )
                 return; // Nothing in the batch
 
-            this.outer.resources.request_event_dispatcher.send(this.fiber,
+            this.outer.request_event_dispatcher.send(this.fiber,
                 ( RequestOnConnBase.EventDispatcher.Payload payload )
                 {
                     payload.addCopy(MessageType.RecordBatch);
@@ -471,7 +476,7 @@ public abstract class GetAllProtocol_v0 : IRequestHandler
             {
                 // Receive message from client.
                 auto message =
-                    this.outer.resources.request_event_dispatcher.receive(
+                    this.outer.request_event_dispatcher.receive(
                         this.fiber,
                         Message(MessageType.Suspend), Message(MessageType.Resume),
                         Message(MessageType.Stop));
@@ -481,7 +486,7 @@ public abstract class GetAllProtocol_v0 : IRequestHandler
 
                 // Send ACK. The protocol guarantees that the client will not
                 // send any further messages until it has received the ACK.
-                this.outer.resources.request_event_dispatcher.send(this.fiber,
+                this.outer.request_event_dispatcher.send(this.fiber,
                     ( RequestOnConnBase.EventDispatcher.Payload payload )
                     {
                         payload.addCopy(MessageType.Ack);
@@ -500,7 +505,7 @@ public abstract class GetAllProtocol_v0 : IRequestHandler
                         stopped = true;
 
                         // End the writer fiber. The request is finished.
-                        this.outer.resources.request_event_dispatcher.abort(
+                        this.outer.request_event_dispatcher.abort(
                             this.outer.writer.fiber);
                         break;
                     default:

@@ -80,19 +80,6 @@ public struct Mirror
 
     /***************************************************************************
 
-        Data which each request-on-conn needs while it is progress. An instance
-        of this struct is stored per connection on which the request runs and is
-        passed to the request handler.
-
-    ***************************************************************************/
-
-    private static struct Working
-    {
-        // Dummy struct.
-    }
-
-    /***************************************************************************
-
         Request core. Mixes in the types `NotificationInfo`, `Notifier`,
         `Params`, `Context` plus the static constants `request_type` and
         `request_code`.
@@ -100,7 +87,7 @@ public struct Mirror
     ***************************************************************************/
 
     mixin RequestCore!(RequestType.AllNodes, RequestCode.Mirror, 0, Args,
-        SharedWorking, Working, Notification);
+        SharedWorking, Notification);
 
     /***************************************************************************
 
@@ -111,13 +98,11 @@ public struct Mirror
                 specified address
             context_blob = untyped chunk of data containing the serialized
                 context of the request which is to be handled
-            working_blob = untyped chunk of data containing the serialized
-                working data for the request on this connection
 
     ***************************************************************************/
 
     public static void handler ( RequestOnConn.EventDispatcherAllNodes conn,
-        void[] context_blob, void[] working_blob )
+        void[] context_blob )
     {
         auto context = Mirror.getContext(context_blob);
 
@@ -136,13 +121,10 @@ public struct Mirror
         Params:
             context_blob = untyped chunk of data containing the serialized
                 context of the request which is finishing
-            working_data_iter = iterator over the stored working data associated
-                with each connection on which this request was run
 
     ***************************************************************************/
 
-    public static void all_finished_notifier ( void[] context_blob,
-        IRequestWorkingData working_data_iter )
+    public static void all_finished_notifier ( void[] context_blob )
     {
         // Do nothing. The only way a Mirror request can end is if the user
         // stops it.
@@ -177,6 +159,9 @@ private scope class MirrorHandler
 
     /// Request resource acquirer.
     private SharedResources.RequestResources resources;
+
+    /// Request event dispatcher.
+    private RequestEventDispatcher request_event_dispatcher;
 
     /// Reader fiber instance.
     private Reader reader;
@@ -215,8 +200,7 @@ private scope class MirrorHandler
     public void run ( )
     {
         auto request = createSuspendableRequest!(Mirror)(this.conn, this.context,
-            &this.connect, &this.disconnected, &this.fillPayload,
-            &this.handleSupportedCode, &this.handle);
+            &this.connect, &this.disconnected, &this.fillPayload, &this.handle);
         request.run();
     }
 
@@ -276,29 +260,13 @@ private scope class MirrorHandler
 
     /***************************************************************************
 
-        HandleStatusCode policy, called from SuspendableRequestInitialiser
-        template to decide how to handle the supported code received from the
-        node.
-
-        Params:
-            code = supported code received from the node in response to the
-                initial message
-
-        Returns:
-            true to continue handling the request (supported); false to abort
-            (unsupported)
+        Handler policy, called from AllNodesRequest template to run the
+        request's main handling logic.
 
     ***************************************************************************/
 
-    private bool handleSupportedCode ( ubyte code )
+    private void handle ( )
     {
-        auto supported = cast(SupportedStatus)code;
-        if ( !Mirror.handleSupportedCodes(supported,
-            this.context, this.conn.remote_address) )
-        {
-            return false; // Request/version not supported
-        }
-
         // Handle initial started/error message from node.
         auto msg = conn.receiveValue!(MessageType)();
         with ( MessageType ) switch ( msg )
@@ -314,29 +282,19 @@ private scope class MirrorHandler
                 n.node_error = RequestNodeInfo(
                     this.context.request_id, conn.remote_address);
                 Mirror.notify(this.context.user_params, n);
-                return false;
+                return;
 
             default:
                 // Treat unknown/unexpected codes as node errors.
                 goto case Error;
         }
 
-        return true;
-    }
-
-    /***************************************************************************
-
-        Handler policy, called from AllNodesRequest template to run the
-        request's main handling logic.
-
-    ***************************************************************************/
-
-    private void handle ( )
-    {
         this.decompress_buffer = this.resources.getVoidBuffer();
 
         scope reader_ = new Reader;
         scope controller_ = new Controller;
+
+        this.request_event_dispatcher.initialise(&this.resources.getVoidBuffer);
 
         // Note: we store refs to the scope instances in class fields as a
         // convenience to be able to access them from each other (e.g. the
@@ -361,12 +319,12 @@ private scope class MirrorHandler
             if ( this.context.shared_working.suspendable_control.
                 allInitialised!(Mirror)(this.context) )
             {
-                this.resources.request_event_dispatcher.signal(this.conn,
+                this.request_event_dispatcher.signal(this.conn,
                     SuspendableRequestSharedWorkingData.Signal.StateChangeRequested);
             }
         }
 
-        this.resources.request_event_dispatcher.eventLoop(this.conn);
+        this.request_event_dispatcher.eventLoop(this.conn);
 
         assert(controller.fiber.finished());
         assert(reader.fiber.finished());
@@ -412,7 +370,7 @@ private scope class MirrorHandler
             bool finished;
             do
             {
-                auto msg = this.outer.resources.request_event_dispatcher.receive(
+                auto msg = this.outer.request_event_dispatcher.receive(
                     this.fiber,
                     Message(MessageType.RecordChanged),
                     Message(MessageType.RecordRefreshBatch),
@@ -470,7 +428,7 @@ private scope class MirrorHandler
             while ( !finished );
 
             // ACK End message
-            this.outer.resources.request_event_dispatcher.send(this.fiber,
+            this.outer.request_event_dispatcher.send(this.fiber,
                 ( RequestOnConnBase.EventDispatcher.Payload payload )
                 {
                     payload.addCopy(MessageType.Ack);
@@ -478,7 +436,7 @@ private scope class MirrorHandler
             );
 
             // It's no longer valid to handle control messages.
-            this.outer.resources.request_event_dispatcher.abort(
+            this.outer.request_event_dispatcher.abort(
                 this.outer.controller.fiber);
         }
 
@@ -558,7 +516,7 @@ private scope class MirrorHandler
                 this.outer.context, n) )
             {
                 // The user used the controller in the notifier callback
-                this.outer.resources.request_event_dispatcher.signal(this.outer.conn,
+                this.outer.request_event_dispatcher.signal(this.outer.conn,
                     suspendable_control.Signal.StateChangeRequested);
             }
         }
@@ -600,10 +558,10 @@ private scope class MirrorHandler
         {
             SuspendableRequestControllerFiber!(Mirror, MessageType) controller;
             controller.handle(this.outer.conn, this.outer.context,
-                this.outer.resources.request_event_dispatcher, this.fiber);
+                &this.outer.request_event_dispatcher, this.fiber);
 
             // Kill the reader fiber; the request is finished.
-            this.outer.resources.request_event_dispatcher.abort(
+            this.outer.request_event_dispatcher.abort(
                 this.outer.reader.fiber);
         }
     }

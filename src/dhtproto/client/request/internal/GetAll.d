@@ -101,7 +101,7 @@ public struct GetAll
     ***************************************************************************/
 
     mixin RequestCore!(RequestType.AllNodes, RequestCode.GetAll, 0, Args,
-        SharedWorking, Working, Notification);
+        SharedWorking, Notification);
 
     /***************************************************************************
 
@@ -111,13 +111,11 @@ public struct GetAll
             conn = request-on-conn event dispatcher
             context_blob = untyped chunk of data containing the serialized
                 context of the request which is to be handled
-            working_blob = untyped chunk of data containing the serialized
-                working data for the request on this connection
 
     ***************************************************************************/
 
     public static void handler ( RequestOnConn.EventDispatcherAllNodes conn,
-        void[] context_blob, void[] working_blob )
+        void[] context_blob )
     {
         auto context = GetAll.getContext(context_blob);
 
@@ -136,13 +134,10 @@ public struct GetAll
         Params:
             context_blob = untyped chunk of data containing the serialized
                 context of the request which is finishing
-            working_data_iter = iterator over the stored working data associated
-                with each connection on which this request was run
 
     ***************************************************************************/
 
-    public static void all_finished_notifier ( void[] context_blob,
-        IRequestWorkingData working_data_iter )
+    public static void all_finished_notifier ( void[] context_blob )
     {
         auto context = GetAll.getContext(context_blob);
 
@@ -184,6 +179,9 @@ private scope class GetAllHandler
 
     /// Request resource acquirer.
     private SharedResources.RequestResources resources;
+
+    /// Request event dispatcher.
+    private RequestEventDispatcher request_event_dispatcher;
 
     /// Reader fiber instance.
     private Reader reader;
@@ -235,7 +233,7 @@ private scope class GetAllHandler
     {
         auto request = createSuspendableRequest!(GetAll)(this.conn, this.context,
             &this.connect, &this.disconnected, &this.fillPayload,
-            &this.handleSupportedCode, &this.handle);
+            &this.handle);
         request.run();
     }
 
@@ -307,29 +305,13 @@ private scope class GetAllHandler
 
     /***************************************************************************
 
-        HandleStatusCode policy, called from SuspendableRequestInitialiser
-        template to decide how to handle the supported code received from the
-        node.
-
-        Params:
-            code = supported code received from the node in response to the
-                initial message
-
-        Returns:
-            true to continue handling the request (supported); false to abort
-            (unsupported)
+        Handler policy, called from AllNodesRequest template to run the
+        request's main handling logic.
 
     ***************************************************************************/
 
-    private bool handleSupportedCode ( ubyte status )
+    private void handle ( )
     {
-        auto supported = cast(SupportedStatus)status;
-        if ( !GetAll.handleSupportedCodes(supported,
-            this.context, this.conn.remote_address) )
-        {
-            return false; // Request/version not supported
-        }
-
         // Handle initial started/error message from node.
         auto msg = conn.receiveValue!(MessageType)();
         with ( MessageType ) switch ( msg )
@@ -345,27 +327,17 @@ private scope class GetAllHandler
                 n.node_error = RequestNodeInfo(
                     this.context.request_id, conn.remote_address);
                 GetAll.notify(this.context.user_params, n);
-                return false;
+                return;
 
             default:
                 // Treat unknown/unexpected codes as node errors.
                 goto case Error;
         }
 
-        return true;
-    }
-
-    /***************************************************************************
-
-        Handler policy, called from AllNodesRequest template to run the
-        request's main handling logic.
-
-    ***************************************************************************/
-
-    private void handle ( )
-    {
         scope reader_ = new Reader;
         scope controller_ = new Controller;
+
+        this.request_event_dispatcher.initialise(&this.resources.getVoidBuffer);
 
         // Note: we store refs to the scope instances in class fields as a
         // convenience to be able to access them from each other (e.g. the
@@ -390,12 +362,12 @@ private scope class GetAllHandler
             if ( this.context.shared_working.suspendable_control.
                 allInitialised!(GetAll)(this.context) )
             {
-                this.resources.request_event_dispatcher.signal(this.conn,
+                this.request_event_dispatcher.signal(this.conn,
                     SuspendableRequestSharedWorkingData.Signal.StateChangeRequested);
             }
         }
 
-        this.resources.request_event_dispatcher.eventLoop(this.conn);
+        this.request_event_dispatcher.eventLoop(this.conn);
 
         assert(controller.fiber.finished());
         assert(reader.fiber.finished());
@@ -439,7 +411,7 @@ private scope class GetAllHandler
             bool finished;
             do
             {
-                auto msg = this.outer.resources.request_event_dispatcher.receive(
+                auto msg = this.outer.request_event_dispatcher.receive(
                     this.fiber,
                     Message(MessageType.RecordBatch),
                     Message(MessageType.Finished));
@@ -464,7 +436,7 @@ private scope class GetAllHandler
             while ( !finished );
 
             // ACK Finished message
-            this.outer.resources.request_event_dispatcher.send(this.fiber,
+            this.outer.request_event_dispatcher.send(this.fiber,
                 ( RequestOnConnBase.EventDispatcher.Payload payload )
                 {
                     payload.addCopy(MessageType.Ack);
@@ -472,7 +444,7 @@ private scope class GetAllHandler
             );
 
             // It's no longer valid to handle control messages.
-            this.outer.resources.request_event_dispatcher.abort(
+            this.outer.request_event_dispatcher.abort(
                 this.outer.controller.fiber);
         }
 
@@ -502,7 +474,7 @@ private scope class GetAllHandler
                     this.outer.context, notification) )
                 {
                     // The user used the controller in the notifier callback
-                    this.outer.resources.request_event_dispatcher.signal(
+                    this.outer.request_event_dispatcher.signal(
                         this.outer.conn,
                         suspendable_control.Signal.StateChangeRequested);
                 }
@@ -575,10 +547,10 @@ private scope class GetAllHandler
         {
             SuspendableRequestControllerFiber!(GetAll, MessageType) controller;
             controller.handle(this.outer.conn, this.outer.context,
-                this.outer.resources.request_event_dispatcher, this.fiber);
+                &this.outer.request_event_dispatcher, this.fiber);
 
             // Kill the reader fiber; the request is finished.
-            this.outer.resources.request_event_dispatcher.abort(
+            this.outer.request_event_dispatcher.abort(
                 this.outer.reader.fiber);
         }
     }

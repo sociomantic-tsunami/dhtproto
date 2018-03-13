@@ -115,7 +115,7 @@ public struct Get
     ***************************************************************************/
 
     mixin RequestCore!(RequestType.SingleNode, RequestCode.Get, 0, Args,
-        SharedWorking, Working, Notification);
+        SharedWorking, Notification);
 
     /***************************************************************************
 
@@ -131,13 +131,10 @@ public struct Get
                 specified address
             context_blob = untyped chunk of data containing the serialized
                 context of the request which is to be handled
-            working_blob = untyped chunk of data containing the serialized
-                working data for the request on this connection
 
     ***************************************************************************/
 
-    public static void handler ( UseNodeDg use_node, void[] context_blob,
-        void[] working_blob )
+    public static void handler ( UseNodeDg use_node, void[] context_blob )
     {
         auto context = Get.getContext(context_blob);
         context.shared_working.result = SharedWorking.Result.Failure;
@@ -301,13 +298,10 @@ public struct Get
         Params:
             context_blob = untyped chunk of data containing the serialized
                 context of the request which is finishing
-            working_data_iter = iterator over the stored working data associated
-                with each connection on which this request was run
 
     ***************************************************************************/
 
-    public static void all_finished_notifier ( void[] context_blob,
-        IRequestWorkingData working_data_iter )
+    public static void all_finished_notifier ( void[] context_blob )
     {
         auto context = Get.getContext(context_blob);
 

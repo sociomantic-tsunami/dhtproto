@@ -28,9 +28,6 @@ class SharedResources : IRequestResources
 {
     import ocean.io.compress.Lzo;
 
-    /// Singleton RequestEventDispatcher used by this request.
-    private RequestEventDispatcher* request_event_dispatcher_;
-
     /***************************************************************************
 
         Struct wrapper used to workaround D's inability to allocate slices on
@@ -97,22 +94,6 @@ class SharedResources : IRequestResources
     public RecordBatcher getRecordBatcher ( )
     {
         return new RecordBatcher(new Lzo);
-    }
-
-    /***************************************************************************
-
-        Returns:
-            pointer to singleton (one per request) RequestEventDispatcher
-            instance
-
-    ***************************************************************************/
-
-    public RequestEventDispatcher* request_event_dispatcher ( )
-    {
-        if ( this.request_event_dispatcher_ is null )
-            this.request_event_dispatcher_ = new RequestEventDispatcher;
-
-        return this.request_event_dispatcher_;
     }
 
     /***************************************************************************
