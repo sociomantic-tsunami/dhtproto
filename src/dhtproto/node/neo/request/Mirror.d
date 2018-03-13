@@ -408,7 +408,7 @@ public abstract class MirrorProtocol_v0 : IRequestHandler
         this.connection.event_dispatcher.send(
             ( RequestOnConnBase.EventDispatcher.Payload payload )
             {
-                payload.addConstant(this.initialised_ok
+                payload.addCopy(this.initialised_ok
                     ? MessageType.Started : MessageType.Error);
             }
         );
@@ -691,7 +691,7 @@ public abstract class MirrorProtocol_v0 : IRequestHandler
             this.outer.resources.request_event_dispatcher.send(this.fiber,
                 ( RequestOnConnBase.EventDispatcher.Payload payload )
                 {
-                    payload.addConstant(MessageType.ChannelRemoved);
+                    payload.addCopy(MessageType.ChannelRemoved);
                 }
             );
 
@@ -790,7 +790,7 @@ public abstract class MirrorProtocol_v0 : IRequestHandler
                 this.outer.resources.request_event_dispatcher.send(this.fiber,
                     ( RequestOnConnBase.EventDispatcher.Payload payload )
                     {
-                        payload.addConstant(MessageType.RecordRefreshBatch);
+                        payload.addCopy(MessageType.RecordRefreshBatch);
                         this.outer.refresh_batch.getCompressed(
                             this.outer.resources.lzo, *this.outer.compress_buffer
                         );
@@ -839,7 +839,7 @@ public abstract class MirrorProtocol_v0 : IRequestHandler
             this.outer.resources.request_event_dispatcher.send(this.fiber,
                 ( RequestOnConnBase.EventDispatcher.Payload payload )
                 {
-                    payload.addConstant(MessageType.RecordChanged);
+                    payload.addCopy(MessageType.RecordChanged);
                     payload.add(key);
                     payload.addArray(value);
                 }
@@ -861,7 +861,7 @@ public abstract class MirrorProtocol_v0 : IRequestHandler
             this.outer.resources.request_event_dispatcher.send(this.fiber,
                 ( RequestOnConnBase.EventDispatcher.Payload payload )
                 {
-                    payload.addConstant(MessageType.RecordDeleted);
+                    payload.addCopy(MessageType.RecordDeleted);
                     payload.add(key);
                 }
             );
@@ -883,7 +883,7 @@ public abstract class MirrorProtocol_v0 : IRequestHandler
             this.outer.resources.request_event_dispatcher.send(this.fiber,
                 ( RequestOnConnBase.EventDispatcher.Payload payload )
                 {
-                    payload.addConstant(MessageType.UpdateOverflow);
+                    payload.addCopy(MessageType.UpdateOverflow);
                 }
             );
 
@@ -976,7 +976,7 @@ public abstract class MirrorProtocol_v0 : IRequestHandler
                 this.outer.resources.request_event_dispatcher.send(this.fiber,
                     ( RequestOnConnBase.EventDispatcher.Payload payload )
                     {
-                        payload.addConstant(MessageType.Ack);
+                        payload.addCopy(MessageType.Ack);
                     }
                 );
 
