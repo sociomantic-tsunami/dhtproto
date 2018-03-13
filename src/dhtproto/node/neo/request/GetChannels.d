@@ -75,7 +75,7 @@ public abstract class GetChannelsProtocol_v0 : IRequestHandler
             this.connection.event_dispatcher.send(
                 ( RequestOnConnBase.EventDispatcher.Payload payload )
                 {
-                    payload.addConstant(MessageType.ChannelName);
+                    payload.addCopy(MessageType.ChannelName);
                     payload.addArray(*channel_buf);
                 }
             );
@@ -85,7 +85,7 @@ public abstract class GetChannelsProtocol_v0 : IRequestHandler
         this.connection.event_dispatcher.send(
             ( RequestOnConnBase.EventDispatcher.Payload payload )
             {
-                payload.addConstant(MessageType.Finished);
+                payload.addCopy(MessageType.Finished);
             }
         );
     }

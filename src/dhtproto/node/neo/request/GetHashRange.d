@@ -223,10 +223,10 @@ public abstract scope class GetHashRangeProtocol_v0 : IRequestHandler
             ( ed.Payload payload )
             {
                 if ( update.self )
-                    payload.addConstant(MessageType.ChangeHashRange);
+                    payload.addCopy(MessageType.ChangeHashRange);
                 else
                 {
-                    payload.addConstant(MessageType.NewNode);
+                    payload.addCopy(MessageType.NewNode);
                     payload.add(update.addr.naddress);
                     payload.add(update.addr.nport);
                 }

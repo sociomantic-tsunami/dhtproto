@@ -172,7 +172,7 @@ public abstract class GetAllProtocol_v0 : IRequestHandler
         this.connection.event_dispatcher.send(
             ( RequestOnConnBase.EventDispatcher.Payload payload )
             {
-                payload.addConstant(this.initialised_ok
+                payload.addCopy(this.initialised_ok
                     ? MessageType.Started : MessageType.Error);
             }
         );
@@ -368,7 +368,7 @@ public abstract class GetAllProtocol_v0 : IRequestHandler
             this.outer.resources.request_event_dispatcher.send(this.fiber,
                 ( RequestOnConnBase.EventDispatcher.Payload payload )
                 {
-                    payload.addConstant(MessageType.Finished);
+                    payload.addCopy(MessageType.Finished);
                 }
             );
 
@@ -421,7 +421,7 @@ public abstract class GetAllProtocol_v0 : IRequestHandler
             this.outer.resources.request_event_dispatcher.send(this.fiber,
                 ( RequestOnConnBase.EventDispatcher.Payload payload )
                 {
-                    payload.addConstant(MessageType.RecordBatch);
+                    payload.addCopy(MessageType.RecordBatch);
                     payload.addArray(*this.outer.compressed_batch);
                 }
             );
@@ -484,7 +484,7 @@ public abstract class GetAllProtocol_v0 : IRequestHandler
                 this.outer.resources.request_event_dispatcher.send(this.fiber,
                     ( RequestOnConnBase.EventDispatcher.Payload payload )
                     {
-                        payload.addConstant(MessageType.Ack);
+                        payload.addCopy(MessageType.Ack);
                     }
                 );
 

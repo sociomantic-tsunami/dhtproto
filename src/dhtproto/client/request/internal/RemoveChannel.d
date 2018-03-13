@@ -112,7 +112,7 @@ public struct RemoveChannel
         auto context = RemoveChannel.getContext(context_blob);
 
         auto shared_resources = SharedResources.fromObject(
-            context.request_resources.get());
+            context.shared_resources);
         scope acquired_resources = shared_resources.new RequestResources;
 
         scope handler = new RemoveChannelHandler(conn, context,

@@ -473,7 +473,7 @@ private scope class MirrorHandler
             this.outer.resources.request_event_dispatcher.send(this.fiber,
                 ( RequestOnConnBase.EventDispatcher.Payload payload )
                 {
-                    payload.addConstant(MessageType.Ack);
+                    payload.addCopy(MessageType.Ack);
                 }
             );
 

@@ -142,7 +142,7 @@ public struct Exists
         context.shared_working.result = SharedWorking.Result.Failure;
 
         auto shared_resources = SharedResources.fromObject(
-            context.request_resources.get());
+            context.shared_resources);
         scope acquired_resources = shared_resources.new RequestResources;
 
         // Try getting the record from the nodes responsible for the hash,
