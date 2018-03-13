@@ -117,19 +117,6 @@ public struct GetChannels
 
     /***************************************************************************
 
-        Data which each request-on-conn needs while it is progress. An instance
-        of this struct is stored per connection on which the request runs and is
-        passed to the request handler.
-
-    ***************************************************************************/
-
-    private static struct Working
-    {
-        // Dummy struct.
-    }
-
-    /***************************************************************************
-
         Request core. Mixes in the types `NotificationInfo`, `Notifier`,
         `Params`, `Context` plus the static constants `request_type` and
         `request_code`.
@@ -137,7 +124,7 @@ public struct GetChannels
     ***************************************************************************/
 
     mixin RequestCore!(RequestType.AllNodes, RequestCode.GetChannels, 0, Args,
-        SharedWorking, Working, Notification);
+        SharedWorking, Notification);
 
     /***************************************************************************
 
@@ -147,13 +134,11 @@ public struct GetChannels
             conn = request-on-conn event dispatcher
             context_blob = untyped chunk of data containing the serialized
                 context of the request which is to be handled
-            working_blob = untyped chunk of data containing the serialized
-                working data for the request on this connection
 
     ***************************************************************************/
 
     public static void handler ( RequestOnConn.EventDispatcherAllNodes conn,
-        void[] context_blob, void[] working_blob )
+        void[] context_blob )
     {
         auto context = GetChannels.getContext(context_blob);
 
@@ -173,13 +158,10 @@ public struct GetChannels
         Params:
             context_blob = untyped chunk of data containing the serialized
                 context of the request which is finishing
-            working_data_iter = iterator over the stored working data associated
-                with each connection on which this request was run
 
     ***************************************************************************/
 
-    public static void all_finished_notifier ( void[] context_blob,
-        IRequestWorkingData working_data_iter )
+    public static void all_finished_notifier ( void[] context_blob )
     {
         auto context = GetChannels.getContext(context_blob);
 
@@ -243,7 +225,7 @@ private scope class GetChannelsHandler
     public void run ( )
     {
         auto initialiser = createAllNodesRequestInitialiser!(GetChannels)(
-            this.conn, this.context, &this.fillPayload, &this.handleSupportedCode);
+            this.conn, this.context, &this.fillPayload);
         auto request = createAllNodesRequest!(GetChannels)(this.conn, this.context,
             &this.connect, &this.disconnected, initialiser, &this.handle);
         request.run();
@@ -298,34 +280,6 @@ private scope class GetChannelsHandler
     private void fillPayload ( RequestOnConnBase.EventDispatcher.Payload payload )
     {
         // Nothing more to add. (Request code and version already added.)
-    }
-
-    /***************************************************************************
-
-        HandleStatusCode policy, called from AllNodesRequestInitialiser
-        template to decide how to handle the supported code received from the
-        node.
-
-        Params:
-            code = supported code received from the node in response to the
-                initial message
-
-        Returns:
-            true to continue handling the request (supported); false to abort
-            (unsupported)
-
-    ***************************************************************************/
-
-    private bool handleSupportedCode ( ubyte code )
-    {
-        auto supported = cast(SupportedStatus)code;
-        if ( !GetChannels.handleSupportedCodes(supported,
-            this.context, this.conn.remote_address) )
-        {
-            return false; // Request/version not supported.
-        }
-
-        return true;
     }
 
     /***************************************************************************
