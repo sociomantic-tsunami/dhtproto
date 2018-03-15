@@ -19,6 +19,7 @@ module dhttest.cases.neo.Basic;
 *******************************************************************************/
 
 import ocean.transition;
+import ocean.core.Test;
 
 import dhttest.DhtTestCase : NeoDhtTestCase;
 

@@ -31,6 +31,8 @@ version ( UnitTest )
     import ocean.transition;
     import ocean.core.SmartUnion;
     import ocean.util.app.DaemonApp;
+    import dhtproto.client.DhtClient;
+    import swarm.neo.client.requests.NotificationFormatter;
 
     // DaemonApp class showing typical neo DHT client initialisation. The class
     // has a single abstract method -- example() -- which is implemented by
@@ -43,10 +45,6 @@ version ( UnitTest )
         import ocean.util.log.Logger;
         import ConfigFiller = ocean.util.config.ConfigFiller;
         import ocean.text.convert.Hex : hexToBin;
-
-        import swarm.neo.client.requests.NotificationFormatter;
-
-        import dhtproto.client.DhtClient;
 
         // DHT client. (See dhtproto.client.DhtClient.)
         private DhtClient dht;

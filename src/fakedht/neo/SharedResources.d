@@ -27,6 +27,8 @@ import dhtproto.node.neo.request.core.IRequestResources;
 class SharedResources : IRequestResources
 {
     import ocean.io.compress.Lzo;
+    import swarm.neo.util.MessageFiber;
+    import swarm.util.RecordBatcher;
 
     /***************************************************************************
 

@@ -32,7 +32,6 @@ import turtle.TestCase;
 
 abstract class DhtTestCase : TestCase
 {
-    import ocean.core.Test; // makes `test` available in derivatives
     import dhttest.DhtClient;
 
     /***************************************************************************
@@ -108,7 +107,6 @@ abstract class DhtTestCase : TestCase
 
 abstract class NeoDhtTestCase : TestCase
 {
-    import ocean.core.Test; // makes `test` available in derivatives
     import ocean.core.Enforce;
     import ocean.task.Scheduler;
     import ocean.task.Task;
