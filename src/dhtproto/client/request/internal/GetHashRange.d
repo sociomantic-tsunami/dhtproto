@@ -89,6 +89,7 @@ private alias void delegate ( Notification, Args ) Notifier;
 public struct GetHashRange
 {
     import dhtproto.common.RequestCodes;
+    import swarm.neo.client.RequestOnConn;
     import swarm.neo.client.mixins.RequestCore;
     import swarm.neo.client.mixins.AllNodesRequestCore;
     import swarm.neo.client.Connection;

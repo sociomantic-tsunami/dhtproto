@@ -242,6 +242,7 @@ public class MirrorConnError : NeoDhtTestCase
 public class MirrorSuspend : NeoDhtTestCase
 {
     import ocean.task.Task;
+    import ocean.task.Scheduler;
     import ocean.io.select.client.TimerEvent;
 
     override public Description description ( )
@@ -414,6 +415,7 @@ public class MirrorRefresh : NeoDhtTestCase
 public class MirrorRefreshSuspend : NeoDhtTestCase
 {
     import ocean.task.Task;
+    import ocean.task.Scheduler;
     import ocean.io.select.client.TimerEvent;
 
     override public Description description ( )

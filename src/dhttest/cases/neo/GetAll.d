@@ -72,6 +72,7 @@ public class GetAllBlocking : NeoDhtTestCase
 public class GetAllSuspend : NeoDhtTestCase
 {
     import ocean.task.Task;
+    import ocean.task.Scheduler;
     import ocean.io.select.client.TimerEvent;
 
     override public Description description ( )

@@ -29,6 +29,7 @@ public final class NodeHashRanges : NodeHashRangesBase
     import swarm.neo.client.ConnectionSet;
     import swarm.neo.client.RequestOnConn;
     import swarm.neo.client.RequestHandlers : UseNodeDg;
+    import swarm.neo.AddrPort;
 
     /// Set of connections to nodes (one per node)
     private ConnectionSet connections;

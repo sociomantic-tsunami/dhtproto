@@ -63,6 +63,7 @@ public struct Get
     import swarm.neo.client.mixins.RequestCore;
     import swarm.neo.client.RequestHandlers;
     import swarm.neo.client.RequestOnConn;
+    import swarm.neo.request.Command;
     import dhtproto.client.internal.SharedResources;
 
     import ocean.io.select.protocol.generic.ErrnoIOException: IOError;

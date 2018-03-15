@@ -30,6 +30,9 @@ import dhttest.DhtTestCase;
 
 class Handshake : DhtTestCase
 {
+    import ocean.core.Test;
+    import dhttest.DhtClient;
+
     override public Description description ( )
     {
         Description desc;

@@ -13,6 +13,7 @@
 module dhttest.cases.neo.Put;
 
 import ocean.transition;
+import ocean.core.Test;
 import dhttest.DhtTestCase : NeoDhtTestCase;
 
 /*******************************************************************************
