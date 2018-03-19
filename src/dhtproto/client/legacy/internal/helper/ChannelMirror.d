@@ -584,6 +584,11 @@ version ( UnitTest )
             super(this.dht, "channel", 1, 1, new ExtendedListen, new ExtendedGetAll);
         }
 
+        SchedulingDhtClient dht_client ( )
+        {
+            return this.dht;
+        }
+
         override protected void receiveRecord ( in char[] key, in char[] value,
             bool single_value ) { }
 
@@ -638,7 +643,7 @@ unittest
         auto cm = new CM;
         for ( ushort port = 1_000; port < num_nodes + 1_000; port++ )
         {
-            cm.dht.addNode("127.0.0.1".dup, port);
+            cm.dht_client.addNode("127.0.0.1".dup, port);
         }
 
         cm.fill();
@@ -679,7 +684,7 @@ unittest
         auto cm = new CM;
         for ( ushort port = 1_000; port < num_nodes + 1_000; port++ )
         {
-            cm.dht.addNode("127.0.0.1".dup, port);
+            cm.dht_client.addNode("127.0.0.1".dup, port);
         }
 
         cm.mirror();
