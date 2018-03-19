@@ -402,7 +402,7 @@ public class DhtClient : IClient
 
         ***********************************************************************/
 
-        public void opCall ( RequestParams.GetBoolDg output,
+        public void opCall ( scope RequestParams.GetBoolDg output,
             NotifierDg user_notifier )
         {
             this.reset(output, user_notifier);
@@ -427,7 +427,7 @@ public class DhtClient : IClient
 
         ***********************************************************************/
 
-        private void reset ( RequestParams.GetBoolDg output,
+        private void reset ( scope RequestParams.GetBoolDg output,
             NotifierDg user_notifier )
         {
             this.output = output;
@@ -685,8 +685,8 @@ public class DhtClient : IClient
 
     ***************************************************************************/
 
-    public void nodeHandshake ( RequestParams.GetBoolDg output,
-        RequestNotification.Callback user_notifier )
+    public void nodeHandshake ( scope RequestParams.GetBoolDg output,
+        scope RequestNotification.Callback user_notifier )
     {
         this.node_handshake(output, user_notifier);
     }
@@ -758,8 +758,8 @@ public class DhtClient : IClient
         mixin RequestParamsSetup; // private setup() method, used by assign()
     }
 
-    public Put put ( Key ) ( cstring channel, Key key, RequestParams.PutValueDg input,
-                             RequestNotification.Callback notifier )
+    public Put put ( Key ) ( cstring channel, Key key, scope RequestParams.PutValueDg input,
+                             scope RequestNotification.Callback notifier )
     {
         return *Put(DhtConst.Command.E.Put, notifier).channel(channel).key(key)
             .io(input).contextFromKey();
@@ -798,8 +798,8 @@ public class DhtClient : IClient
         mixin RequestParamsSetup; // private setup() method, used by assign()
     }
 
-    public Get get ( Key ) ( cstring channel, Key key, RequestParams.GetValueDg output,
-            RequestNotification.Callback notifier )
+    public Get get ( Key ) ( cstring channel, Key key, scope RequestParams.GetValueDg output,
+            scope RequestNotification.Callback notifier )
     {
         return *Get(DhtConst.Command.E.Get, notifier).channel(channel).key(key)
             .io(output).contextFromKey();
@@ -836,8 +836,8 @@ public class DhtClient : IClient
         mixin RequestParamsSetup; // private setup() method, used by assign()
     }
 
-    public Exists exists ( Key ) ( cstring channel, Key key, RequestParams.GetBoolDg output,
-            RequestNotification.Callback notifier )
+    public Exists exists ( Key ) ( cstring channel, Key key, scope RequestParams.GetBoolDg output,
+            scope RequestNotification.Callback notifier )
     {
         return *Exists(DhtConst.Command.E.Exists, notifier).channel(channel)
             .key(key).io(output).contextFromKey();
@@ -869,7 +869,7 @@ public class DhtClient : IClient
         mixin RequestParamsSetup; // private setup() method, used by assign()
     }
 
-    public Remove remove ( Key ) ( cstring channel, Key key, RequestNotification.Callback notifier )
+    public Remove remove ( Key ) ( cstring channel, Key key, scope RequestNotification.Callback notifier )
     {
         return *Remove(DhtConst.Command.E.Remove, notifier).channel(channel)
             .key(key).contextFromKey();
@@ -914,8 +914,8 @@ public class DhtClient : IClient
         mixin RequestParamsSetup; // private setup() method, used by assign()
     }
 
-    public GetAll getAll ( cstring channel, RequestParams.GetPairDg output,
-            RequestNotification.Callback notifier )
+    public GetAll getAll ( cstring channel, scope RequestParams.GetPairDg output,
+            scope RequestNotification.Callback notifier )
     {
         return *GetAll(DhtConst.Command.E.GetAll, notifier).channel(channel)
             .io(output);
@@ -959,8 +959,8 @@ public class DhtClient : IClient
         mixin RequestParamsSetup; // private setup() method, used by assign()
     }
 
-    public GetAllKeys getAllKeys ( cstring channel, RequestParams.GetValueDg output,
-            RequestNotification.Callback notifier )
+    public GetAllKeys getAllKeys ( cstring channel, scope RequestParams.GetValueDg output,
+            scope RequestNotification.Callback notifier )
     {
         return *GetAllKeys(DhtConst.Command.E.GetAllKeys, notifier)
             .channel(channel).io(output);
@@ -1003,8 +1003,8 @@ public class DhtClient : IClient
         mixin RequestParamsSetup; // private setup() method, used by assign()
     }
 
-    public Listen listen ( cstring channel, RequestParams.GetPairDg output,
-            RequestNotification.Callback notifier )
+    public Listen listen ( cstring channel, scope RequestParams.GetPairDg output,
+            scope RequestNotification.Callback notifier )
     {
         return *Listen(DhtConst.Command.E.Listen, notifier).channel(channel)
             .io(output);
@@ -1046,8 +1046,8 @@ public class DhtClient : IClient
         mixin RequestParamsSetup; // private setup() method, used by assign()
     }
 
-    public GetChannels getChannels ( RequestParams.GetNodeValueDg output,
-            RequestNotification.Callback notifier )
+    public GetChannels getChannels ( scope RequestParams.GetNodeValueDg output,
+            scope RequestNotification.Callback notifier )
     {
         return *GetChannels(DhtConst.Command.E.GetChannels, notifier).io(output);
     }
@@ -1087,7 +1087,7 @@ public class DhtClient : IClient
         mixin RequestParamsSetup; // private setup() method, used by assign()
     }
 
-    public GetSize getSize ( RequestParams.GetSizeInfoDg output, RequestNotification.Callback notifier )
+    public GetSize getSize ( scope RequestParams.GetSizeInfoDg output, scope RequestNotification.Callback notifier )
     {
         return *GetSize(DhtConst.Command.E.GetSize, notifier).io(output);
     }
@@ -1130,7 +1130,7 @@ public class DhtClient : IClient
         mixin RequestParamsSetup; // private setup() method, used by assign()
     }
 
-    public GetChannelSize getChannelSize ( cstring channel, RequestParams.GetChannelSizeInfoDg output, RequestNotification.Callback notifier )
+    public GetChannelSize getChannelSize ( cstring channel, scope RequestParams.GetChannelSizeInfoDg output, scope RequestNotification.Callback notifier )
     {
         return *GetChannelSize(DhtConst.Command.E.GetChannelSize, notifier)
             .channel(channel).io(output);
@@ -1164,7 +1164,7 @@ public class DhtClient : IClient
         mixin RequestParamsSetup; // private setup() method, used by assign()
     }
 
-    public RemoveChannel removeChannel ( cstring channel, RequestNotification.Callback notifier )
+    public RemoveChannel removeChannel ( cstring channel, scope RequestNotification.Callback notifier )
     {
         return *RemoveChannel(DhtConst.Command.E.RemoveChannel, notifier)
             .channel(channel);
@@ -1205,8 +1205,8 @@ public class DhtClient : IClient
         mixin RequestParamsSetup; // private setup() method, used by assign()
     }
 
-    public GetNumConnections getNumConnections ( RequestParams.GetNumConnectionsDg output,
-            RequestNotification.Callback notifier )
+    public GetNumConnections getNumConnections ( scope RequestParams.GetNumConnectionsDg output,
+            scope RequestNotification.Callback notifier )
     {
         return *GetNumConnections(DhtConst.Command.E.GetNumConnections, notifier)
             .io(output);
@@ -1249,8 +1249,8 @@ public class DhtClient : IClient
         mixin RequestParamsSetup; // private setup() method, used by assign()
     }
 
-    public GetVersion getVersion ( RequestParams.GetNodeValueDg output,
-            RequestNotification.Callback notifier )
+    public GetVersion getVersion ( scope RequestParams.GetNodeValueDg output,
+            scope RequestNotification.Callback notifier )
     {
         return *GetVersion(DhtConst.Command.E.GetVersion, notifier).io(output);
     }
@@ -1291,8 +1291,8 @@ public class DhtClient : IClient
         mixin RequestParamsSetup; // private setup() method, used by assign()
     }
 
-    public GetResponsibleRange getResponsibleRange ( RequestParams.GetResponsibleRangeDg output,
-            RequestNotification.Callback notifier )
+    public GetResponsibleRange getResponsibleRange ( scope RequestParams.GetResponsibleRangeDg output,
+            scope RequestNotification.Callback notifier )
     {
         return *GetResponsibleRange(DhtConst.Command.E.GetResponsibleRange,
             notifier).io(output);
@@ -1315,7 +1315,7 @@ public class DhtClient : IClient
     ***************************************************************************/
 
     override protected void scopeRequestParams (
-        void delegate ( IRequestParams params ) dg )
+        scope void delegate ( IRequestParams params ) dg )
     {
         scope params = new RequestParams;
         dg(params);
