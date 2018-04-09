@@ -221,12 +221,12 @@ unittest
             // ```
             // auto timeout_microsec = 60_000_000;
             //
-            // auto handshake_timeout =   /* true if timeout is reached */
+            // auto handshake_timed_out =   /* true if timeout is reached */
             //     theScheduler.awaitOrTimeout(
             //         this.handshake.allNodesConnected(),
             //         timeout_microsec);
             //
-            // /* react to `handshake_timeout` as you wish, but note
+            // /* react to `handshake_timed_out` as you wish, but note
             //    that the `DhtHandshake` instance will keep working
             //    in the background to complete the handshake */
             // ```

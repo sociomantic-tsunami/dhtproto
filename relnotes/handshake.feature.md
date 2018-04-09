@@ -19,12 +19,12 @@ Stdout.formatln("At least one node is now connected!");
 // is only available for more recent ocean releases)
 auto timeout_microsec = 60_000_000;
 
-auto handshake_timeout =   // true if timeout is reached
+auto handshake_timed_out =   // true if timeout is reached
     theScheduler.awaitOrTimeout(
         handshake.allNodesConnected(),
         timeout_microsec);
 
-if (handshake_timeout)
+if (handshake_timed_out)
 {
     Stdout.formatln(
         "DHT handshake did not succeed within {} seconds!",
