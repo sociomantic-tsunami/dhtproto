@@ -17,7 +17,7 @@ public class DhtHandshake
     import dhtproto.client.DhtClient;
     import dhtproto.client.legacy.internal.helper.RetryHandshake;
 
-    import ocean.task.Scheduler;
+    import ocean.task.IScheduler;
     import ocean.task.Task;
     import ocean.task.util.Event;
     import ocean.util.log.Logger;
