@@ -215,27 +215,37 @@ unittest
             theScheduler.await(this.handshake.oneNodeConnected());
             Stdout.formatln("At least one node is now connected!");
 
-            // if `theScheduler.awaitOrTimeout` is available, it can
-            // be used to implement support for a partial handshake:
+            // wait until either all nodes have connected, or 60 seconds
+            // have passed, whichever comes sooner
             //
-            // ```
-            // auto timeout_microsec = 60_000_000;
-            //
-            // auto handshake_timed_out =   /* true if timeout is reached */
-            //     theScheduler.awaitOrTimeout(
-            //         this.handshake.allNodesConnected(),
-            //         timeout_microsec);
-            //
-            // /* react to `handshake_timed_out` as you wish, but note
-            //    that the `DhtHandshake` instance will keep working
-            //    in the background to complete the handshake */
-            // ```
-            //
-            // alternatively, we can block on all DHT nodes being
-            // connected using `await`:
-            theScheduler.await(this.handshake.allNodesConnected());
+            // (if you really need a hard block until the full handshake
+            // completes, with no timeout, use `theScheduler.await` just
+            // as we do above for `this.handshake.oneNodeConnected()`)
+            auto timeout_microsec = 60_000_000;
 
-            Stdout.formatln("DHT handshake complete!");
+            auto handshake_timed_out =   /* true if timeout is reached */
+                theScheduler.awaitOrTimeout(
+                    this.handshake.allNodesConnected(),
+                    timeout_microsec);
+
+            if (handshake_timed_out)
+            {
+                // we reached the timeout, so we proceed with only a
+                // partial handshake complete
+                Stderr.formatln(
+                    "DHT handshake did not succeed within {} seconds!",
+                    timeout_microsec / 1_000_000);
+            }
+            else
+            {
+                // we completed the handshake before the timeout, so
+                // all is good
+                Stdout.formatln("DHT handshake complete!");
+            }
+
+            // if we timed out, the `DhtHandshake` instance will still
+            // keep working in the background to connect to the missing
+            // DHT nodes, so all nodes should be reached eventually
         }
     }
 }
