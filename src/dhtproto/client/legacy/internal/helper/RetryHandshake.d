@@ -25,73 +25,41 @@ class RetryHandshake
     import ocean.io.select.EpollSelectDispatcher;
     import ocean.io.select.client.TimerEvent;
 
-    /***************************************************************************
-
-        Timer to retry the handshake
-
-    ***************************************************************************/
-
+    /// Timer to retry the handshake.
     protected TimerEvent timer;
 
-    /***************************************************************************
-
-        DHT CLIENT. YES!
-
-    ***************************************************************************/
-
+    /// DHT client to use to perform handshakes.
     protected DhtClient dht;
 
-    /***************************************************************************
-
-        Epoll
-
-    ***************************************************************************/
-
+    /// Epoll instance to register timer with.
     protected EpollSelectDispatcher epoll;
 
-    /***************************************************************************
-
-        Time to wait before retrying
-
-    ***************************************************************************/
-
+    /// Time to wait (in seconds) before retrying, after an incomplete
+    /// handshake.
     protected size_t wait_time;
 
-    /***************************************************************************
-
-        Set of nodes which have already handshaken succesfully. (Nodes are only
-        added to this set, never removed.)
-
-    ***************************************************************************/
-
+    /// Set of nodes which have already handshaken succesfully. (Nodes are only
+    /// added to this set, never removed.)
     private bool[hash_t] established_nodes;
 
-    /***************************************************************************
-
-        Delegate that will be called on success of a complete handshake (i.e.
-        the handshake has succeeded for every node)
-
-    ***************************************************************************/
-
+    /// Delegate that will be called on success of a complete handshake (i.e.
+    /// the handshake has succeeded for every node).
     protected void delegate ( ) handshake_complete_dg;
 
-    /***************************************************************************
-
-        Delegate that will be called on the first successful handshake with each
-        individual node
-
-    ***************************************************************************/
-
+    /// Delegate that will be called on the first successful handshake with each
+    /// individual node.
     protected void delegate ( NodeItem ) one_node_handshake_dg;
 
     /***************************************************************************
 
-        Constructor
+        Constructor. Initiates the handshake (and the retrying process, if the
+        handshake does not complete on the first attempt).
 
         Params:
             epoll = epoll instance
-            dht   = dht client
-            wait_time = time to wait in seconds
+            dht = dht client
+            wait_time = time to wait (in seconds) before retrying, after an
+                incomplete handshake
             handshake_complete_dg = delegate to call on success, optional
             one_node_handshake_dg = delegate to call on connecting to one node,
                 optional
@@ -118,10 +86,11 @@ class RetryHandshake
 
     /***************************************************************************
 
-        try doing the handshake
+        Try doing the handshake.
 
         Returns:
-            false, so the timer doesn't stay registered
+            false, so the timer doesn't stay registered. (Re-registering the
+            timer is handled by the `result` method.)
 
     ***************************************************************************/
 
@@ -134,11 +103,8 @@ class RetryHandshake
 
     /***************************************************************************
 
-        handshake callback
-
-        Calls the user delegate on success, else retries the handshake after the
-        specified wait time
-
+        Handshake callback. Calls the user delegate on success, else retries the
+        handshake after the specified wait time.
 
         Params:
             success = whether the handshake was a success
@@ -212,23 +178,26 @@ class RetryHandshake
         Optionally overrideable handshake notifier callback, called from
         handshake_notifier().
 
+        Params:
+            info = DHT request notification for one of the requests involved in
+                the handshake
+
     ***************************************************************************/
 
     protected void nodeHandshakeCB ( DhtClient.RequestNotification info ) {   }
 
-
     /***************************************************************************
 
-        Called when the handshake failed and it will be retried
+        Called when the handshake failed and it will be retried.
 
     ***************************************************************************/
 
     protected void error (  ) {    }
 
-
     /***************************************************************************
 
-        Called when the handshake succeeded and the user delegate will be called
+        Called when the handshake succeeded and the user delegate will be
+        called.
 
     ***************************************************************************/
 
