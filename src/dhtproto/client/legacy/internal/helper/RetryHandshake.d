@@ -24,6 +24,15 @@ class RetryHandshake
 
     import ocean.io.select.EpollSelectDispatcher;
     import ocean.io.select.client.TimerEvent;
+    import ocean.util.log.Logger;
+
+    /// Logger for instances of this class.
+    /// Note: in theory, an application may have multiple instances of this
+    /// class. Currently, these will all write to the same logger (which will
+    /// result in a confusing mess). This is a highly unusual case, though,
+    /// so is not specifically supported. We can add better support, if it's
+    /// ever needed.
+    private Logger log;
 
     /// Timer to retry the handshake.
     protected TimerEvent timer;
@@ -81,6 +90,8 @@ class RetryHandshake
 
         this.timer = new TimerEvent(&this.tryHandshake);
 
+        this.log = Log.lookup("RetryHandshake");
+
         this.tryHandshake();
     }
 
@@ -96,6 +107,7 @@ class RetryHandshake
 
     protected bool tryHandshake ( )
     {
+        this.log.info("Attempting handshake.");
         this.dht.nodeHandshake(&this.result, &this.handshake_notifier);
 
         return false;
@@ -117,12 +129,14 @@ class RetryHandshake
         {
             this.error();
 
+            this.log.info("Handshake did not succeed for all nodes. Retrying in {}s",
+                this.wait_time);
             this.epoll.register(this.timer);
-
             this.timer.set(this.wait_time, 0, 0, 0);
         }
         else
         {
+            this.log.info("Handshake succeeded for all nodes.");
             this.success();
 
             if ( this.handshake_complete_dg !is null )
@@ -145,6 +159,8 @@ class RetryHandshake
 
     private void handshake_notifier ( DhtClient.RequestNotification info )
     {
+        this.log.trace("Callback: {}", info.message(this.dht.msg_buf));
+
         this.nodeHandshakeCB(info);
 
         if ( info.type != info.type.Finished )
@@ -169,6 +185,8 @@ class RetryHandshake
             {
                 this.established_nodes[node_hash] = true;
                 this.one_node_handshake_dg(info.nodeitem);
+                this.log.info("Handshake succeeded on {}:{}.",
+                    info.nodeitem.Address, info.nodeitem.Port);
             }
         }
     }
