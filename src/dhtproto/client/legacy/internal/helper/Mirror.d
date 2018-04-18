@@ -55,7 +55,7 @@ abstract public class Mirror ( Dht : DhtClient ) : MirrorBase!(Dht)
         }
 
         /// State of the request.
-        public State state = State.None;
+        private State state = State.None;
 
         /// Logger for this request.
         private Logger log;
@@ -114,6 +114,18 @@ abstract public class Mirror ( Dht : DhtClient ) : MirrorBase!(Dht)
                 this.outer.dht.schedule(rq, start_in_ms);
                 this.state = State.Scheduled;
             }
+        }
+
+        /***********************************************************************
+
+            Resets the internal state. Should be called when the request
+            finishes.
+
+        ***********************************************************************/
+
+        public void finished ( )
+        {
+            this.state = State.None;
         }
     }
 
@@ -189,7 +201,7 @@ abstract public class Mirror ( Dht : DhtClient ) : MirrorBase!(Dht)
 
             if ( info.type == info.type.Finished )
             {
-                this.core.state = this.core.state.None;
+                this.core.finished();
 
                 // No need to check `info.succeeded` -- a Listen request can
                 // never end cleanly.
@@ -292,7 +304,7 @@ abstract public class Mirror ( Dht : DhtClient ) : MirrorBase!(Dht)
 
             if ( info.type == info.type.Finished )
             {
-                this.core.state = this.core.state.None;
+                this.core.finished();
 
                 if ( info.succeeded )
                 {
