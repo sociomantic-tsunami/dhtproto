@@ -202,6 +202,7 @@ abstract public class Mirror ( Dht : DhtClient ) : MirrorBase!(Dht)
         }
     }
 
+    /// Single-node GetAll request handler.
     private class GetAll
     {
         /// Core single-node request functionality.
