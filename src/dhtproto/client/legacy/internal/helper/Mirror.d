@@ -42,6 +42,7 @@ abstract public class Mirror ( Dht : DhtClient ) : MirrorBase!(Dht)
     import ocean.util.log.Logger;
     import ocean.text.convert.Formatter;
     import swarm.Const : NodeItem;
+    import dhtproto.util.Verify;
 
     /// Core functionality shared by Listen and GetAll handlers.
     private final class SingleNodeRequest
@@ -51,7 +52,8 @@ abstract public class Mirror ( Dht : DhtClient ) : MirrorBase!(Dht)
         {
             None,
             Assigned,
-            Scheduled
+            Scheduled,
+            Running
         }
 
         /// State of the request.
@@ -127,6 +129,27 @@ abstract public class Mirror ( Dht : DhtClient ) : MirrorBase!(Dht)
         {
             this.state = State.None;
         }
+
+        /***********************************************************************
+
+            Handles the state change from Assigned / Schedulued -> Running.
+            Should be called when the request receives a record. (The API of the
+            GetAll and Mirror requests do not provide any other way of telling
+            when a request has been successfully established.)
+
+        ***********************************************************************/
+
+        public void receivedRecord ( )
+        {
+            if ( this.state == State.Running )
+                return;
+
+            verify(this.state == State.Assigned ||
+                this.state == State.Scheduled);
+
+            this.state = State.Running;
+            log.info("Started receiving data.");
+        }
     }
 
     /// Single-node Listen request handler.
@@ -180,6 +203,7 @@ abstract public class Mirror ( Dht : DhtClient ) : MirrorBase!(Dht)
         private void receiveRecord ( Dht.RequestContext, in char[] key,
             in char[] value )
         {
+            this.core.receivedRecord();
             this.outer.receiveRecord(key, value, true);
         }
 
@@ -283,6 +307,7 @@ abstract public class Mirror ( Dht : DhtClient ) : MirrorBase!(Dht)
         private void receiveRecord ( Dht.RequestContext, in char[] key,
             in char[] value )
         {
+            this.core.receivedRecord();
             this.outer.receiveRecord(key, value, false);
         }
 
