@@ -167,6 +167,7 @@ import ocean.core.Array : copy, endsWith;
 import ocean.io.select.EpollSelectDispatcher;
 
 import ocean.core.Enforce;
+import ocean.core.Verify;
 
 debug ( SwarmClient ) import ocean.io.Stdout;
 
@@ -469,7 +470,7 @@ public class DhtClient : IClient
                 }
 
                 auto dht_registry = cast(IDhtNodeRegistryInfo)this.outer.nodes;
-                assert(dht_registry);
+                verify(dht_registry !is null);
 
                 if ( this.version_done_count == dht_registry.length &&
                      this.ranges_done_count == dht_registry.length )

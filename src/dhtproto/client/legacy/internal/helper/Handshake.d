@@ -17,6 +17,7 @@ public class DhtHandshake
     import dhtproto.client.DhtClient;
     import dhtproto.client.legacy.internal.helper.RetryHandshake;
 
+    import ocean.core.Verify;
     import ocean.task.IScheduler;
     import ocean.task.Task;
     import ocean.task.util.Event;
@@ -132,12 +133,9 @@ public class DhtHandshake
     ***************************************************************************/
 
     public this (DhtClient dht, size_t retry_delay_seconds)
-    in
     {
-        assert(dht !is null);
-    }
-    body
-    {
+        verify(dht !is null);
+
         this.log = Log.lookup("dhtproto.client.legacy.internal.helper.Handshake");
 
         this.all_nodes_connected = new AllDhtNodesConnected;

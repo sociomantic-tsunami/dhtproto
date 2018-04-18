@@ -36,6 +36,7 @@ import ocean.util.container.pool.FreeList;
 import ocean.util.container.map.Map;
 
 import ocean.transition;
+import ocean.core.Verify;
 
 
 /*******************************************************************************
@@ -246,13 +247,10 @@ public class NodeRecordBatcher
     ***************************************************************************/
 
     public AddResult add ( cstring key, cstring value )
-    in
     {
-        assert(this.node.Address.length);
-        assert(this.registry);
-    }
-    body
-    {
+        verify(this.node.Address.length != 0);
+        verify(this.registry !is null);
+
         auto hash = Hash.straightToHash(key);
         auto responsible_node = this.registry.responsibleNode(hash);
         if ( responsible_node.address != this.node.Address ||
@@ -435,12 +433,9 @@ public class NodeRecordBatcherMap
     ***************************************************************************/
 
     public NodeRecordBatcher opIndex ( DhtConst.NodeItem node )
-    in
     {
-        assert(this.registry);
-    }
-    body
-    {
+        verify(this.registry !is null);
+
         NodeRecordBatcher* batch = node in this.map;
         if ( batch is null )
         {
@@ -449,7 +444,7 @@ public class NodeRecordBatcherMap
             batch = &new_batch;
             batch.reset(node, this.registry);
         }
-        assert(batch !is null);
+        verify(batch !is null);
 
         return *batch;
     }
