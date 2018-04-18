@@ -21,6 +21,7 @@
 module dhtproto.client.legacy.internal.helper.mirror.model.MirrorBase;
 
 import ocean.transition;
+import ocean.core.Verify;
 
 import dhtproto.client.DhtClient;
 
@@ -131,7 +132,7 @@ abstract public class MirrorBase ( Dht : DhtClient )
 
     public void start ( Setup setup = Setup.init )
     {
-        assert(setup.get_all_mode != setup.get_all_mode.None ||
+        verify(setup.get_all_mode != setup.get_all_mode.None ||
             setup.listen_mode != setup.listen_mode.None,
             "It doesn't make any sense to start a channel mirror with no GetAll"
             ~ " and no Listen.");

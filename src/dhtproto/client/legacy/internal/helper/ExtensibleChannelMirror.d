@@ -29,6 +29,7 @@ module dhtproto.client.legacy.internal.helper.ExtensibleChannelMirror;
 
 import ocean.transition;
 import ocean.core.Enforce;
+import ocean.core.Verify;
 
 import dhtproto.client.legacy.internal.helper.mirror.model.MirrorBase;
 import dhtproto.client.DhtClient;
@@ -662,7 +663,7 @@ public class DeserializedRecordCache ( T )
 
     public this ( Cache cache )
     {
-        assert(cache !is null);
+        verify(cache !is null);
         this.cache_ = cache;
     }
 

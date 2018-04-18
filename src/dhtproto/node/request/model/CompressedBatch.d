@@ -23,6 +23,7 @@ module dhtproto.node.request.model.CompressedBatch;
 import dhtproto.node.request.model.SingleChannel;
 
 import ocean.transition;
+import ocean.core.Verify;
 import ocean.util.log.Logger;
 
 /*******************************************************************************
@@ -136,7 +137,7 @@ public abstract scope class CompressedBatch(T...) : SingleChannel
                     // add the record to new batch
                     writeBatch();
                     add_result = this.batcher.add(args);
-                    assert (add_result == Added);
+                    verify(add_result == Added);
                     break;
                 case TooBig:
                     // impossible to fit the record even in empty batch
