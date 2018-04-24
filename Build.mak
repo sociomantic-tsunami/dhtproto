@@ -6,6 +6,7 @@ override DFLAGS  += -w
 ifeq ($(DVER),1)
 override DFLAGS += -v2 -v2=-static-arr-params -v2=-volatile
 else
+override DFLAGS  += -de
 DC:=dmd-transitional
 endif
 

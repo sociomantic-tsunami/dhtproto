@@ -44,6 +44,7 @@ import dhtproto.client.legacy.internal.request.model.IRequest;
 debug (SwarmClient) import ocean.io.Stdout;
 
 import ocean.core.Enforce;
+import ocean.core.Verify;
 
 import ocean.math.Range;
 
@@ -327,12 +328,8 @@ public class DhtNodeConnectionPool : NodeConnectionPool, IDhtNodeConnectionPoolI
      **************************************************************************/
 
     public bool coversRange ( hash_t start, hash_t end )
-    in
     {
-        assert(this.range_queried, typeof(this).stringof ~ ".coversRange: node hash range unknown -- cannot query");
-    }
-    body
-    {
+        verify(this.range_queried, typeof(this).stringof ~ ".coversRange: node hash range unknown -- cannot query");
         return this.hash_range.overlaps(Hash.HashRange(start, end));
     }
 }

@@ -167,6 +167,7 @@ import ocean.core.Array : copy, endsWith;
 import ocean.io.select.EpollSelectDispatcher;
 
 import ocean.core.Enforce;
+import ocean.core.Verify;
 
 debug ( SwarmClient ) import ocean.io.Stdout;
 
@@ -622,7 +623,7 @@ public class DhtClient : IClient
                 }
 
                 auto dht_registry = cast(IDhtNodeRegistryInfo)this.outer.nodes;
-                assert(dht_registry);
+                verify(dht_registry !is null);
 
                 if ( this.version_done_count == dht_registry.length &&
                      this.ranges_done_count == dht_registry.length )
@@ -989,7 +990,7 @@ public class DhtClient : IClient
 
     ***************************************************************************/
 
-    private struct Put
+    public struct Put
     {
         mixin RequestBase;
         mixin IODelegate;       // io(T) method
@@ -1029,7 +1030,7 @@ public class DhtClient : IClient
 
     ***************************************************************************/
 
-    private struct Get
+    public struct Get
     {
         mixin RequestBase;
         mixin IODelegate;       // io(T) method
@@ -1067,7 +1068,7 @@ public class DhtClient : IClient
 
     ***************************************************************************/
 
-    private struct Exists
+    public struct Exists
     {
         mixin RequestBase;
         mixin IODelegate;       // io(T) method
@@ -1101,7 +1102,7 @@ public class DhtClient : IClient
 
     ***************************************************************************/
 
-    private struct Remove
+    public struct Remove
     {
         mixin RequestBase;
         mixin Channel;          // channel(cstring) method
@@ -1142,7 +1143,7 @@ public class DhtClient : IClient
 
     ***************************************************************************/
 
-    private struct GetAll
+    public struct GetAll
     {
         mixin RequestBase;
         mixin IODelegate;       // io(T) method
@@ -1188,7 +1189,7 @@ public class DhtClient : IClient
 
     ***************************************************************************/
 
-    private struct GetAllKeys
+    public struct GetAllKeys
     {
         mixin RequestBase;
         mixin IODelegate;       // io(T) method
@@ -1232,7 +1233,7 @@ public class DhtClient : IClient
 
     ***************************************************************************/
 
-    private struct Listen
+    public struct Listen
     {
         mixin RequestBase;
         mixin IODelegate;       // io(T) method
@@ -1278,7 +1279,7 @@ public class DhtClient : IClient
 
     ***************************************************************************/
 
-    private struct GetChannels
+    public struct GetChannels
     {
         mixin RequestBase;
         mixin IODelegate;       // io(T) method
@@ -1319,7 +1320,7 @@ public class DhtClient : IClient
 
     ***************************************************************************/
 
-    private struct GetSize
+    public struct GetSize
     {
         mixin RequestBase;
         mixin IODelegate;       // io(T) method
@@ -1361,7 +1362,7 @@ public class DhtClient : IClient
 
     ***************************************************************************/
 
-    private struct GetChannelSize
+    public struct GetChannelSize
     {
         mixin RequestBase;
         mixin Channel;          // channel(cstring) method
@@ -1396,7 +1397,7 @@ public class DhtClient : IClient
 
     ***************************************************************************/
 
-    private struct RemoveChannel
+    public struct RemoveChannel
     {
         mixin RequestBase;
         mixin Channel;          // channel(cstring) method
@@ -1437,7 +1438,7 @@ public class DhtClient : IClient
 
     ***************************************************************************/
 
-    private struct GetNumConnections
+    public struct GetNumConnections
     {
         mixin RequestBase;
         mixin IODelegate;       // io(T) method
@@ -1481,7 +1482,7 @@ public class DhtClient : IClient
 
     ***************************************************************************/
 
-    private struct GetVersion
+    public struct GetVersion
     {
         mixin RequestBase;
         mixin IODelegate;       // io(T) method
@@ -1523,7 +1524,7 @@ public class DhtClient : IClient
 
     ***************************************************************************/
 
-    private struct GetResponsibleRange
+    public struct GetResponsibleRange
     {
         mixin RequestBase;
         mixin IODelegate;       // io(T) method

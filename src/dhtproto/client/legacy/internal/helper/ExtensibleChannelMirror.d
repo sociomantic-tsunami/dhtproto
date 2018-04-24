@@ -28,8 +28,10 @@ module dhtproto.client.legacy.internal.helper.ExtensibleChannelMirror;
 *******************************************************************************/
 
 import ocean.transition;
+import ocean.core.Enforce;
+import ocean.core.Verify;
 
-import dhtproto.client.legacy.internal.helper.ChannelMirror;
+import dhtproto.client.legacy.internal.helper.mirror.model.MirrorBase;
 import dhtproto.client.DhtClient;
 
 /*******************************************************************************
@@ -59,13 +61,15 @@ import dhtproto.client.DhtClient;
     Template_Params:
         Dht = type of dht client (must be derived from DhtClient and contain the
             RequestScheduler plugin)
+        MirrorImpl = type of channel mirror implementation; must be derived from
+            MirrorBase!(Dht)
         Plugins = variadic list of record-handling plugins to be called (*in the
             order specified*) when records are received by the mirror
 
 *******************************************************************************/
 
-public class ExtensibleChannelMirror ( Dht : DhtClient, Plugins ... )
-    : ChannelMirror!(Dht)
+public class ExtensibleMirror
+    ( Dht : DhtClient, MirrorImpl : MirrorBase!(Dht), Plugins ... ) : MirrorImpl
 {
     import ocean.core.Exception;
     import ocean.core.Traits : ctfe_i2a;
@@ -235,6 +239,54 @@ public class ExtensibleChannelMirror ( Dht : DhtClient, Plugins ... )
 
 version ( UnitTest )
 {
+    import dhtproto.client.legacy.internal.helper.Mirror;
+}
+
+// Check that ExtensibleMirror compiles with Mirror implementation and plugins
+unittest
+{
+    static struct Record
+    {
+        ulong update_time;
+        hash_t id;
+        size_t count;
+    }
+
+    alias ExtensibleMirror!(SchedulingDhtClient, Mirror!(SchedulingDhtClient),
+        RawRecordDeserializer!(Record), DeserializedRecordCache!(Record))
+        ExampleMirror;
+
+    istring channel = "channel";
+    auto deserializer = new RawRecordDeserializer!(Record);
+    auto cache = new DeserializedRecordCache!(Record)(100);
+    auto mirror = new ExampleMirror(
+        new SchedulingDhtClient(new EpollSelectDispatcher), channel, 100, 2,
+        null, null, deserializer, cache);
+}
+
+import dhtproto.client.legacy.internal.helper.ChannelMirror;
+
+/*******************************************************************************
+
+    Extensible channel mirror class template based on the ChannelMirror
+    implementation.
+
+    Params:
+        Dht = type of dht client (must be derived from DhtClient and contain the
+            RequestScheduler plugin)
+        Plugins = variadic list of record-handling plugins to be called (*in the
+            order specified*) when records are received by the mirror
+
+*******************************************************************************/
+
+public template ExtensibleChannelMirror ( Dht : DhtClient, Plugins ... )
+{
+    alias ExtensibleMirror!(Dht, ChannelMirror!(Dht), Plugins)
+        ExtensibleChannelMirror;
+}
+
+version ( UnitTest )
+{
     import ocean.io.Stdout;
     import ocean.io.select.EpollSelectDispatcher;
     import ocean.util.serialize.contiguous.Serializer;
@@ -268,13 +320,15 @@ unittest
         auto epoll = new EpollSelectDispatcher;
         auto dht = new SchedulingDhtClient(epoll);
         dht.addNode("127.0.0.1".dup, 6424);
+        bool handshake_ok;
         dht.nodeHandshake(
             (DhtClient.RequestContext, bool ok)
             {
-                assert(ok);
+                handshake_ok = ok;
             },
             null);
         epoll.eventLoop();
+        enforce(handshake_ok);
 
         // Add some records to the channel being mirrored
         const num_records = 10;
@@ -609,7 +663,7 @@ public class DeserializedRecordCache ( T )
 
     public this ( Cache cache )
     {
-        assert(cache !is null);
+        verify(cache !is null);
         this.cache_ = cache;
     }
 

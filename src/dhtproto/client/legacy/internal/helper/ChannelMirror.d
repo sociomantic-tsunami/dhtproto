@@ -32,9 +32,8 @@ import swarm.client.request.notifier.IRequestNotification;
 import swarm.Const : NodeItem;
 
 import dhtproto.client.DhtClient;
-
+import dhtproto.client.legacy.internal.helper.mirror.model.MirrorBase;
 import dhtproto.client.legacy.internal.helper.GroupRequest;
-
 
 
 /*******************************************************************************
@@ -57,19 +56,8 @@ import dhtproto.client.legacy.internal.helper.GroupRequest;
 
 *******************************************************************************/
 
-abstract public class ChannelMirror ( Dht : DhtClient )
+abstract public class ChannelMirror ( Dht : DhtClient ) : MirrorBase!(Dht)
 {
-    /***************************************************************************
-
-        This helper only works in conjunction with the request scheduler plugin,
-        so we assert that that exists in the client.
-
-    ***************************************************************************/
-
-    static assert(Dht.HasPlugin!(DhtClient.RequestScheduler),
-        "ChannelMirror helper requires RequestScheduler plugin in client");
-
-
     /***************************************************************************
 
         Helper class to manage a dht Listen request across multiple nodes.
@@ -157,6 +145,9 @@ abstract public class ChannelMirror ( Dht : DhtClient )
 
     private class GetAllRequest : GroupRequest!(Dht.GetAll)
     {
+        /// Run once and do not repeat?
+        private bool one_shot;
+
         /***********************************************************************
 
             Constructor. Calls the super constructor with a GetAll request for
@@ -232,10 +223,11 @@ abstract public class ChannelMirror ( Dht : DhtClient )
 
             this.outer.fillFinished();
 
-            if ( !this.outer.filling )
+            if ( !this.one_shot )
             {
                 this.reschedule(this.outer.update_time_ms);
             }
+            this.one_shot = false;
         }
 
 
@@ -268,51 +260,6 @@ abstract public class ChannelMirror ( Dht : DhtClient )
 
     /***************************************************************************
 
-        Dht client used to access dht.
-
-    ***************************************************************************/
-
-    protected Dht dht;
-
-
-    /***************************************************************************
-
-        Name of dht channel to mirror.
-
-    ***************************************************************************/
-
-    protected istring channel_;
-
-
-    /***************************************************************************
-
-        Time (in milliseconds) to wait between successful GetAlls.
-
-    ***************************************************************************/
-
-    public Const!(uint) update_time_ms;
-
-
-    /***************************************************************************
-
-        Time (in milliseconds) to wait between failed requests.
-
-    ***************************************************************************/
-
-    public Const!(uint) retry_time_ms;
-
-
-    /***************************************************************************
-
-        Flag set to true when performing the initial cache fill.
-
-    ***************************************************************************/
-
-    private bool filling;
-
-
-    /***************************************************************************
-
         Constructor.
 
         Params:
@@ -328,10 +275,7 @@ abstract public class ChannelMirror ( Dht : DhtClient )
                   uint update_time_s, uint retry_time_s,
                   Dht.RequestNotification.Callback notifier = null )
     {
-        this.dht         = dht;
-        this.channel_    = idup(channel);
-        this.update_time_ms = update_time_s * 1_000;
-        this.retry_time_ms  = retry_time_s * 1_000;
+        super(dht, channel, update_time_s, retry_time_s);
 
         this.listen  = this.new ListenRequest(notifier);
         this.get_all = this.new GetAllRequest(notifier);
@@ -363,169 +307,88 @@ abstract public class ChannelMirror ( Dht : DhtClient )
                   lazy ListenRequest listen, lazy GetAllRequest get_all,
                   Dht.RequestNotification.Callback notifier = null )
     {
-        this.dht         = dht;
-        this.channel_    = idup(channel);
-        this.update_time_ms = update_time_s * 1_000;
-        this.retry_time_ms  = retry_time_s * 1_000;
+        super(dht, channel, update_time_s, retry_time_s);
 
         this.listen  = listen;
         this.get_all = get_all;
     }
 
-
     /***************************************************************************
 
-        Returns:
-            Name of dht channel to mirror.
+        Assigns a Listen request.
 
     ***************************************************************************/
 
-    public istring channel ()
+    override protected void assignListen ( )
     {
-        return this.channel_;
+        this.dht.assign(this.listen);
     }
 
     /***************************************************************************
 
-        Struct, passed to start(), describing the requests to start.
+        Assigns a one-shot (i.e. non-repeating) GetAll request.
 
     ***************************************************************************/
 
-    public struct Setup
+    override protected void assignOneShotGetAll ( )
     {
-        /***********************************************************************
-
-            Enum describing the possible GetAll modes.
-
-        ***********************************************************************/
-
-        public enum GetAllMode
-        {
-            None,           // do not assign GetAll requests
-            OneShot,        // assign one GetAll request but do not repeat
-            Repeating,      // repeatedly assign GetAlls, according to the
-                            // specified update time
-            RepeatingNow    // ditto, but assign the first immediately (no delay)
-        }
-
-        /***********************************************************************
-
-            Enum describing the possible Listen modes.
-
-        ***********************************************************************/
-
-        public enum ListenMode
-        {
-            None,       // do not assign Listen requests
-            Continuous  // assign Listen requests (runs continuously)
-        }
-
-        /***********************************************************************
-
-            The desired GetAll mode. (Defaults to a repeating GetAll.)
-
-        ***********************************************************************/
-
-        GetAllMode get_all_mode = GetAllMode.Repeating;
-
-        /***********************************************************************
-
-            The desired Listen mode. (Defaults to a continuous Listen.)
-
-        ***********************************************************************/
-
-        ListenMode listen_mode = ListenMode.Continuous;
+        this.get_all.one_shot = true;
+        this.dht.assign(this.get_all);
     }
 
     /***************************************************************************
 
-        Assigns GetAll and/or Listen requests according to the specific setup.
+        Assigns a GetAll request that will periodically repeat, once it has
+        finished.
+
+    ***************************************************************************/
+
+    override protected void assignGetAll ( )
+    {
+        this.dht.assign(this.get_all);
+    }
+
+    /***************************************************************************
+
+        Schedules a GetAll request that will periodically repeat, once it has
+        finished.
+
+    ***************************************************************************/
+
+    override protected void scheduleGetAll ( )
+    {
+        this.dht.schedule(this.get_all, this.update_time_ms);
+    }
+
+    /***************************************************************************
+
+        GetAll finished notification.
+
+        The base class does nothing, but this method may be overridden by
+        derived classes to implement special fill behaviour.
+
+    ***************************************************************************/
+
+    protected void fillFinished ( )
+    {
+    }
+
+    /***************************************************************************
+
+        Error notification. Called when one request in either the Listen or the
+        GetAll group fails (see the respective oneFinished() methods).
+
+        The base class does nothing, but this method may be overridden by
+        derived classes to implement special error behaviour.
 
         Params:
-            setup = struct instance describing the requests to start (defaults
-                to a repeating GetAll request and a continuous Listen)
+            info = request notification
 
     ***************************************************************************/
 
-    public void start ( Setup setup = Setup.init )
+    protected void error ( Dht.RequestNotification info )
     {
-        assert(!(setup.get_all_mode == setup.get_all_mode.None &&
-            setup.listen_mode == setup.listen_mode.None),
-            "It doesn't make any sense to start the ChannelMirror with no GetAll"
-            ~ " and no Listen.");
-
-        this.filling = false;
-
-        with ( Setup.GetAllMode ) switch ( setup.get_all_mode )
-        {
-            case OneShot:
-                this.filling = true;
-                this.dht.assign(this.get_all);
-                break;
-
-            case Repeating:
-                this.dht.schedule(this.get_all, this.update_time_ms);
-                break;
-
-            case RepeatingNow:
-                this.dht.assign(this.get_all);
-                break;
-
-            case None:
-            default:
-                break;
-        }
-
-        with ( Setup.ListenMode ) switch ( setup.listen_mode )
-        {
-            case Continuous:
-                this.dht.assign(this.listen);
-                break;
-
-            case None:
-            default:
-                break;
-        }
     }
-
-    /***************************************************************************
-
-        Assigns a GetAll request to fetch all records from the channel. When the
-        GetAll has finished it is not rescheduled.
-
-    ***************************************************************************/
-
-    public void fill ( )
-    {
-        Setup s;
-        s.get_all_mode = s.get_all_mode.OneShot;
-        s.listen_mode = s.listen_mode.None;
-        this.start(s);
-    }
-
-    /***************************************************************************
-
-        Schedules a GetAll request and assigns a Listen request to fetch all
-        records from the channel as they are updated. When the GetAll finishes
-        it is rescheduled to happen again after the time specified in the ctor.
-
-        This method is aliased as opCall.
-
-        Params:
-            now = if true, the GetAll is started immediately, otherwise it is
-                scheduled to occur after the update time specified in the ctor
-
-    ***************************************************************************/
-
-    public void mirror ( bool now = true )
-    {
-        Setup s;
-        s.get_all_mode =
-            now ? s.get_all_mode.RepeatingNow : s.get_all_mode.Repeating;
-        this.start(s);
-    }
-
-    public alias mirror opCall;
 
     /***************************************************************************
 
@@ -557,53 +420,6 @@ abstract public class ChannelMirror ( Dht : DhtClient )
                                        in char[] key, in char[] value )
     {
         this.receiveRecord(key, value, true);
-    }
-
-    /***************************************************************************
-
-        Application user callback. Receives a value from the dht.
-
-        Params:
-            key = record key
-            value = record value
-            single_value = flag indicating whether the record was received from
-                a Listen request (true) or a GetAll request (false)
-
-    ***************************************************************************/
-
-    abstract protected void receiveRecord ( in char[] key, in char[] value,
-                                            bool single_value );
-
-
-    /***************************************************************************
-
-        Error notification. Called when one request in either the Listen or the
-        GetAll group fails (see the respective oneFinished() methods).
-
-        The base class does nothing, but this method may be overridden by
-        derived classes to implement special error behaviour.
-
-        Params:
-            info = request notification
-
-    ***************************************************************************/
-
-    protected void error ( Dht.RequestNotification info )
-    {
-    }
-
-
-    /***************************************************************************
-
-        GetAll finished notification.
-
-        The base class does nothing, but this method may be overridden by
-        derived classes to implement special fill behaviour.
-
-    ***************************************************************************/
-
-    protected void fillFinished ( )
-    {
     }
 }
 
@@ -768,6 +584,11 @@ version ( UnitTest )
             super(this.dht, "channel", 1, 1, new ExtendedListen, new ExtendedGetAll);
         }
 
+        SchedulingDhtClient dht_client ( )
+        {
+            return this.dht;
+        }
+
         override protected void receiveRecord ( in char[] key, in char[] value,
             bool single_value ) { }
 
@@ -822,7 +643,7 @@ unittest
         auto cm = new CM;
         for ( ushort port = 1_000; port < num_nodes + 1_000; port++ )
         {
-            cm.dht.addNode("127.0.0.1".dup, port);
+            cm.dht_client.addNode("127.0.0.1".dup, port);
         }
 
         cm.fill();
@@ -863,7 +684,7 @@ unittest
         auto cm = new CM;
         for ( ushort port = 1_000; port < num_nodes + 1_000; port++ )
         {
-            cm.dht.addNode("127.0.0.1".dup, port);
+            cm.dht_client.addNode("127.0.0.1".dup, port);
         }
 
         cm.mirror();

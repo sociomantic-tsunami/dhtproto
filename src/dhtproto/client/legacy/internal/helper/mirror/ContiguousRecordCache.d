@@ -22,6 +22,7 @@ module dhtproto.client.legacy.internal.helper.mirror.ContiguousRecordCache;
 import dhtproto.client.legacy.internal.helper.mirror.model.IContiguousRecordCache;
 
 import ocean.transition;
+import ocean.core.Verify;
 import ocean.util.container.map.model.IAllocator;
 import ocean.util.container.map.Map : StandardKeyHashingMap;
 import ocean.util.serialize.contiguous.Contiguous;
@@ -110,7 +111,7 @@ public class ContiguousRecordCache ( S, Key = hash_t )
         if (auto rec = key in this)
         {
             copy(*rec, record);
-            assert((rec.ptr is null) == (record.ptr is null));
+            verify((rec.ptr is null) == (record.ptr is null));
         }
         else
         {
@@ -137,7 +138,7 @@ public class ContiguousRecordCache ( S, Key = hash_t )
     {
         auto entry = this.put(key);
         copy(record, *entry);
-        assert((record.ptr is null) == (entry.ptr is null));
+        verify((record.ptr is null) == (entry.ptr is null));
     }
 }
 

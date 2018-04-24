@@ -21,6 +21,7 @@ module fakedht.request.Listen;
 import ocean.transition;
 import ocean.util.log.Logger;
 
+import swarm.util.Hash;
 import Protocol = dhtproto.node.request.Listen;
 import fakedht.Storage; // DhtListener
 
@@ -142,7 +143,7 @@ public scope class Listen : Protocol.Listen, DhtListener
     override protected bool getNextRecord( cstring channel_name, mstring key,
         out Const!(void)[] value )
     {
-        assert (key.length == Hash.HashDigits);
+        assert (key.length == HashDigits);
 
         if (this.remaining_keys.length == 0)
             return false;

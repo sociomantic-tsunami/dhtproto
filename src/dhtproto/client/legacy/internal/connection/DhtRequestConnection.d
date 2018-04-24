@@ -21,6 +21,7 @@ module dhtproto.client.legacy.internal.connection.DhtRequestConnection;
 *******************************************************************************/
 
 import ocean.transition;
+import ocean.core.Enforce;
 
 import swarm.client.connection.RequestConnection;
 
@@ -46,6 +47,7 @@ import swarm.client.request.GetChannelSizeRequest;
 import swarm.client.request.GetSizeRequest;
 import swarm.client.request.RemoveChannelRequest;
 
+import dhtproto.client.legacy.internal.request.model.IDhtRequestResources;
 import dhtproto.client.legacy.internal.request.GetVersionRequest;
 import dhtproto.client.legacy.internal.request.GetResponsibleRangeRequest;
 import dhtproto.client.legacy.internal.request.GetRequest;
@@ -70,23 +72,23 @@ import dhtproto.client.legacy.DhtConst;
 *******************************************************************************/
 
 private alias GetChannelsRequestTemplate!(IRequest,
-    IRequest.IDhtRequestResources, DhtConst.Command.E.GetChannels)
+    IDhtRequestResources, DhtConst.Command.E.GetChannels)
     GetChannelsRequest;
 
 private alias GetNumConnectionsRequestTemplate!(IRequest,
-    IRequest.IDhtRequestResources, DhtConst.Command.E.GetNumConnections)
+    IDhtRequestResources, DhtConst.Command.E.GetNumConnections)
     GetNumConnectionsRequest;
 
 private alias GetChannelSizeRequestTemplate!(IChannelRequest,
-    IRequest.IDhtRequestResources, DhtConst.Command.E.GetChannelSize)
+    IDhtRequestResources, DhtConst.Command.E.GetChannelSize)
     GetChannelSizeRequest;
 
 private alias GetSizeRequestTemplate!(IRequest,
-    IRequest.IDhtRequestResources, DhtConst.Command.E.GetSize)
+    IDhtRequestResources, DhtConst.Command.E.GetSize)
     GetSizeRequest;
 
 private alias RemoveChannelRequestTemplate!(IChannelRequest,
-    IRequest.IDhtRequestResources, DhtConst.Command.E.RemoveChannel)
+    IDhtRequestResources, DhtConst.Command.E.RemoveChannel)
     RemoveChannelRequest;
 
 
@@ -410,7 +412,7 @@ public class DhtRequestConnection :
 
     override protected void handleNone ( )
     {
-        assert(false, "Handling command with code None");
+        enforce(false, "Handling command with code None");
     }
 
 

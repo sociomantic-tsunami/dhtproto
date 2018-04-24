@@ -26,6 +26,8 @@ import swarm.Const;
 
 import dhtproto.client.legacy.DhtConst;
 
+import ocean.core.Verify;
+
 
 
 /*******************************************************************************
@@ -48,7 +50,7 @@ public scope class RequestNotification : IRequestNotification
 
     public this ( ICommandCodes.Value command, Context context )
     {
-        assert(command in DhtConst.Command());
+        verify((command in DhtConst.Command()) !is null);
 
         super(DhtConst.Command(), DhtConst.Status(), command, context);
     }

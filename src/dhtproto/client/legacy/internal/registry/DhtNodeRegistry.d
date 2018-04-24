@@ -46,6 +46,7 @@ import dhtproto.client.legacy.internal.DhtClientExceptions;
 import ocean.io.select.EpollSelectDispatcher;
 
 import ocean.core.Enforce;
+import ocean.core.Verify;
 
 import ocean.io.compress.lzo.LzoChunkCompressor;
 
@@ -249,7 +250,7 @@ public class DhtNodeRegistry : NodeRegistry, IDhtNodeRegistryInfo
             // (cannot be inferred from a key, for example)
             case Redistribute:
             case PutBatch:
-                assert(params.node.set());
+                verify(params.node.set());
                 return false;
 
             default:
@@ -290,7 +291,7 @@ public class DhtNodeRegistry : NodeRegistry, IDhtNodeRegistryInfo
         NodeConnectionPool node_conn_pool )
     {
         auto dht_conn_pool = (cast(DhtNodeConnectionPool)node_conn_pool);
-        assert(dht_conn_pool);
+        verify(dht_conn_pool !is null);
 
         if ( params.command != DhtConst.Command.E.GetVersion &&
             params.command != DhtConst.Command.E.GetResponsibleRange )
@@ -313,15 +314,16 @@ public class DhtNodeRegistry : NodeRegistry, IDhtNodeRegistryInfo
             api = API version reported by node
 
         Throws:
-            VersionException if the node's API version does not match the
-                client's
+            - Exception if the specified node is not in the registry
+            - VersionException if the node's API version does not match the
+              client's
 
     ***************************************************************************/
 
     public void setNodeAPIVersion ( mstring address, ushort port, cstring api )
     {
         auto conn_pool = super.inRegistry(address, port);
-        assert(conn_pool, "node not in registry");
+        enforce(conn_pool, "node not in registry");
 
         auto dht_conn_pool = (cast(DhtNodeConnectionPool*)conn_pool);
         dht_conn_pool.setAPIVerison(api);
@@ -340,8 +342,9 @@ public class DhtNodeRegistry : NodeRegistry, IDhtNodeRegistryInfo
             max = maximum hash the specified node should handle
 
         Throws:
-            NodeOverlapException if another node in the registry is already
-            known to be responsible for part of the specified hash range
+            - Exception if the specified node is not in the registry
+            - NodeOverlapException if another node in the registry is already
+              known to be responsible for part of the specified hash range
 
     ***************************************************************************/
 
@@ -349,7 +352,7 @@ public class DhtNodeRegistry : NodeRegistry, IDhtNodeRegistryInfo
         hash_t min, hash_t max )
     {
         auto conn_pool = super.inRegistry(address, port);
-        assert(conn_pool, "node not in registry");
+        enforce(conn_pool, "node not in registry");
 
         auto dht_conn_pool = (cast(DhtNodeConnectionPool*)conn_pool);
         dht_conn_pool.setNodeRange(min, max);

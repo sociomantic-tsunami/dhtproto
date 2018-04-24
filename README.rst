@@ -41,9 +41,9 @@ Dependencies
 ==========  =======
 Dependency  Version
 ==========  =======
-ocean       v3.1.4
-swarm       v4.3.x
-turtle      v8.0.x
+ocean       v4.0.x
+swarm       v5.0.x
+turtle      v9.0.x
 ==========  =======
 
 Versioning
@@ -68,7 +68,16 @@ Maintained Major Branches
 ======= ==================== =============== =====
 Major   Initial release date Supported until Notes
 ======= ==================== =============== =====
-v13.x.x v13.0.0_: 01/08/2017 TBD             First open source release
+v13.x.x v13.0.0_: 01/08/2017 30/07/2018      First open source release
+v14.x.x v14.0.0_: 30/01/2018 TBD
 ======= ==================== =============== =====
 
 .. _v13.0.0: https://github.com/sociomantic-tsunami/dhtproto/releases/tag/v13.0.0
+.. _v14.0.0: https://github.com/sociomantic-tsunami/dhtproto/releases/tag/v14.0.0
+
+
+Contributing
+============
+
+See the guide for `contributing to Neptune-versioned libraries
+<https://github.com/sociomantic-tsunami/neptune/blob/master/doc/library-contributor.rst>`_.

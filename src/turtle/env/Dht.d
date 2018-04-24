@@ -27,6 +27,8 @@ import ocean.task.Scheduler;
 import ocean.task.util.Timer;
 import ocean.text.convert.Formatter;
 
+import swarm.Const : NodeItem;
+
 /*******************************************************************************
 
     Aliases to exceptions thrown on illegal operations with dht storage
@@ -71,6 +73,7 @@ public class Dht : Node!(DhtNode, "dht")
 {
     import dhtproto.client.legacy.DhtConst;
     import Hash = swarm.util.Hash;
+    import swarm.neo.AddrPort;
 
     import ocean.core.Enforce;
 
@@ -391,14 +394,18 @@ public class Dht : Node!(DhtNode, "dht")
         Creates a fake node at the specified address/port.
 
         Params:
-            node_item = address/port
+            node_addrport = address/port
 
     ***************************************************************************/
 
-    override protected DhtNode createNode ( NodeItem node_item )
+    override protected DhtNode createNode ( AddrPort node_addrport )
     {
         auto epoll = theScheduler.epoll();
 
+        auto addr = node_addrport.address_bytes();
+        auto node_item = NodeItem(
+            .format("{}.{}.{}.{}", addr[0], addr[1], addr[2], addr[3]).dup,
+            node_addrport.port());
         auto node = new DhtNode(node_item, epoll);
         node.register(epoll);
 
@@ -412,10 +419,15 @@ public class Dht : Node!(DhtNode, "dht")
 
     ***************************************************************************/
 
-    override public NodeItem node_item ( )
+    override public AddrPort node_addrport ( )
     {
         assert(this.node);
-        return this.node.node_item;
+
+        AddrPort addrport;
+        addrport.setAddress(this.node.node_item.Address);
+        addrport.port = cast(ushort)this.node.node_item.Port;
+
+        return addrport;
     }
 
     /***************************************************************************
@@ -460,15 +472,17 @@ public class Dht : Node!(DhtNode, "dht")
 
     /***************************************************************************
 
-        Suppresses log output from the fake dht if used version of dhtproto
-        supports it.
+        Suppresses/allows log output from the fake node if used version of node
+        proto supports it.
+
+        Params:
+            log = true to log errors, false to stop logging errors
 
     ***************************************************************************/
 
-    override public void ignoreErrors ( )
+    override public void log_errors ( bool log )
     {
-        static if (is(typeof(this.node.ignoreErrors())))
-            this.node.ignoreErrors();
+        this.node.log_errors = log;
     }
 }
 

@@ -24,10 +24,7 @@ module dhtproto.client.legacy.internal.RequestSetup;
 *******************************************************************************/
 
 public import swarm.client.RequestSetup;
-
-static import swarm.util.Hash;
-
-
+import ocean.core.Verify;
 
 /*******************************************************************************
 
@@ -87,7 +84,7 @@ public template IODelegate ( )
     private void setup_io_item ( IRequestParams params )
     {
         auto params_ = downcast!(RequestParams)(params);
-        assert(params_);
+        verify(params_ !is null);
 
         params_.io_item = this.io_item;
     }
@@ -167,7 +164,7 @@ public template Filter ( )
     private void setup_filter_string ( IRequestParams params )
     {
         auto params_ = downcast!(RequestParams)(params);
-        assert(params_);
+        verify(params_ !is null);
 
         params_.filter = this.filter_string;
     }
@@ -184,6 +181,7 @@ public template Key ( )
 {
     import ocean.transition;
     import ocean.core.TypeConvert : downcast;
+    static import swarm.util.Hash;
 
     mixin TypeofThis;
     static assert (is(This == struct));
@@ -259,7 +257,7 @@ public template Key ( )
     private void setup_hash ( IRequestParams params )
     {
         auto params_ = downcast!(RequestParams)(params);
-        assert(params_);
+        verify(params_ !is null);
 
         params_.hash = this.hash;
     }
