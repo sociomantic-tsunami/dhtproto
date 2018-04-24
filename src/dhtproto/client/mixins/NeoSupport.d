@@ -66,7 +66,7 @@ template NeoSupport ( )
 
         ***********************************************************************/
 
-        private alias SmartUnion!(DhtConnNotificationUnion) DhtConnNotification;
+        public alias SmartUnion!(DhtConnNotificationUnion) DhtConnNotification;
 
         /***********************************************************************
 
