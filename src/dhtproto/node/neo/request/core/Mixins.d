@@ -60,7 +60,7 @@ public template IRequestHandlerRequestCore ( )
     private RequestOnConn connection;
 
     /// Acquired resources of this request.
-    private IRequestResources resources;
+    protected IRequestResources resources;
 
     /***************************************************************************
 
