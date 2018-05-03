@@ -23,5 +23,6 @@ public enum RequestCode : ubyte
     GetChannels,
     Exists,
     Remove,
-    RemoveChannel
+    RemoveChannel,
+    Update
 }
