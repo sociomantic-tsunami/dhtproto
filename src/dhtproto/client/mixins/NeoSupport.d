@@ -272,8 +272,8 @@ template NeoSupport ( )
 
         ***********************************************************************/
 
-        public RequestId exists ( Options ... ) ( cstring channel, hash_t key,
-            Exists.Notifier notifier, Options options )
+        public RequestId exists ( cstring channel, hash_t key,
+            Exists.Notifier notifier )
         {
             auto params = Const!(Internals.Exists.UserSpecifiedParams)(
                 Const!(Exists.Args)(channel, key), notifier);
