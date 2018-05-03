@@ -26,6 +26,7 @@ import fakedht.neo.request.Remove;
 import fakedht.neo.request.GetChannels;
 import fakedht.neo.request.Exists;
 import fakedht.neo.request.RemoveChannel;
+import fakedht.neo.request.Update;
 
 /*******************************************************************************
 
@@ -52,4 +53,6 @@ static this ( )
         "Exists", ExistsImpl_v0.classinfo);
     requests.add(Command(RequestCode.RemoveChannel, 0), "RemoveChannel",
         RemoveChannelImpl_v0.classinfo);
+    requests.add(Command(RequestCode.Update, 0),
+        "Update", UpdateImpl_v0.classinfo);
 }
