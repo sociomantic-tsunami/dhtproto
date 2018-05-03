@@ -878,6 +878,191 @@ unittest
     }
 }
 
+/// Example of neo Update request usage
+unittest
+{
+    class UpdateExample : ExampleApp
+    {
+        import ocean.core.array.Mutation : copy;
+
+        override protected void example ( )
+        {
+            // Assign a neo Update request. Note that the channel is copied
+            // inside the client -- the user does not need to maintain it after
+            // calling this method.
+            this.dht.neo.update("channel", 0x1234567812345678, &this.updateNotifier);
+        }
+
+        // Notifier which is called when something of interest happens to
+        // the Update request. See dhtproto.client.request.Update for
+        // details of the parameters of the notifier.
+        private void updateNotifier ( DhtClient.Neo.Update.Notification info,
+            Const!(DhtClient.Neo.Update.Args) args )
+        {
+            formatNotification(info, this.msg_buf);
+
+            with ( info.Active ) final switch ( info.active )
+            {
+                case received:
+                    // Set updated value. In this simple example, we simply
+                    // copy the original value, without change.
+                    auto received_record = info.received.value;
+                    (*info.received.updated_value).copy(info.received.value);
+                    goto case;
+
+                case succeeded: // Updated successfully.
+                case no_record: // Record not in DHT. Use Put to write a new record.
+                    this.log.trace(this.msg_buf);
+                    break;
+
+                case conflict: // Another client updated the same record. Try again.
+                    this.log.warn(this.msg_buf);
+                    break;
+
+                case error:
+                case no_node:
+                case node_disconnected:
+                case node_error:
+                case wrong_node:
+                case unsupported:
+                    this.log.error(this.msg_buf);
+                    break;
+
+                mixin(typeof(info).handleInvalidCases);
+            }
+        }
+    }
+}
+
+/// Example of neo Update request usage, including record de/serialization
+unittest
+{
+    class UpdateExample : ExampleApp
+    {
+        import ocean.util.serialize.contiguous.Contiguous;
+
+        override protected void example ( )
+        {
+            // Assign a neo Update request. Note that the channel is copied
+            // inside the client -- the user does not need to maintain it after
+            // calling this method.
+            this.dht.neo.update("channel", 0x1234567812345678, &this.updateNotifier);
+        }
+
+        // Notifier which is called when something of interest happens to
+        // the Update request. See dhtproto.client.request.Update for
+        // details of the parameters of the notifier.
+        private void updateNotifier ( DhtClient.Neo.Update.Notification info,
+            Const!(DhtClient.Neo.Update.Args) args )
+        {
+            // Struct expected to be serialized in the received record value.
+            struct Record
+            {
+                mstring name;
+                hash_t id;
+                ulong[7] daily_totals;
+            }
+
+            formatNotification(info, this.msg_buf);
+
+            with ( info.Active ) final switch ( info.active )
+            {
+                case received:
+                    // Deserialize the received record.
+                    Contiguous!(Record) record;
+                    auto deserialized = info.received.deserialize(record);
+                    this.log.trace("Deserialized: {} / {} / {}",
+                        deserialized.name, deserialized.id,
+                        deserialized.daily_totals);
+
+                    // Update the record.
+                    deserialized.daily_totals[0]++;
+
+                    // Serialize the updated record.
+                    info.received.serialize(*deserialized);
+                    goto case;
+
+                case succeeded: // Updated successfully.
+                case no_record: // Record not in DHT. Use Put to write a new record.
+                    this.log.trace(this.msg_buf);
+                    break;
+
+                case conflict: // Another client updated the same record. Try again.
+                    this.log.warn(this.msg_buf);
+                    break;
+
+                case error:
+                case no_node:
+                case node_disconnected:
+                case node_error:
+                case wrong_node:
+                case unsupported:
+                    this.log.error(this.msg_buf);
+                    break;
+
+                mixin(typeof(info).handleInvalidCases);
+            }
+        }
+    }
+}
+
+/// Example of Task-blocking neo Update request usage
+unittest
+{
+    class UpdateExample : ExampleApp
+    {
+        import ocean.core.array.Mutation : copy;
+
+        override protected void example ( )
+        {
+            // Perform a blocking neo Update request. Note that the channel is
+            // copied inside the client -- the user does not need to maintain
+            // it after calling this method.
+            this.dht.blocking.update("channel", 0x1234567812345678,
+                &this.updateNotifier);
+        }
+
+        // Notifier which is called when something of interest happens to
+        // the Update request. See dhtproto.client.request.Update for
+        // details of the parameters of the notifier.
+        private void updateNotifier ( DhtClient.Neo.Update.Notification info,
+            Const!(DhtClient.Neo.Update.Args) args )
+        {
+            formatNotification(info, this.msg_buf);
+
+            with ( info.Active ) final switch ( info.active )
+            {
+                case received:
+                    // Set updated value. In this simple example, we simply
+                    // copy the original value, without change.
+                    auto received_record = info.received.value;
+                    (*info.received.updated_value).copy(info.received.value);
+                    goto case;
+
+                case succeeded: // Updated successfully.
+                case no_record: // Record not in DHT. Use Put to write a new record.
+                    this.log.trace(this.msg_buf);
+                    break;
+
+                case conflict: // Another client updated the same record. Try again.
+                    this.log.warn(this.msg_buf);
+                    break;
+
+                case error:
+                case no_node:
+                case node_disconnected:
+                case node_error:
+                case wrong_node:
+                case unsupported:
+                    this.log.error(this.msg_buf);
+                    break;
+
+                mixin(typeof(info).handleInvalidCases);
+            }
+        }
+    }
+}
+
 /// Example of using the DHT client's stats APIs
 unittest
 {
