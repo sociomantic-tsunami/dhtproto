@@ -24,7 +24,6 @@ module dhtproto.client.legacy.internal.RequestSetup;
 *******************************************************************************/
 
 public import swarm.client.RequestSetup;
-import ocean.core.Verify;
 
 /*******************************************************************************
 
@@ -36,6 +35,7 @@ public template IODelegate ( )
 {
     import ocean.transition;
     import ocean.core.TypeConvert : downcast;
+    import ocean.core.Verify;
 
     mixin TypeofThis;
     static assert (is(This == struct));
@@ -102,6 +102,7 @@ public template Filter ( )
 {
     import ocean.transition;
     import ocean.core.TypeConvert : downcast;
+    import ocean.core.Verify;
 
     mixin TypeofThis;
     static assert (is(This == struct));
@@ -181,6 +182,7 @@ public template Key ( )
 {
     import ocean.transition;
     import ocean.core.TypeConvert : downcast;
+    import ocean.core.Verify;
     static import swarm.util.Hash;
 
     mixin TypeofThis;
