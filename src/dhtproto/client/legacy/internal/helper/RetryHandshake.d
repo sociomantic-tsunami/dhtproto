@@ -76,8 +76,8 @@ class RetryHandshake
     ***************************************************************************/
 
     public this ( EpollSelectDispatcher epoll, DhtClient dht,
-        size_t wait_time, void delegate ( ) handshake_complete_dg = null,
-        void delegate ( NodeItem ) one_node_handshake_dg = null )
+        size_t wait_time, scope void delegate ( ) handshake_complete_dg = null,
+        scope void delegate ( NodeItem ) one_node_handshake_dg = null )
     {
         this.wait_time = wait_time;
 
@@ -244,16 +244,16 @@ unittest
         // event loop running.
         void main ( )
         {
-            this.epoll = new EpollSelectDispatcher;
-            this.dht = new DhtClient(this.epoll);
+            (&this).epoll = new EpollSelectDispatcher;
+            (&this).dht = new DhtClient((&this).epoll);
             // In a real app, you should call `this.dht.addNodes(...);`
 
             // Start the handshake
             auto retry_delay_seconds = 3;
-            new RetryHandshake(this.epoll, this.dht, retry_delay_seconds,
-                &this.handshake_complete_dg, &this.node_connected_dg);
+            new RetryHandshake((&this).epoll, (&this).dht, retry_delay_seconds,
+                &(&this).handshake_complete_dg, &(&this).node_connected_dg);
 
-            this.epoll.eventLoop();
+            (&this).epoll.eventLoop();
         }
 
         // Called when an individual node is initially connected.
