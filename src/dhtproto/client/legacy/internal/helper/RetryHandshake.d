@@ -250,7 +250,9 @@ unittest
 
             // Start the handshake
             auto retry_delay_seconds = 3;
-            new RetryHandshake(this.epoll, this.dht, retry_delay_seconds,
+            // Store the reference to the RetryHandshake
+            // object so it doesn't get garbage collected.
+            auto handshake = new RetryHandshake(this.epoll, this.dht, retry_delay_seconds,
                 &this.handshake_complete_dg, &this.node_connected_dg);
 
             this.epoll.eventLoop();
