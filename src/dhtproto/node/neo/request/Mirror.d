@@ -32,6 +32,7 @@ public abstract class MirrorProtocol_v0 : IRequestHandler
     import dhtproto.common.Mirror;
     import dhtproto.node.neo.request.core.Mixins;
     import ocean.transition;
+    import ocean.core.Verify;
 
     /***************************************************************************
 
@@ -161,12 +162,8 @@ public abstract class MirrorProtocol_v0 : IRequestHandler
         ***********************************************************************/
 
         public E pop ( )
-        in
         {
-            assert(this.num_elems > 0);
-        }
-        body
-        {
+            verify(this.num_elems > 0);
             E e;
             e = this.queue[this.read_from_elem];
             this.incWrap(this.read_from_elem);
@@ -212,7 +209,7 @@ public abstract class MirrorProtocol_v0 : IRequestHandler
         private void incWrap ( ref size_t elem_index )
         {
             elem_index++;
-            assert(elem_index <= this.max_elems);
+            verify(elem_index <= this.max_elems);
             if ( elem_index == this.max_elems )
                 elem_index = 0;
         }
@@ -515,16 +512,12 @@ public abstract class MirrorProtocol_v0 : IRequestHandler
     ***************************************************************************/
 
     private void refreshed ( hash_t key )
-    in
     {
-        assert(!this.refresh_queue.isFull());
-    }
-    body
-    {
+        verify(!this.refresh_queue.isFull());
         auto pushed = this.refresh_queue.push(key);
         // The logic in PeriodicRefresh ensures that the refresh queue will
         // never overflow.
-        assert(pushed);
+        verify(pushed);
 
         if ( this.writer.suspended_waiting_for_events )
             this.request_event_dispatcher.signal(
@@ -747,12 +740,8 @@ public abstract class MirrorProtocol_v0 : IRequestHandler
         ***********************************************************************/
 
         private void sendQueuedUpdate ( )
-        in
         {
-            assert(this.outer.update_queue.length > 0);
-        }
-        body
-        {
+            verify(this.outer.update_queue.length > 0);
             auto update = this.outer.update_queue.pop();
             with ( UpdateType ) switch ( update.type )
             {
@@ -784,12 +773,8 @@ public abstract class MirrorProtocol_v0 : IRequestHandler
         ***********************************************************************/
 
         private void sendQueuedRefresh ( )
-        in
         {
-            assert(this.outer.refresh_queue.length > 0);
-        }
-        body
-        {
+            verify(this.outer.refresh_queue.length > 0);
             void sendBatch ( )
             {
                 this.outer.request_event_dispatcher.send(this.fiber,
@@ -911,7 +896,7 @@ public abstract class MirrorProtocol_v0 : IRequestHandler
                 Signal(NodeFiberResumeCode.PushedToQueue),
                 Signal(NodeFiberResumeCode.QueueOverflowNotification),
                 Signal(NodeFiberResumeCode.ChannelRemoved));
-            assert(event.active == event.active.signal,
+            verify(event.active == event.active.signal,
                 "Unexpected event: waiting only for fiber resume code");
 
             with ( NodeFiberResumeCode ) switch ( event.signal.code )

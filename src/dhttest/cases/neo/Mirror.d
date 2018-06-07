@@ -14,6 +14,7 @@ module dhttest.cases.neo.Mirror;
 
 import ocean.transition;
 import ocean.core.Test;
+import ocean.core.Verify;
 import dhttest.DhtTestCase : NeoDhtTestCase;
 import dhtproto.client.DhtClient;
 
@@ -631,16 +632,13 @@ private struct Mirror
 
     public void start ( DhtClient.Neo.Mirror.Settings mirror_settings,
         cstring channel, DhtClient.Neo.Mirror.Notifier user_notifier )
-    in
-    {
-        assert(this.user_notifier is null);
-    }
     out
     {
         assert(this.user_notifier !is null);
     }
     body
     {
+        verify(this.user_notifier is null);
         this.user_notifier = user_notifier;
         this.id = this.dht.neo.mirror(channel, &this.counterNotifier,
             mirror_settings);
@@ -655,12 +653,8 @@ private struct Mirror
     ***************************************************************************/
 
     public void suspend ( )
-    in
     {
-        assert(this.id != this.id.init);
-    }
-    body
-    {
+        verify(this.id != this.id.init);
         this.dht.neo.control(this.id,
             ( DhtClient.Neo.Mirror.IController mirror )
             {
@@ -678,12 +672,8 @@ private struct Mirror
     ***************************************************************************/
 
     public void resume ( )
-    in
     {
-        assert(this.id != this.id.init);
-    }
-    body
-    {
+        verify(this.id != this.id.init);
         this.dht.neo.control(this.id,
             ( DhtClient.Neo.Mirror.IController mirror )
             {
@@ -700,12 +690,8 @@ private struct Mirror
     ***************************************************************************/
 
     public void stop ( )
-    in
     {
-        assert(this.id != this.id.init);
-    }
-    body
-    {
+        verify(this.id != this.id.init);
         this.dht.neo.control(this.id,
             ( DhtClient.Neo.Mirror.IController mirror )
             {

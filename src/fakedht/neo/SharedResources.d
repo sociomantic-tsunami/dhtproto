@@ -26,6 +26,7 @@ import dhtproto.node.neo.request.core.IRequestResources;
 
 class SharedResources : IRequestResources
 {
+    import ocean.core.Verify;
     import ocean.io.compress.Lzo;
     import swarm.neo.util.MessageFiber;
     import swarm.util.RecordBatcher;
@@ -114,14 +115,10 @@ class SharedResources : IRequestResources
 
     public ITimer getTimer ( uint period_s, uint period_ms,
         void delegate ( ) timer_dg )
-    in
     {
-        assert(period_ms < 1_000);
-        assert(period_s > 0 || period_ms > 0);
-        assert(timer_dg !is null);
-    }
-    body
-    {
+        verify(period_ms < 1_000);
+        verify(period_s > 0 || period_ms > 0);
+        verify(timer_dg !is null);
         return new Timer(period_s, period_ms, timer_dg);
     }
 

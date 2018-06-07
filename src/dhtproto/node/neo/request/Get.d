@@ -27,6 +27,7 @@ public abstract class GetProtocol_v0 : IRequestHandler
     import dhtproto.node.neo.request.core.Mixins;
 
     import ocean.transition;
+    import ocean.core.Verify;
     import ocean.core.array.Mutation : copy;
 
     /***************************************************************************
@@ -106,8 +107,8 @@ public abstract class GetProtocol_v0 : IRequestHandler
             auto ok = this.get(cast(char[])*this.channel, this.key,
                 ( Const!(void)[] value )
                 {
-                    assert(value !is null);
-                    assert(value.length);
+                    verify(value !is null);
+                    verify(value.length > 0);
 
                     sendResponse(MessageType.Got,
                         ( ed.Payload payload )

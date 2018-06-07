@@ -53,6 +53,7 @@ public template RequestCore ( )
 
 public template IRequestHandlerRequestCore ( )
 {
+    import ocean.core.Verify;
     import swarm.neo.node.RequestOnConn;
     import dhtproto.node.neo.request.core.IRequestResources;
 
@@ -76,6 +77,6 @@ public template IRequestHandlerRequestCore ( )
     {
         this.connection = connection;
         this.resources = cast(IRequestResources)resources_object;
-        assert(this.resources !is null);
+        verify(this.resources !is null);
     }
 }

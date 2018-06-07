@@ -269,6 +269,7 @@ private class NodeHashRangesBase
     import swarm.neo.client.ConnectionSet;
     import swarm.util.Hash : isWithinNodeResponsibility;
     import ocean.core.array.Mutation : sort;
+    import ocean.core.Verify;
 
     /// Value of the next created NodeHashRange's order field.
     private static ulong order_counter;
@@ -309,7 +310,7 @@ private class NodeHashRangesBase
         // Update an existing node.
         if ( auto nhr = addr.cmp_id in this.node_hash_ranges )
         {
-            assert(nhr.addr == addr);
+            verify(nhr.addr == addr);
             nhr.hash_range = NodeHashRange.HashRange(min, max);
             nhr.order = order_counter++;
         }
@@ -352,7 +353,7 @@ private class NodeHashRangesBase
 
         bool sortPred ( NodeHashRange e1, NodeHashRange e2 )
         {
-            assert(e1.order != e2.order);
+            verify(e1.order != e2.order);
             return e1.order > e2.order;
         }
 

@@ -44,6 +44,7 @@ template NeoSupport ( )
         import swarm.neo.client.mixins.Controllers;
         import swarm.neo.client.request_options.RequestOptions;
         import ocean.core.SmartUnion;
+        import ocean.core.Verify;
 
         /***********************************************************************
 
@@ -614,7 +615,7 @@ template NeoSupport ( )
         public void waitAllHashRangesKnown ( )
         {
             auto task = Task.getThis();
-            assert(task, "This method may only be called from inside a Task");
+            verify(task !is null, "This method may only be called from inside a Task");
 
             auto old_user_conn_notifier = this.outer.user_conn_notifier;
 
@@ -742,14 +743,10 @@ template NeoSupport ( )
 
         public void put ( cstring channel, hash_t key, Const!(void)[] value,
             Neo.Put.Notifier user_notifier )
-        in
         {
-            assert(user_notifier !is null);
-        }
-        body
-        {
+            verify(user_notifier !is null);
             auto task = Task.getThis();
-            assert(task, "This method may only be called from inside a Task");
+            verify(task !is null, "This method may only be called from inside a Task");
 
             bool finished;
 
@@ -767,7 +764,7 @@ template NeoSupport ( )
             this.outer.neo.put(channel, key, value, &notifier);
             if ( !finished ) // if request not completed, suspend
                 task.suspend();
-            assert(finished);
+            verify(finished);
         }
 
         /***********************************************************************
@@ -813,7 +810,7 @@ template NeoSupport ( )
         public PutResult put ( cstring channel, hash_t key, Const!(void)[] value )
         {
             auto task = Task.getThis();
-            assert(task, "This method may only be called from inside a Task");
+            verify(task !is null, "This method may only be called from inside a Task");
 
             enum FinishedStatus
             {
@@ -853,7 +850,7 @@ template NeoSupport ( )
             this.outer.neo.put(channel, key, value, &notifier);
             if ( state == state.None ) // if request not completed, suspend
                 task.suspend();
-            assert(state != state.None);
+            verify(state != state.None);
 
             PutResult res;
             res.succeeded = state == state.Succeeded;
@@ -876,14 +873,10 @@ template NeoSupport ( )
 
         public void get ( cstring channel, hash_t key,
             Neo.Get.Notifier user_notifier )
-        in
         {
-            assert(user_notifier !is null);
-        }
-        body
-        {
+            verify(user_notifier !is null);
             auto task = Task.getThis();
-            assert(task, "This method may only be called from inside a Task");
+            verify(task !is null, "This method may only be called from inside a Task");
 
             bool finished;
 
@@ -901,7 +894,7 @@ template NeoSupport ( )
             this.outer.neo.get(channel, key, &notifier);
             if ( !finished ) // if request not completed, suspend
                 task.suspend();
-            assert(finished);
+            verify(finished);
         }
 
         /***********************************************************************
@@ -957,7 +950,7 @@ template NeoSupport ( )
         public GetResult get ( cstring channel, hash_t key, ref void[] value )
         {
             auto task = Task.getThis();
-            assert(task, "This method may only be called from inside a Task");
+            verify(task !is null, "This method may only be called from inside a Task");
 
             enum FinishedStatus
             {
@@ -1003,7 +996,7 @@ template NeoSupport ( )
             this.outer.neo.get(channel, key, &notifier);
             if ( state == state.None ) // if request not completed, suspend
                 task.suspend();
-            assert(state != state.None);
+            verify(state != state.None);
 
             res.succeeded = state == state.Succeeded;
             return res;
@@ -1025,14 +1018,10 @@ template NeoSupport ( )
 
         public void update ( cstring channel, hash_t key,
             Neo.Update.Notifier user_notifier )
-        in
         {
-            assert(user_notifier !is null);
-        }
-        body
-        {
+            verify(user_notifier !is null);
             auto task = Task.getThis();
-            assert(task, "This method may only be called from inside a Task");
+            verify(task !is null, "This method may only be called from inside a Task");
 
             bool finished;
 
@@ -1061,7 +1050,7 @@ template NeoSupport ( )
             this.outer.neo.update(channel, key, &notifier);
             if ( !finished ) // if request not completed, suspend
                 task.suspend();
-            assert(finished);
+            verify(finished);
         }
 
         /***********************************************************************
@@ -1080,14 +1069,10 @@ template NeoSupport ( )
 
         public void exists ( cstring channel, hash_t key,
             Neo.Exists.Notifier user_notifier )
-        in
         {
-            assert(user_notifier !is null);
-        }
-        body
-        {
+            verify(user_notifier !is null);
             auto task = Task.getThis();
-            assert(task, "This method may only be called from inside a Task");
+            verify(task !is null, "This method may only be called from inside a Task");
 
             bool finished;
 
@@ -1106,7 +1091,7 @@ template NeoSupport ( )
             this.outer.neo.exists(channel, key, &notifier);
             if ( !finished ) // if request not completed, suspend
                 task.suspend();
-            assert(finished);
+            verify(finished);
         }
 
         /***********************************************************************
@@ -1158,7 +1143,7 @@ template NeoSupport ( )
         public ExistsResult exists ( cstring channel, hash_t key )
         {
             auto task = Task.getThis();
-            assert(task, "This method may only be called from inside a Task");
+            verify(task !is null, "This method may only be called from inside a Task");
 
             bool finished;
             ExistsResult res;
@@ -1199,7 +1184,7 @@ template NeoSupport ( )
             this.outer.neo.exists(channel, key, &notifier);
             if ( !finished ) // if request not completed, suspend
                 task.suspend();
-            assert(finished);
+            verify(finished);
 
             return res;
         }
@@ -1220,14 +1205,10 @@ template NeoSupport ( )
 
         public void remove ( cstring channel, hash_t key,
             Neo.Remove.Notifier user_notifier )
-        in
         {
-            assert(user_notifier !is null);
-        }
-        body
-        {
+            verify(user_notifier !is null);
             auto task = Task.getThis();
-            assert(task, "This method may only be called from inside a Task");
+            verify(task !is null, "This method may only be called from inside a Task");
 
             bool finished;
 
@@ -1246,7 +1227,7 @@ template NeoSupport ( )
             this.outer.neo.remove(channel, key, &notifier);
             if ( !finished ) // if request not completed, suspend
                 task.suspend();
-            assert(finished);
+            verify(finished);
         }
 
         /***********************************************************************
@@ -1298,7 +1279,7 @@ template NeoSupport ( )
         public RemoveResult remove ( cstring channel, hash_t key )
         {
             auto task = Task.getThis();
-            assert(task, "This method may only be called from inside a Task");
+            verify(task !is null, "This method may only be called from inside a Task");
 
             enum FinishedStatus
             {
@@ -1343,7 +1324,7 @@ template NeoSupport ( )
             this.outer.neo.remove(channel, key, &notifier);
             if ( state == state.None ) // if request not completed, suspend
                 task.suspend();
-            assert(state != state.None);
+            verify(state != state.None);
 
             res.succeeded = state == state.Succeeded;
             return res;
@@ -1537,7 +1518,7 @@ template NeoSupport ( )
         public GetAllFruct getAll ( cstring channel, ref void[] record_buffer )
         {
             auto task = Task.getThis();
-            assert(task !is null,
+            verify(task !is null,
                     "This method may only be called from inside a Task");
 
             GetAllFruct res;
@@ -1695,7 +1676,7 @@ template NeoSupport ( )
         public GetChannelsFruct getChannels ( ref mstring channel_buffer )
         {
             auto task = Task.getThis();
-            assert(task !is null,
+            verify(task !is null,
                     "This method may only be called from inside a Task");
 
             GetChannelsFruct res;
@@ -1747,7 +1728,7 @@ template NeoSupport ( )
         public RemoveChannelResult removeChannel ( cstring channel )
         {
             auto task = Task.getThis();
-            assert(task !is null, "This method may only be called from inside a Task");
+            verify(task !is null, "This method may only be called from inside a Task");
 
             enum FinishedStatus
             {
@@ -1785,7 +1766,7 @@ template NeoSupport ( )
             this.outer.neo.removeChannel(channel, &notifier);
             if ( state == state.None ) // if request not completed, suspend
                 task.suspend();
-            assert(state != state.None);
+            verify(state != state.None);
 
             RemoveChannelResult res;
             res.succeeded = state == state.Succeeded;
@@ -1846,12 +1827,8 @@ template NeoSupport ( )
 
     private void neoInit ( Neo.Config config,
         Neo.DhtConnectionNotifier user_conn_notifier )
-    in
     {
-        assert(user_conn_notifier !is null);
-    }
-    body
-    {
+        verify(user_conn_notifier !is null);
         this.user_conn_notifier = user_conn_notifier;
 
         this.shared_resources = new SharedResources;
@@ -1888,12 +1865,8 @@ template NeoSupport ( )
 
     private void neoInit ( cstring auth_name, ubyte[] auth_key,
         Neo.DhtConnectionNotifier user_conn_notifier )
-    in
     {
-        assert(user_conn_notifier !is null);
-    }
-    body
-    {
+        verify(user_conn_notifier !is null);
         this.user_conn_notifier = user_conn_notifier;
 
         this.shared_resources = new SharedResources;

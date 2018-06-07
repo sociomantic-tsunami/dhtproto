@@ -26,6 +26,7 @@ public abstract class GetAllProtocol_v0 : IRequestHandler
     import dhtproto.common.GetAll;
     import dhtproto.node.neo.request.core.Mixins;
     import ocean.transition;
+    import ocean.core.Verify;
 
     /***************************************************************************
 
@@ -344,7 +345,7 @@ public abstract class GetAllProtocol_v0 : IRequestHandler
                                 this.sendBatch();
                                 add_result = this.addToBatch(key_slice,
                                     cast(cstring)value);
-                                assert(add_result == Added);
+                                verify(add_result == Added);
                                 break;
                             case TooBig:
                                 // Impossible to fit the record even in empty batch

@@ -37,6 +37,7 @@ import fakedht.Storage; // DhtListener
 public class MirrorImpl_v0 : MirrorProtocol_v0, DhtListener
 {
     import fakedht.Storage;
+    import ocean.core.Verify;
     import ocean.core.array.Mutation : copy;
     import ocean.text.convert.Hash : toHashT;
 
@@ -89,7 +90,7 @@ public class MirrorImpl_v0 : MirrorProtocol_v0, DhtListener
 
     override protected void registerForUpdates ( )
     {
-        assert(this.channel !is null);
+        verify(this.channel !is null);
         this.channel.register(this);
     }
 
@@ -137,12 +138,8 @@ public class MirrorImpl_v0 : MirrorProtocol_v0, DhtListener
     ***************************************************************************/
 
     override protected void startIteration ( )
-    in
     {
-        assert(this.iterate_keys.length == 0, "Iteration already in progress");
-    }
-    body
-    {
+        verify(this.iterate_keys.length == 0, "Iteration already in progress");
         this.iterate_keys = this.channel.getKeys();
     }
 
@@ -168,7 +165,7 @@ public class MirrorImpl_v0 : MirrorProtocol_v0, DhtListener
         this.iterate_keys.length = this.iterate_keys.length - 1;
 
         auto ok = toHashT(key, hash_key);
-        assert(ok);
+        verify(ok);
 
         return true;
     }
@@ -191,7 +188,7 @@ public class MirrorImpl_v0 : MirrorProtocol_v0, DhtListener
             case DataReady:
                 hash_t hash_key;
                 auto ok = toHashT(key, hash_key);
-                assert(ok);
+                verify(ok);
 
                 this.updated(Update(UpdateType.Change, hash_key));
                 break;
@@ -199,7 +196,8 @@ public class MirrorImpl_v0 : MirrorProtocol_v0, DhtListener
             case Deletion:
                 hash_t hash_key;
                 auto ok = toHashT(key, hash_key);
-                assert(ok);
+                verify(ok);
+                verify(ok);
 
                 this.updated(Update(UpdateType.Deletion, hash_key));
                 break;
