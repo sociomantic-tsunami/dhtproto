@@ -14,6 +14,7 @@ module dhtproto.client.request.internal.Update;
 
 import ocean.transition;
 import ocean.util.log.Logger;
+import ocean.core.Verify;
 
 /*******************************************************************************
 
@@ -450,7 +451,7 @@ private struct FirstROCHandler
                 auto value = conn.message_parser.getArray!(void)(payload);
 
                 this.context.shared_working.original_hash = Fnv1a(value);
-                assert(this.context.shared_working.updated_value is null);
+                verify(this.context.shared_working.updated_value is null);
                 this.context.shared_working.updated_value =
                     acquired_resources.getVoidBuffer();
 
@@ -580,8 +581,8 @@ private struct FirstROCHandler
         // the buffer for the updated value. If this ROC were to simply exit at
         // this stage, this buffer would be relinquished.)
         auto event = conn.nextEvent(conn.NextEventFlags.init);
-        assert(event.active == event.Active.resumed);
-        assert(event.resumed.code == Update.SecondROCFinished);
+        verify(event.active == event.Active.resumed);
+        verify(event.resumed.code == Update.SecondROCFinished);
 
         // If the request on the second request-on-conn failed, the result code
         // will already have been set in the shared working data.

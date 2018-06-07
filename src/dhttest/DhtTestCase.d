@@ -108,6 +108,7 @@ abstract class DhtTestCase : TestCase
 abstract class NeoDhtTestCase : TestCase
 {
     import ocean.core.Enforce;
+    import ocean.core.Verify;
     import ocean.task.Scheduler;
     import ocean.task.Task;
     import ocean.util.log.Logger;
@@ -233,7 +234,7 @@ abstract class NeoDhtTestCase : TestCase
     public void connect ( ushort legacy_port )
     {
         this.connect_task = Task.getThis();
-        assert(this.connect_task !is null);
+        verify(this.connect_task !is null);
 
         this.dht.neo.addNode("127.0.0.1".dup, cast(ushort)(legacy_port + 100));
 
@@ -262,7 +263,7 @@ abstract class NeoDhtTestCase : TestCase
         this.dht.addNode("127.0.0.1".dup, legacy_port);
 
         auto task = Task.getThis();
-        assert(task !is null);
+        verify(task !is null);
 
         bool ok, finished;
 

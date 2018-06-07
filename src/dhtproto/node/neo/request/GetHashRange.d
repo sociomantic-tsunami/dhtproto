@@ -53,6 +53,7 @@ public abstract scope class GetHashRangeProtocol_v0 : IRequestHandler
     import dhtproto.node.neo.request.core.Mixins;
 
     import ocean.transition;
+    import ocean.core.Verify;
 
     /// Mixin the initialiser and the connection and resources members.
     mixin IRequestHandlerRequestCore!();
@@ -139,7 +140,7 @@ public abstract scope class GetHashRangeProtocol_v0 : IRequestHandler
             // Wait for updates about the hash range
             this.resume_fiber_on_update = true;
             auto resume_code = connection.suspendFiber();
-            assert(resume_code == NodeFiberResumeCode.HashRangeUpdate,
+            verify(resume_code == NodeFiberResumeCode.HashRangeUpdate,
                 "Unexpected fiber resume code");
             this.resume_fiber_on_update = false;
         }

@@ -200,6 +200,7 @@ struct DHT
 
 class Channel
 {
+    import ocean.core.Verify;
     import ocean.text.convert.Formatter;
 
     /***************************************************************************
@@ -258,7 +259,7 @@ class Channel
 
         public void listenerFlushed ( )
         {
-            assert(this.sending_listeners);
+            verify(this.sending_listeners > 0);
             this.sending_listeners--;
 
             if ( this.sending_listeners == 0 && (this.caller !is null) )

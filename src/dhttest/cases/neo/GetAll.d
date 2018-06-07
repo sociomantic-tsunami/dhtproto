@@ -17,6 +17,7 @@ module dhttest.cases.neo.GetAll;
 
 import ocean.transition;
 import ocean.core.Test;
+import ocean.core.Verify;
 import ocean.math.random.Random;
 import dhttest.DhtTestCase : NeoDhtTestCase;
 import dhtproto.client.DhtClient;
@@ -272,16 +273,13 @@ private struct GetAll
 
     public void start ( cstring channel,
         DhtClient.Neo.GetAll.Notifier user_notifier )
-    in
-    {
-        assert(this.user_notifier is null);
-    }
     out
     {
         assert(this.user_notifier !is null);
     }
     body
     {
+        verify(this.user_notifier is null);
         this.user_notifier = user_notifier;
         this.id = this.dht.neo.getAll(channel, &this.counterNotifier);
     }
@@ -295,12 +293,8 @@ private struct GetAll
     ***************************************************************************/
 
     public void suspend ( )
-    in
     {
-        assert(this.id != this.id.init);
-    }
-    body
-    {
+        verify(this.id != this.id.init);
         this.dht.neo.control(this.id,
             ( DhtClient.Neo.GetAll.IController getall )
             {
@@ -318,12 +312,8 @@ private struct GetAll
     ***************************************************************************/
 
     public void resume ( )
-    in
     {
-        assert(this.id != this.id.init);
-    }
-    body
-    {
+        verify(this.id != this.id.init);
         this.dht.neo.control(this.id,
             ( DhtClient.Neo.GetAll.IController getall )
             {
@@ -340,12 +330,8 @@ private struct GetAll
     ***************************************************************************/
 
     public void stop ( )
-    in
     {
-        assert(this.id != this.id.init);
-    }
-    body
-    {
+        verify(this.id != this.id.init);
         this.dht.neo.control(this.id,
             ( DhtClient.Neo.GetAll.IController getall )
             {

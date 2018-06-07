@@ -28,6 +28,7 @@ import Protocol = dhtproto.node.request.Redistribute;
 
 public scope class Redistribute : Protocol.Redistribute
 {
+    import ocean.core.Enforce;
     import dhtproto.node.request.params.RedistributeNode;
     import fakedht.mixins.RequestConstruction;
 
@@ -44,13 +45,13 @@ public scope class Redistribute : Protocol.Redistribute
 
     override protected void adjustHashRange ( hash_t min, hash_t max )
     {
-        assert (false, "Not supported by fake DHT node");
+        enforce(false, "Not supported by fake DHT node");
     }
 
     /**************************************************************************/
 
     override protected void redistributeData ( RedistributeNode[] dataset )
     {
-        assert (false, "Not supported by fake DHT node");
+        enforce(false, "Not supported by fake DHT node");
     }
 }

@@ -22,6 +22,7 @@ public final class SharedResources
     import swarm.neo.client.ConnectionSet;
     import ocean.util.container.pool.FreeList;
     import ocean.core.TypeConvert : downcast;
+    import ocean.core.Verify;
     import ocean.io.compress.Lzo;
     import swarm.neo.util.MessageFiber;
     import swarm.neo.util.VoidBufferAsArrayOf;
@@ -59,7 +60,7 @@ public final class SharedResources
     public static SharedResources fromObject ( Object obj )
     {
         auto shared_resources = downcast!(SharedResources)(obj);
-        assert(shared_resources !is null);
+        verify(shared_resources !is null);
         return shared_resources;
     }
 

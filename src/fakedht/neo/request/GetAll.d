@@ -35,6 +35,7 @@ import ocean.transition;
 public class GetAllImpl_v0 : GetAllProtocol_v0
 {
     import fakedht.Storage;
+    import ocean.core.Verify;
     import ocean.text.convert.Hash : toHashT;
 
     /// Reference to channel being iterated over.
@@ -91,7 +92,7 @@ public class GetAllImpl_v0 : GetAllProtocol_v0
         {
             hash_t key;
             auto ok = toHashT(str_key, key);
-            assert(ok);
+            verify(ok);
             if ( key == continue_from )
             {
                 index = i;
@@ -130,7 +131,7 @@ public class GetAllImpl_v0 : GetAllProtocol_v0
 
         hash_t key;
         auto ok = toHashT(str_key, key);
-        assert(ok);
+        verify(ok);
         auto value = this.channel.get(key);
 
         dg(key, value);

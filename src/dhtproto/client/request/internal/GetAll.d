@@ -14,6 +14,7 @@ module dhtproto.client.request.internal.GetAll;
 
 import ocean.transition;
 import ocean.util.log.Logger;
+import ocean.core.Verify;
 
 /*******************************************************************************
 
@@ -369,8 +370,8 @@ private scope class GetAllHandler
 
         this.request_event_dispatcher.eventLoop(this.conn);
 
-        assert(controller.fiber.finished());
-        assert(reader.fiber.finished());
+        verify(controller.fiber.finished());
+        verify(reader.fiber.finished());
     }
 
     /***************************************************************************
