@@ -91,6 +91,7 @@ template NeoSupport ( )
         public import GetChannels = dhtproto.client.request.GetChannels;
         public import Exists = dhtproto.client.request.Exists;
         public import RemoveChannel = dhtproto.client.request.RemoveChannel;
+        public import Update = dhtproto.client.request.Update;
 
         /***********************************************************************
 
@@ -109,6 +110,7 @@ template NeoSupport ( )
             import dhtproto.client.request.internal.GetChannels;
             import dhtproto.client.request.internal.Exists;
             import dhtproto.client.request.internal.RemoveChannel;
+            import dhtproto.client.request.internal.Update;
         }
 
         /***********************************************************************
@@ -309,6 +311,36 @@ template NeoSupport ( )
                 Const!(Remove.Args)(channel, key), notifier);
 
             auto id = this.assign!(Internals.Remove)(params);
+            return id;
+        }
+
+        /***********************************************************************
+
+            Assigns an Update request, fetching a record and replacing it with
+            an updated version.
+            See $(LINK2 dhtproto/client/request/Update.html, dhtproto.client.request.Update)
+            for detailed documentation.
+
+            Params:
+                channel = name of the channel to update a record in
+                key = hash of the record to update
+                notifier = notifier delegate
+
+            Returns:
+                id of newly assigned request
+
+            Throws:
+                NoMoreRequests if the pool of active requests is full
+
+        ***********************************************************************/
+
+        public RequestId update ( cstring channel, hash_t key,
+            Update.Notifier notifier )
+        {
+            auto params = Const!(Internals.Update.UserSpecifiedParams)(
+                Const!(Update.Args)(channel, key), notifier);
+
+            auto id = this.assign!(Internals.Update)(params);
             return id;
         }
 
@@ -975,6 +1007,61 @@ template NeoSupport ( )
 
             res.succeeded = state == state.Succeeded;
             return res;
+        }
+
+        /***********************************************************************
+
+            Assigns an Update request and blocks the current Task until the
+            request is completed. See
+            $(LINK2 dhtproto/client/request/Update.html, dhtproto.client.request.Update)
+            for detailed documentation.
+
+            Params:
+                channel = name of the channel to update a record in
+                key = hash of the record to update
+                user_notifier = notifier delegate
+
+        ***********************************************************************/
+
+        public void update ( cstring channel, hash_t key,
+            Neo.Update.Notifier user_notifier )
+        in
+        {
+            assert(user_notifier !is null);
+        }
+        body
+        {
+            auto task = Task.getThis();
+            assert(task, "This method may only be called from inside a Task");
+
+            bool finished;
+
+            void notifier ( Neo.Update.Notification info,
+                Const!(Neo.Update.Args) args )
+            {
+                user_notifier(info, args);
+
+                with ( info.Active ) switch ( info.active )
+                {
+                    case succeeded: // Updated successfully.
+                    case no_record: // Record not in DHT. Use Put to write a new record.
+                    case conflict: // Another client updated the same record. Try again.
+                    case error:
+                    case no_node:
+                        finished = true;
+                        if ( task.suspended )
+                            task.resume();
+                        break;
+
+                    default:
+                        break;
+                }
+            }
+
+            this.outer.neo.update(channel, key, &notifier);
+            if ( !finished ) // if request not completed, suspend
+                task.suspend();
+            assert(finished);
         }
 
         /***********************************************************************

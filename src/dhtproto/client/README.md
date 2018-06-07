@@ -45,6 +45,9 @@ The DHT supports the following requests (links to the API modules):
   puts a record key and value to a channel.
 * [`Get`](request/Get.d):
   gets a record, specified by its key, from a channel.
+* [`Update`](request/Update.d):
+  gets a record, specified by its key, from a channel, and replaces it with an
+  updated value, specified by the user.
 * [`Exists`](request/Exists.d):
   checks whether a record, specified by its key, exists in a channel.
 * [`Remove`](request/Remove.d):
