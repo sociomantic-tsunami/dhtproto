@@ -37,7 +37,7 @@ public class GetChannelsImpl_v0 : GetChannelsProtocol_v0
 
     ***************************************************************************/
 
-    override protected int opApply ( int delegate ( ref cstring ) dg )
+    override protected int opApply ( scope int delegate ( ref cstring ) dg )
     {
         int ret;
         foreach ( channel; global_storage.getChannelList() )

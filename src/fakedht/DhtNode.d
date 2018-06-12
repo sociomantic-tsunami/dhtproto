@@ -86,7 +86,7 @@ public class DhtNode
 
     public this ( DhtConst.NodeItem node_item, EpollSelectDispatcher epoll )
     {
-        const backlog = 20;
+        static immutable backlog = 20;
 
         auto params = new ConnectionSetupParams;
         params.epoll = epoll;
@@ -143,7 +143,7 @@ public class DhtNode
     ***************************************************************************/
 
     override protected void getResourceAcquirer (
-        void delegate ( Object request_resources ) handle_request_dg )
+        scope void delegate ( Object request_resources ) handle_request_dg )
     {
         // In the fake node, we don't actually store a shared resources
         // instance; a new one is simply passed to each request.

@@ -338,7 +338,7 @@ abstract public class Mirror ( Dht : DhtClient ) : MirrorBase!(Dht)
     ***************************************************************************/
 
     public this ( Dht dht, cstring channel, uint update_time_s,
-        uint retry_time_s, Dht.RequestNotification.Callback notifier = null )
+        uint retry_time_s, scope Dht.RequestNotification.Callback notifier = null )
     {
         super(dht, channel, update_time_s, retry_time_s);
         this.user_notifier = notifier;
@@ -510,8 +510,8 @@ unittest
     // Dummy concrete channel mirror class
     class ExampleMirror : Mirror!(SchedulingDhtClient)
     {
-        const UpdatePeriod = 60; // do a GetAll every 60 seconds
-        const RetryPeriod = 3; // retry failed requests after 3 seconds
+        static immutable UpdatePeriod = 60; // do a GetAll every 60 seconds
+        static immutable RetryPeriod = 3; // retry failed requests after 3 seconds
 
         public this ( SchedulingDhtClient dht, cstring channel )
         {

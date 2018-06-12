@@ -80,7 +80,7 @@ class SharedResources : IRequestResources
 
     ***************************************************************************/
 
-    public MessageFiber getFiber ( void delegate ( ) fiber_method )
+    public MessageFiber getFiber ( scope void delegate ( ) fiber_method )
     {
         return new MessageFiber(fiber_method, 64 * 1024);
     }
@@ -114,7 +114,7 @@ class SharedResources : IRequestResources
     ***************************************************************************/
 
     public ITimer getTimer ( uint period_s, uint period_ms,
-        void delegate ( ) timer_dg )
+        scope void delegate ( ) timer_dg )
     {
         verify(period_ms < 1_000);
         verify(period_s > 0 || period_ms > 0);
@@ -153,7 +153,7 @@ class SharedResources : IRequestResources
 
         ***********************************************************************/
 
-        private this ( uint period_s, uint period_ms, void delegate ( ) timer_dg )
+        private this ( uint period_s, uint period_ms, scope void delegate ( ) timer_dg )
         {
             this.timer_dg = timer_dg;
             this.timer = new TimerEvent(&this.timerDg);

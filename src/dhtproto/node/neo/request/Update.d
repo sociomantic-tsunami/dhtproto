@@ -278,7 +278,7 @@ public abstract class UpdateProtocol_v0 : IRequestHandler
     ***************************************************************************/
 
     abstract protected bool get ( cstring channel, hash_t key,
-        void delegate ( Const!(void)[] value ) dg );
+        scope void delegate ( Const!(void)[] value ) dg );
 
     /***************************************************************************
 
