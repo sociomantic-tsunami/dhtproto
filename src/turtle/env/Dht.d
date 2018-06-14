@@ -281,7 +281,7 @@ public class Dht : Node!(DhtNode, "dht")
 
     ***************************************************************************/
 
-    public ChannelSize getSize ( cstring channel)
+    public ChannelSize getSize ( cstring channel )
     {
         ChannelSize result;
         if (auto channel_obj = global_storage.get(channel))
