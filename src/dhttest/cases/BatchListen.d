@@ -18,6 +18,7 @@ module dhttest.cases.BatchListen;
 
 *******************************************************************************/
 
+import ocean.core.Test;
 import dhttest.DhtTestCase;
 
 /*******************************************************************************
@@ -30,6 +31,8 @@ import dhttest.DhtTestCase;
 class BatchListenTest : DhtTestCase
 {
     import dhttest.util.Record;
+
+    import ocean.core.Test;
 
     public override Description description ( )
     {
@@ -60,4 +63,3 @@ class BatchListenTest : DhtTestCase
         }
     }
 }
-

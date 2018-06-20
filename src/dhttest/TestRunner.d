@@ -33,7 +33,16 @@ import dhttest.cases.OrderedRemove;
 import dhttest.cases.UnorderedRemove;
 import dhttest.cases.BatchListen;
 
-import dhttest.cases.neo.Dummy;
+import dhttest.cases.neo.Basic;
+import dhttest.cases.neo.Put;
+import dhttest.cases.neo.OrderedPut;
+import dhttest.cases.neo.UnorderedPut;
+import dhttest.cases.neo.Mirror;
+import dhttest.cases.neo.GetAll;
+import dhttest.cases.neo.GetChannels;
+import dhttest.cases.neo.Remove;
+import dhttest.cases.neo.RemoveChannel;
+import dhttest.cases.neo.Update;
 
 /*******************************************************************************
 

@@ -24,7 +24,7 @@ module dhtproto.client.legacy.internal.request.ExistsRequest;
 *******************************************************************************/
 
 import dhtproto.client.legacy.internal.request.model.IKeyRequest;
-
+import ocean.core.Verify;
 
 
 
@@ -74,7 +74,8 @@ public scope class ExistsRequest : IKeyRequest
 
     override protected void handle__ ( )
     {
-        assert(this.params.io_item.active == this.params.io_item.Active.get_bool, typeof(this).stringof ~ ".handle: I/O delegate mismatch");
+        verify(this.params.io_item.active == this.params.io_item.Active.get_bool,
+            typeof(this).stringof ~ ".handle: I/O delegate mismatch");
         bool exists;
         this.reader.read(exists);
 

@@ -21,6 +21,7 @@ module dhtproto.client.legacy.internal.connection.DhtRequestConnection;
 *******************************************************************************/
 
 import ocean.transition;
+import ocean.core.Enforce;
 
 import swarm.client.connection.RequestConnection;
 
@@ -411,7 +412,7 @@ public class DhtRequestConnection :
 
     override protected void handleNone ( )
     {
-        assert(false, "Handling command with code None");
+        enforce(false, "Handling command with code None");
     }
 
 

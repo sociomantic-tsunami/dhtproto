@@ -25,7 +25,7 @@ import ocean.util.log.Logger;
 
 import fakedht.ConnectionHandler;
 
-import swarm.node.model.Node;
+import swarm.node.model.NeoNode;
 
 /*******************************************************************************
 
@@ -58,6 +58,10 @@ public class DhtNode
 
     import dhtproto.client.legacy.DhtConst;
     import swarm.node.connection.ConnectionHandler;
+    import swarm.neo.authentication.HmacDef: Key;
+    import fakedht.neo.RequestHandlers;
+    import fakedht.neo.SharedResources;
+    import swarm.neo.AddrPort;
 
     import fakedht.Storage;
 
@@ -68,7 +72,7 @@ public class DhtNode
 
     ***************************************************************************/
 
-    private bool log_errors = true;
+    public bool log_errors = true;
 
     /***************************************************************************
 
@@ -88,20 +92,18 @@ public class DhtNode
         params.epoll = epoll;
         params.node_info = this;
 
-        super (node_item, params, backlog);
+        Options neo_options;
+        neo_options.requests = requests;
+        neo_options.epoll = epoll;
+        neo_options.no_delay = true; // favour network turn-around over packet efficiency
+        neo_options.credentials_map["admin"] = Key.init;
+
+        ushort neo_port = node_item.Port;
+        if ( neo_port != 0)
+            neo_port += 100; // See dhtnode.node.DhtHashRange.newNodeAdded()
+
+        super(node_item, neo_port, params, neo_options, backlog);
         this.error_callback = &this.onError;
-    }
-
-    /***************************************************************************
-
-        After this method is called, node will stop logging unhandled exceptions
-        as part of the test suite trace.
-
-    ***************************************************************************/
-
-    public void ignoreErrors ( )
-    {
-        this.log_errors = false;
     }
 
     /***************************************************************************
@@ -126,7 +128,26 @@ public class DhtNode
 
     override public void shutdown ( )
     {
-        this.ignoreErrors();
+        this.log_errors = false;
+    }
+
+    /***************************************************************************
+
+        Scope allocates a request resource acquirer instance and passes it to
+        the provided delegate for use in a request.
+
+        Params:
+            handle_request_dg = delegate that receives a resources acquirer and
+                initiates handling of a request
+
+    ***************************************************************************/
+
+    override protected void getResourceAcquirer (
+        void delegate ( Object request_resources ) handle_request_dg )
+    {
+        // In the fake node, we don't actually store a shared resources
+        // instance; a new one is simply passed to each request.
+        handle_request_dg(new SharedResources);
     }
 
     /***************************************************************************

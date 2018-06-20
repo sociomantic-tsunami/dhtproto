@@ -42,9 +42,17 @@ jobs:
           env: DMD=2.070.2.s* F=production
         - <<: *test-matrix
           env: DMD=2.070.2.s* F=devel
+        - <<: *test-matrix
+          env: DMD=2.071.2.s* F=production
+        - <<: *test-matrix
+          env: DMD=2.071.2.s* F=devel
+        - <<: *test-matrix
+          env: DMD=2.077.* F=production
+        - <<: *test-matrix
+          env: DMD=2.077.* F=devel
 
         # Additional stages
-        #
+
         - stage: Closure allocation check
           env: DMD=2.070.2.s* F=devel
           install: beaver dlang install

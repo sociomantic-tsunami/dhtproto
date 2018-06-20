@@ -28,6 +28,8 @@ module dhtproto.client.legacy.internal.helper.ExtensibleChannelMirror;
 *******************************************************************************/
 
 import ocean.transition;
+import ocean.core.Enforce;
+import ocean.core.Verify;
 
 import dhtproto.client.legacy.internal.helper.mirror.model.MirrorBase;
 import dhtproto.client.DhtClient;
@@ -318,13 +320,15 @@ unittest
         auto epoll = new EpollSelectDispatcher;
         auto dht = new SchedulingDhtClient(epoll);
         dht.addNode("127.0.0.1".dup, 6424);
+        bool handshake_ok;
         dht.nodeHandshake(
             (DhtClient.RequestContext, bool ok)
             {
-                assert(ok);
+                handshake_ok = ok;
             },
             null);
         epoll.eventLoop();
+        enforce(handshake_ok);
 
         // Add some records to the channel being mirrored
         const num_records = 10;
@@ -659,7 +663,7 @@ public class DeserializedRecordCache ( T )
 
     public this ( Cache cache )
     {
-        assert(cache !is null);
+        verify(cache !is null);
         this.cache_ = cache;
     }
 

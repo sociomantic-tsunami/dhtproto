@@ -28,6 +28,7 @@ import Protocol = dhtproto.node.request.GetNumConnections;
 
 public scope class GetNumConnections : Protocol.GetNumConnections
 {
+    import ocean.core.Enforce;
     import fakedht.mixins.RequestConstruction;
 
     /***************************************************************************
@@ -50,7 +51,8 @@ public scope class GetNumConnections : Protocol.GetNumConnections
 
     override protected NumConnectionsData getConnectionsData ( )
     {
-        assert (false,
+        enforce(false,
             "GetNumConnections is not supported by the fake DHT node");
+        return NumConnectionsData.init;
     }
 }
