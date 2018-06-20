@@ -244,13 +244,13 @@ template NeoSupport ( )
 
             auto id = this.assign!(Internals.Get)(params);
 
-            setupOptionalArgs!(options.length)(options,
+            scope args_visitor =
                 ( Get.Timeout timeout )
                 {
                     this.connections.request_set.setRequestTimeout(
                         id, timeout.ms);
-                }
-            );
+                };
+            setupOptionalArgs!(options.length)(options, args_visitor);
 
             return id;
         }
@@ -373,12 +373,12 @@ template NeoSupport ( )
         {
             Mirror.Settings settings;
 
-            setupOptionalArgs!(options.length)(options,
+            scope args_visitor =
                 ( Mirror.Settings user_settings )
                 {
                     settings = user_settings;
-                }
-            );
+                };
+            setupOptionalArgs!(options.length)(options, args_visitor);
 
             auto params = Const!(Internals.Mirror.UserSpecifiedParams)(
                 Const!(Mirror.Args)(
@@ -418,12 +418,12 @@ template NeoSupport ( )
         {
             GetAll.Settings settings;
 
-            setupOptionalArgs!(options.length)(options,
+            scope args_visitor =
                 ( GetAll.Settings user_settings )
                 {
                     settings = user_settings;
-                }
-            );
+                };
+            setupOptionalArgs!(options.length)(options, args_visitor);
 
             auto params = Const!(Internals.GetAll.UserSpecifiedParams)(
                 Const!(GetAll.Args)(
@@ -619,26 +619,27 @@ template NeoSupport ( )
 
             auto old_user_conn_notifier = this.outer.user_conn_notifier;
 
-            void conn_notifier ( Neo.DhtConnNotification info )
-            {
-                old_user_conn_notifier(info);
-
-                with ( info.Active ) switch ( info.active )
+            scope conn_notifier =
+                ( Neo.DhtConnNotification info )
                 {
-                    case hash_range_queried:
-                        if ( task.suspended() )
-                            task.resume();
-                        break;
+                    old_user_conn_notifier(info);
 
-                    case connected:
-                    case connection_error:
-                        break;
+                    with ( info.Active ) switch ( info.active )
+                    {
+                        case hash_range_queried:
+                            if ( task.suspended() )
+                                task.resume();
+                            break;
 
-                    default: assert(false);
-                }
-            }
+                        case connected:
+                        case connection_error:
+                            break;
 
-            this.outer.user_conn_notifier = &conn_notifier;
+                        default: assert(false);
+                    }
+                };
+
+            this.outer.user_conn_notifier = conn_notifier;
             scope ( exit )
                 this.outer.user_conn_notifier = old_user_conn_notifier;
 

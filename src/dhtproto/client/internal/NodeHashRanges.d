@@ -98,12 +98,12 @@ public final class NodeHashRanges : NodeHashRangesBase
         foreach ( node_hash_range; nodes.array() )
         {
             bool try_next_node;
-            use_node(node_hash_range.addr,
+            scope conn_dg =
                 ( RequestOnConn.EventDispatcher conn )
                 {
                     try_next_node = get(conn);
-                }
-            );
+                };
+            use_node(node_hash_range.addr, conn_dg);
 
             // If we got the record or an error occurred, don't try more nodes
             if ( !try_next_node )
@@ -156,12 +156,12 @@ public final class NodeHashRanges : NodeHashRangesBase
         foreach_reverse ( node_hash_range; nodes.array() )
         {
             bool continue_to_next_node;
-            use_node(node_hash_range.addr,
+            scope conn_dg =
                 ( RequestOnConn.EventDispatcher conn )
                 {
                     continue_to_next_node = remove(conn);
-                }
-            );
+                };
+            use_node(node_hash_range.addr, conn_dg);
 
             // If an error occurred, don't try more nodes
             if ( !continue_to_next_node )
@@ -197,12 +197,12 @@ public final class NodeHashRanges : NodeHashRangesBase
         if ( nodes.length == 0 )
             return;
 
-        use_node(nodes.array()[0].addr,
+        scope conn_dg =
             ( RequestOnConn.EventDispatcher conn )
             {
                 put(conn);
-            }
-        );
+            };
+        use_node(nodes.array()[0].addr, conn_dg);
     }
 
     /***************************************************************************

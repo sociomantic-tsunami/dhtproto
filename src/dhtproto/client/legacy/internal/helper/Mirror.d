@@ -42,6 +42,7 @@ abstract public class Mirror ( Dht : DhtClient ) : MirrorBase!(Dht)
     import ocean.util.log.Logger;
     import ocean.text.convert.Formatter;
     import swarm.Const : NodeItem;
+    import dhtproto.util.Verify;
 
     /// Core functionality shared by Listen and GetAll handlers.
     private final class SingleNodeRequest
@@ -51,11 +52,12 @@ abstract public class Mirror ( Dht : DhtClient ) : MirrorBase!(Dht)
         {
             None,
             Assigned,
-            Scheduled
+            Scheduled,
+            Running
         }
 
         /// State of the request.
-        public State state = State.None;
+        private State state = State.None;
 
         /// Logger for this request.
         private Logger log;
@@ -115,6 +117,39 @@ abstract public class Mirror ( Dht : DhtClient ) : MirrorBase!(Dht)
                 this.state = State.Scheduled;
             }
         }
+
+        /***********************************************************************
+
+            Resets the internal state. Should be called when the request
+            finishes.
+
+        ***********************************************************************/
+
+        public void finished ( )
+        {
+            this.state = State.None;
+        }
+
+        /***********************************************************************
+
+            Handles the state change from Assigned / Schedulued -> Running.
+            Should be called when the request receives a record. (The API of the
+            GetAll and Mirror requests do not provide any other way of telling
+            when a request has been successfully established.)
+
+        ***********************************************************************/
+
+        public void receivedRecord ( )
+        {
+            if ( this.state == State.Running )
+                return;
+
+            verify(this.state == State.Assigned ||
+                this.state == State.Scheduled);
+
+            this.state = State.Running;
+            log.info("Started receiving data.");
+        }
     }
 
     /// Single-node Listen request handler.
@@ -168,6 +203,7 @@ abstract public class Mirror ( Dht : DhtClient ) : MirrorBase!(Dht)
         private void receiveRecord ( Dht.RequestContext, in char[] key,
             in char[] value )
         {
+            this.core.receivedRecord();
             this.outer.receiveRecord(key, value, true);
         }
 
@@ -189,7 +225,7 @@ abstract public class Mirror ( Dht : DhtClient ) : MirrorBase!(Dht)
 
             if ( info.type == info.type.Finished )
             {
-                this.core.state = this.core.state.None;
+                this.core.finished();
 
                 // No need to check `info.succeeded` -- a Listen request can
                 // never end cleanly.
@@ -202,6 +238,7 @@ abstract public class Mirror ( Dht : DhtClient ) : MirrorBase!(Dht)
         }
     }
 
+    /// Single-node GetAll request handler.
     private class GetAll
     {
         /// Core single-node request functionality.
@@ -270,6 +307,7 @@ abstract public class Mirror ( Dht : DhtClient ) : MirrorBase!(Dht)
         private void receiveRecord ( Dht.RequestContext, in char[] key,
             in char[] value )
         {
+            this.core.receivedRecord();
             this.outer.receiveRecord(key, value, false);
         }
 
@@ -291,7 +329,7 @@ abstract public class Mirror ( Dht : DhtClient ) : MirrorBase!(Dht)
 
             if ( info.type == info.type.Finished )
             {
-                this.core.state = this.core.state.None;
+                this.core.finished();
 
                 if ( info.succeeded )
                 {

@@ -275,7 +275,7 @@ private struct FirstROCHandler
         bool success, error;
         foreach ( node_hash_range; nodes.array() )
         {
-            this.use_node(node_hash_range.addr,
+            scope conn_dg =
                 ( RequestOnConn.EventDispatcher conn )
                 {
                     auto ret = this.tryConnection(conn, nodes.array[0].addr,
@@ -300,8 +300,8 @@ private struct FirstROCHandler
                             default: assert(false);
                         }
                     }
-                }
-            );
+                };
+            this.use_node(node_hash_range.addr, conn_dg);
 
             if ( error )
                 break;
@@ -697,13 +697,13 @@ private struct SecondROCHandler
 
     public void handle ( )
     {
-        this.use_node(this.context.shared_working.second_node_addr,
+        scope conn_dg =
             ( RequestOnConn.EventDispatcher conn )
             {
                 if ( !this.handleRequest(conn) )
                     this.context.shared_working.second_node_failed = true;
-            }
-        );
+            };
+        this.use_node(this.context.shared_working.second_node_addr, conn_dg);
     }
 
     /***************************************************************************
