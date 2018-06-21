@@ -191,7 +191,7 @@ abstract class NeoDhtTestCase : TestCase
     {
         cstring auth_name = "admin";
         auto auth_key = Key.init;
-        const max_connections = 2;
+        static immutable max_connections = 2;
         this.dht = new DhtClient(theScheduler.epoll, auth_name,
             auth_key.content, &this.neoConnectionNotifier, max_connections);
         this.dht.neo.enableSocketNoDelay();

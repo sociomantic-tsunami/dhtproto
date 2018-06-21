@@ -86,7 +86,7 @@ public abstract class MirrorProtocol_v0 : IRequestHandler
         private E[] queue;
 
         /// Maximum allowed size of the queue in bytes.
-        private const max_size = 256 * 1024;
+        private enum max_size = 256 * 1024;
 
         /// Maximum allowed elements of type E of the queue.
         private size_t max_elems;
@@ -103,11 +103,11 @@ public abstract class MirrorProtocol_v0 : IRequestHandler
         /// Tests for basic sanity of num_elems and the read/write indices.
         invariant ( )
         {
-            if ( this.num_elems == 0 )
-                assert(this.write_to_elem == this.read_from_elem);
+            if ( (&this).num_elems == 0 )
+                assert((&this).write_to_elem == (&this).read_from_elem);
             else
-                assert(this.write_to_elem ==
-                    (this.read_from_elem + this.num_elems) % this.max_elems);
+                assert((&this).write_to_elem ==
+                    ((&this).read_from_elem + (&this).num_elems) % (&this).max_elems);
         }
 
         /***********************************************************************
@@ -122,9 +122,9 @@ public abstract class MirrorProtocol_v0 : IRequestHandler
 
         public void initialise ( ref void[] buf )
         {
-            this.max_elems = (max_size / E.sizeof) * E.sizeof;
-            buf.length = this.max_elems * E.sizeof;
-            this.queue = cast(E[])buf;
+            (&this).max_elems = (max_size / E.sizeof) * E.sizeof;
+            buf.length = (&this).max_elems * E.sizeof;
+            (&this).queue = cast(E[])buf;
         }
 
         /***********************************************************************
@@ -141,12 +141,12 @@ public abstract class MirrorProtocol_v0 : IRequestHandler
 
         public bool push ( E e )
         {
-            if ( this.num_elems >= this.max_elems )
+            if ( (&this).num_elems >= (&this).max_elems )
                 return false;
 
-            this.queue[this.write_to_elem] = e;
-            this.incWrap(this.write_to_elem);
-            this.num_elems++;
+            (&this).queue[(&this).write_to_elem] = e;
+            (&this).incWrap((&this).write_to_elem);
+            (&this).num_elems++;
 
             return true;
         }
@@ -163,11 +163,11 @@ public abstract class MirrorProtocol_v0 : IRequestHandler
 
         public E pop ( )
         {
-            verify(this.num_elems > 0);
+            verify((&this).num_elems > 0);
             E e;
-            e = this.queue[this.read_from_elem];
-            this.incWrap(this.read_from_elem);
-            this.num_elems--;
+            e = (&this).queue[(&this).read_from_elem];
+            (&this).incWrap((&this).read_from_elem);
+            (&this).num_elems--;
 
             return e;
         }
@@ -181,7 +181,7 @@ public abstract class MirrorProtocol_v0 : IRequestHandler
 
         public size_t length ( )
         {
-            return this.num_elems;
+            return (&this).num_elems;
         }
 
         /***********************************************************************
@@ -193,7 +193,7 @@ public abstract class MirrorProtocol_v0 : IRequestHandler
 
         public bool isFull ( )
         {
-            return this.num_elems == this.max_elems;
+            return (&this).num_elems == (&this).max_elems;
         }
 
         /***********************************************************************
@@ -209,8 +209,8 @@ public abstract class MirrorProtocol_v0 : IRequestHandler
         private void incWrap ( ref size_t elem_index )
         {
             elem_index++;
-            verify(elem_index <= this.max_elems);
-            if ( elem_index == this.max_elems )
+            verify(elem_index <= (&this).max_elems);
+            if ( elem_index == (&this).max_elems )
                 elem_index = 0;
         }
     }
@@ -222,7 +222,7 @@ public abstract class MirrorProtocol_v0 : IRequestHandler
         Queue!(Update) q;
         q.initialise(backing);
 
-        const elems_per_cycle = 7;
+        static immutable elems_per_cycle = 7;
         uint write_wraps, read_wraps;
         Update update;
         for ( uint i; i < q.max_elems; i++ )
@@ -292,8 +292,8 @@ public abstract class MirrorProtocol_v0 : IRequestHandler
 
         public void opPostInc ( )
         {
-            this.last_overflow_time = time(null);
-            this.count_since_last_notification++;
+            (&this).last_overflow_time = time(null);
+            (&this).count_since_last_notification++;
         }
 
         /***********************************************************************
@@ -305,7 +305,7 @@ public abstract class MirrorProtocol_v0 : IRequestHandler
 
         public bool notification_pending ( )
         {
-            return this.last_overflow_time > this.last_notified_overflow_time;
+            return (&this).last_overflow_time > (&this).last_notified_overflow_time;
         }
 
         /***********************************************************************
@@ -316,8 +316,8 @@ public abstract class MirrorProtocol_v0 : IRequestHandler
 
         public void notification_sent ( )
         {
-            this.last_notified_overflow_time = this.last_overflow_time;
-            this.count_since_last_notification = 0;
+            (&this).last_notified_overflow_time = (&this).last_overflow_time;
+            (&this).count_since_last_notification = 0;
         }
     }
 
@@ -419,7 +419,7 @@ public abstract class MirrorProtocol_v0 : IRequestHandler
         this.value_buffer = this.resources.getVoidBuffer();
         this.update_queue.initialise(*this.resources.getVoidBuffer());
         this.refresh_queue.initialise(*this.resources.getVoidBuffer());
-        const max_batch_size = 64 * 1024; // TODO: read from config
+        static immutable max_batch_size = 64 * 1024; // TODO: read from config
         this.refresh_batch.initialise(this.resources.getVoidBuffer(),
             max_batch_size);
         this.compress_buffer = this.resources.getVoidBuffer();
