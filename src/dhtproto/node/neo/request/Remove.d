@@ -12,6 +12,7 @@
 
 module dhtproto.node.neo.request.Remove;
 
+import ocean.core.VersionCheck;
 import swarm.neo.node.IRequestHandler;
 
 /*******************************************************************************
@@ -93,7 +94,9 @@ public abstract class RemoveProtocol_v0 : IRequestHandler
                 payload.add(this.response);
             }
         );
-        ed.flush();
+
+        static if (!hasFeaturesFrom!("swarm", 4, 7))
+            ed.flush();
     }
 
     /***************************************************************************

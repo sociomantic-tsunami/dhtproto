@@ -21,6 +21,7 @@ module dhttest.DhtTestCase;
 *******************************************************************************/
 
 import ocean.transition;
+import ocean.core.VersionCheck;
 
 import turtle.TestCase;
 
@@ -194,7 +195,9 @@ abstract class NeoDhtTestCase : TestCase
         const max_connections = 2;
         this.dht = new DhtClient(theScheduler.epoll, auth_name,
             auth_key.content, &this.neoConnectionNotifier, max_connections);
-        this.dht.neo.enableSocketNoDelay();
+
+        static if (!hasFeaturesFrom!("swarm", 4, 7))
+            this.dht.neo.enableSocketNoDelay();
 
         this.connect(10000);
     }

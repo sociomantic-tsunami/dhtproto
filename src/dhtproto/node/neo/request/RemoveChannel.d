@@ -12,6 +12,7 @@
 
 module dhtproto.node.neo.request.RemoveChannel;
 
+import ocean.core.VersionCheck;
 import ocean.util.log.Logger;
 import swarm.neo.node.IRequestHandler;
 
@@ -82,7 +83,9 @@ public abstract scope class RemoveChannelProtocol_v0 : IRequestHandler
                 payload.add(this.response);
             }
         );
-        ed.flush();
+
+        static if (!hasFeaturesFrom!("swarm", 4, 7))
+            ed.flush();
     }
 
     /***************************************************************************

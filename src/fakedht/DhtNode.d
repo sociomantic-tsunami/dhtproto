@@ -52,6 +52,7 @@ public class DhtNode
 {
     import core.stdc.stdlib : abort;
 
+    import ocean.core.VersionCheck;
     import ocean.io.select.client.model.ISelectClient : IAdvancedSelectClient;
     import ocean.net.server.connection.IConnectionHandlerInfo;
     import ocean.io.select.protocol.generic.ErrnoIOException;
@@ -95,7 +96,10 @@ public class DhtNode
         Options neo_options;
         neo_options.requests = requests;
         neo_options.epoll = epoll;
-        neo_options.no_delay = true; // favour network turn-around over packet efficiency
+
+        static if (!hasFeaturesFrom!("swarm", 4, 7))
+            neo_options.no_delay = true; // favour network turn-around over packet efficiency
+
         neo_options.credentials_map["admin"] = Key.init;
 
         ushort neo_port = node_item.Port;

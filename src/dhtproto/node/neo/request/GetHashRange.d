@@ -12,6 +12,7 @@
 
 module dhtproto.node.neo.request.GetHashRange;
 
+import ocean.core.VersionCheck;
 import swarm.neo.AddrPort;
 import swarm.neo.node.IRequestHandler;
 
@@ -128,7 +129,9 @@ public abstract scope class GetHashRangeProtocol_v0 : IRequestHandler
                 payload.add(max);
             }
         );
-        ed.flush();
+
+        static if (!hasFeaturesFrom!("swarm", 4, 7))
+            ed.flush();
 
         while ( true )
         {

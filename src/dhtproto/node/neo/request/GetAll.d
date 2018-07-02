@@ -12,6 +12,7 @@
 
 module dhtproto.node.neo.request.GetAll;
 
+import ocean.core.VersionCheck;
 import swarm.neo.node.IRequestHandler;
 import ocean.util.log.Logger;
 
@@ -180,7 +181,9 @@ public abstract class GetAllProtocol_v0 : IRequestHandler
                     ? MessageType.Started : MessageType.Error);
             }
         );
-        this.connection.event_dispatcher.flush();
+
+        static if (!hasFeaturesFrom!("swarm", 4, 7))
+            this.connection.event_dispatcher.flush();
 
         if ( !this.initialised_ok )
             return;
@@ -431,9 +434,11 @@ public abstract class GetAllProtocol_v0 : IRequestHandler
                     payload.addArray(*this.outer.compressed_batch);
                 }
             );
+
             // flush() does not suspend the fiber, so is safe to call in a
             // RequestEventDispatcher-managed request.
-            this.outer.connection.event_dispatcher.flush();
+            static if (!hasFeaturesFrom!("swarm", 4, 7))
+                this.outer.connection.event_dispatcher.flush();
         }
     }
 
