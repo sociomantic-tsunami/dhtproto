@@ -12,6 +12,7 @@
 
 module dhtproto.node.neo.request.Exists;
 
+import ocean.core.VersionCheck;
 import swarm.neo.node.IRequestHandler;
 
 /*******************************************************************************
@@ -92,7 +93,9 @@ public abstract scope class ExistsProtocol_v0 : IRequestHandler
                 payload.add(this.response);
             }
         );
-        ed.flush();
+
+        static if (!hasFeaturesFrom!("swarm", 4, 7))
+            ed.flush();
     }
 
     /***************************************************************************

@@ -19,6 +19,7 @@ module dhtproto.client.request.internal.Put;
 *******************************************************************************/
 
 import ocean.transition;
+import ocean.core.VersionCheck;
 import ocean.util.log.Logger;
 
 /*******************************************************************************
@@ -170,7 +171,9 @@ public struct Put
                     payload.addArray(context.user_params.args.value);
                 }
             );
-            conn.flush();
+
+            static if (!hasFeaturesFrom!("swarm", 4, 7))
+                conn.flush();
 
             // Receive supported code from node
             auto supported = conn.receiveValue!(SupportedStatus)();

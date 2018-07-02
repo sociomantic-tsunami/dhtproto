@@ -12,6 +12,7 @@
 
 module dhtproto.node.neo.request.Get;
 
+import ocean.core.VersionCheck;
 import swarm.neo.node.IRequestHandler;
 
 /*******************************************************************************
@@ -128,7 +129,8 @@ public abstract class GetProtocol_v0 : IRequestHandler
         else
             sendResponse(MessageType.WrongNode);
 
-        ed.flush();
+        static if (!hasFeaturesFrom!("swarm", 4, 7))
+            ed.flush();
     }
 
     /***************************************************************************

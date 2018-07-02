@@ -12,6 +12,7 @@
 
 module dhtproto.node.neo.request.Update;
 
+import ocean.core.VersionCheck;
 import swarm.neo.node.IRequestHandler;
 
 /*******************************************************************************
@@ -110,7 +111,9 @@ public abstract class UpdateProtocol_v0 : IRequestHandler
                 payload.add(response);
             }
         );
-        ed.flush();
+
+        static if (!hasFeaturesFrom!("swarm", 4, 7))
+            ed.flush();
     }
 
     /***************************************************************************
@@ -144,7 +147,9 @@ public abstract class UpdateProtocol_v0 : IRequestHandler
                         payload.addArray(value);
                     }
                 );
-                ed.flush();
+
+                static if (!hasFeaturesFrom!("swarm", 4, 7))
+                    ed.flush();
             }
         );
 
