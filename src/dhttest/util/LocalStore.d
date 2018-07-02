@@ -54,7 +54,7 @@ struct LocalStore
 
     public void put ( hash_t key, cstring val )
     {
-        this.data[key] = val.dup;
+        (&this).data[key] = val.dup;
     }
 
     /***************************************************************************
@@ -68,7 +68,7 @@ struct LocalStore
 
     public void remove ( hash_t key )
     {
-        this.data.remove(key);
+        (&this).data.remove(key);
     }
 }
 
@@ -107,14 +107,14 @@ public struct LegacyVerifier
     public void verifyAgainstDht ( ref LocalStore local, DhtClient dht,
         cstring channel )
     {
-        this.local = &local;
+        (&this).local = &local;
 
-        this.verifyGetChannelSize(dht, channel);
-        this.verifyGetAll(dht, channel);
-        this.verifyGetAllFilter(dht, channel);
-        this.verifyGetAllKeys(dht, channel);
-        this.verifyExists(dht, channel);
-        this.verifyGet(dht, channel);
+        (&this).verifyGetChannelSize(dht, channel);
+        (&this).verifyGetAll(dht, channel);
+        (&this).verifyGetAllFilter(dht, channel);
+        (&this).verifyGetAllKeys(dht, channel);
+        (&this).verifyExists(dht, channel);
+        (&this).verifyGet(dht, channel);
     }
 
     /***************************************************************************
@@ -136,8 +136,8 @@ public struct LegacyVerifier
         ulong records, bytes;
         dht.getChannelSize(channel, records, bytes);
         log.trace("\tVerifying channel with GetChannelSize: local:{}, remote:{}",
-            this.local.data.length, records);
-        test!("==")(this.local.data.length, records);
+            (&this).local.data.length, records);
+        test!("==")((&this).local.data.length, records);
     }
 
     /***************************************************************************
@@ -158,13 +158,13 @@ public struct LegacyVerifier
     {
         auto remote = dht.getAll(channel);
         log.trace("\tVerifying channel with GetAll: local:{}, remote:{}",
-            this.local.data.length, remote.length);
-        test!("==")(this.local.data.length, remote.length);
+            (&this).local.data.length, remote.length);
+        test!("==")((&this).local.data.length, remote.length);
 
         foreach ( k, v; remote )
         {
-            test!("in")(k, this.local.data);
-            test!("==")(v, this.local.data[k]);
+            test!("in")(k, (&this).local.data);
+            test!("==")(v, (&this).local.data[k]);
         }
     }
 
@@ -186,10 +186,10 @@ public struct LegacyVerifier
 
     private void verifyGetAllFilter ( DhtClient dht, cstring channel )
     {
-        const filter = "0";
+        enum filter = "0";
 
         hash_t[] local;
-        foreach ( k, v; this.local.data )
+        foreach ( k, v; (&this).local.data )
         {
             if ( v.contains(filter) )
                 local ~= k;
@@ -203,7 +203,7 @@ public struct LegacyVerifier
         foreach ( k, v; remote )
         {
             test(local.contains(k));
-            test!("==")(v, this.local.data[k]);
+            test!("==")(v, (&this).local.data[k]);
         }
     }
 
@@ -225,12 +225,12 @@ public struct LegacyVerifier
     {
         auto remote = dht.getAllKeys(channel);
         log.trace("\tVerifying channel with GetAllKeys: local:{}, remote:{}",
-            this.local.data.length, remote.length);
-        test!("==")(this.local.data.length, remote.length);
+            (&this).local.data.length, remote.length);
+        test!("==")((&this).local.data.length, remote.length);
 
         foreach ( k; remote )
         {
-            test!("in")(k, this.local.data);
+            test!("in")(k, (&this).local.data);
         }
     }
 
@@ -251,7 +251,7 @@ public struct LegacyVerifier
     private void verifyExists ( DhtClient dht, cstring channel )
     {
         log.trace("\tVerifying channel with Exists");
-        foreach ( k, v; this.local.data )
+        foreach ( k, v; (&this).local.data )
         {
             auto exists = dht.exists(channel, k);
             test(exists);
@@ -275,7 +275,7 @@ public struct LegacyVerifier
     private void verifyGet ( DhtClient dht, cstring channel )
     {
         log.trace("\tVerifying channel with Get");
-        foreach ( k, v; this.local.data )
+        foreach ( k, v; (&this).local.data )
         {
             auto remote_v = dht.get(channel, k);
             test!("==")(remote_v, v);
@@ -319,14 +319,14 @@ public struct NeoVerifier
     public void verifyAgainstDht ( ref LocalStore local, DhtClient dht,
         cstring channel )
     {
-        this.local = &local;
+        (&this).local = &local;
 
-        this.verifyGetChannels(dht, channel);
-        this.verifyGet(dht, channel);
-        this.verifyExists(dht, channel);
-        this.verifyGetAll(dht, channel);
-        this.verifyGetAllKeysOnly(dht, channel);
-        this.verifyGetAllFilter(dht, channel);
+        (&this).verifyGetChannels(dht, channel);
+        (&this).verifyGet(dht, channel);
+        (&this).verifyExists(dht, channel);
+        (&this).verifyGetAll(dht, channel);
+        (&this).verifyGetAllKeysOnly(dht, channel);
+        (&this).verifyGetAllFilter(dht, channel);
     }
 
     /***************************************************************************
@@ -346,7 +346,7 @@ public struct NeoVerifier
     private void verifyGet ( DhtClient dht, cstring channel )
     {
         log.trace("\tVerifying channel with Get");
-        foreach ( k, v; this.local.data )
+        foreach ( k, v; (&this).local.data )
         {
             void[] buf;
             auto res = dht.blocking.get(channel, k, buf);
@@ -372,7 +372,7 @@ public struct NeoVerifier
     private void verifyExists ( DhtClient dht, cstring channel )
     {
         log.trace("\tVerifying channel with Exists");
-        foreach ( k, v; this.local.data )
+        foreach ( k, v; (&this).local.data )
         {
             auto res = dht.blocking.exists(channel, k);
             test(res.succeeded);
@@ -430,8 +430,8 @@ public struct NeoVerifier
         task.suspend();
 
         test(!duplicate);
-        test!("==")(records.length, this.local.data.length);
-        foreach ( k, v; this.local.data )
+        test!("==")(records.length, (&this).local.data.length);
+        foreach ( k, v; (&this).local.data )
         {
             test!("in")(k, records);
             test!("==")(v, records[k]);
@@ -517,8 +517,8 @@ public struct NeoVerifier
         task.suspend();
 
         test(!duplicate);
-        test!("==")(keys.length, this.local.data.length);
-        foreach ( k, v; this.local.data )
+        test!("==")(keys.length, (&this).local.data.length);
+        foreach ( k, v; (&this).local.data )
             test!("in")(k, keys);
     }
 
@@ -541,10 +541,10 @@ public struct NeoVerifier
         log.trace("\tVerifying channel with GetAll, filtering");
         auto task = Task.getThis();
 
-        const filter = "0";
+        enum filter = "0";
 
         hash_t[] local_filtered;
-        foreach ( k, v; this.local.data )
+        foreach ( k, v; (&this).local.data )
             if ( v.contains(filter) )
                 local_filtered ~= k;
 
@@ -584,8 +584,8 @@ public struct NeoVerifier
         test!("==")(records.length, local_filtered.length);
         foreach ( k, v; records )
         {
-            test!("in")(k, this.local.data);
-            test!("==")(v, this.local.data[k]);
+            test!("in")(k, (&this).local.data);
+            test!("==")(v, (&this).local.data[k]);
         }
     }
 }

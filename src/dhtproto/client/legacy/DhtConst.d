@@ -56,7 +56,7 @@ static:
 
     ***************************************************************************/
 
-    public const ApiVersion = "20110401";
+    public enum ApiVersion = "20110401";
 
 
     /***************************************************************************
@@ -66,7 +66,7 @@ static:
 
     ***************************************************************************/
 
-    public const RecordSizeLimit = RecordBatcher.DefaultMaxBatchSize;
+    public enum RecordSizeLimit = RecordBatcher.DefaultMaxBatchSize;
 
 
     /***************************************************************************
@@ -221,6 +221,6 @@ public struct NodeHashRange
 
     public equals_t opEquals ( NodeHashRange rhs )
     {
-        return this.opCmp(rhs) == 0;
+        return (&this).opCmp(rhs) == 0;
     }
 }
