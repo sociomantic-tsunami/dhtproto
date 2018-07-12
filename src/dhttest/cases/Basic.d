@@ -23,7 +23,7 @@ import ocean.transition;
 
 import dhttest.DhtTestCase;
 
-const PRIORITY = 100;
+static immutable PRIORITY = 100;
 
 /*******************************************************************************
 
