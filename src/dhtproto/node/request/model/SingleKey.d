@@ -75,7 +75,11 @@ public abstract scope class SingleKey : SingleChannel
 
     final override protected void readChannelRequestData ( )
     {
-        this.reader.readArray(*this.key_buffer);
+        if (!this.reader.readArrayLimit(*this.key_buffer, MaximumRecordSize))
+        {
+            throw this.inputException.set(
+                    "Error while reading the request key: too large");
+        }
         this.readKeyRequestData();
     }
 

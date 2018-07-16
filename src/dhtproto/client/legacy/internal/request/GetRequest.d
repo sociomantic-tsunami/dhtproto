@@ -74,7 +74,11 @@ public scope class GetRequest : IKeyRequest
 
     override protected void handle__ ( )
     {
-        this.reader.readArray(*this.resources.value_buffer);
+        if (!this.reader.readArrayLimit(*this.resources.value_buffer, MaximumRecordSize))
+        {
+            throw this.inputException.set(
+                    "Error while reading the record's value: too large");
+        }
 
         auto output = this.params.io_item.get_value();
 

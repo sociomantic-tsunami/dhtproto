@@ -74,7 +74,11 @@ public abstract scope class SingleChannel : DhtCommand
 
     final override protected void readRequestData ( )
     {
-        this.reader.readArray(*this.channel_buffer);
+        if (!this.reader.readArrayLimit(*this.channel_buffer, MaximumRecordSize))
+        {
+            throw this.inputException.set(
+                    "Error while reading the channel buffer array: too large");
+        }
         this.readChannelRequestData();
     }
 

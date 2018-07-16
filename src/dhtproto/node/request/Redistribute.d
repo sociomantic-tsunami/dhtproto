@@ -131,7 +131,11 @@ public abstract scope class Redistribute : DhtCommand
                 (*this.redistribute_node_buffer).length + 1;
             auto next = &((*this.redistribute_node_buffer)[$-1]);
 
-            this.reader.readArray(next.node.Address);
+            if (!this.reader.readArrayLimit(next.node.Address, MaximumRecordSize))
+            {
+                throw this.inputException.set(
+                        "Error while reading the address of the next node: too large");
+            }
             if (next.node.Address.length == 0)
                 break;
             this.reader.read(next.node.Port);

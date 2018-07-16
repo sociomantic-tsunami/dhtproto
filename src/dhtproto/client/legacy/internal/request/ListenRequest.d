@@ -145,8 +145,16 @@ public scope class ListenRequest : IChannelRequest, IStreamInfo
         do
         {
             // Read key & value
-            this.reader.readArray(*this.resources.key_buffer);
-            this.reader.readArray(*this.resources.value_buffer);
+            if (!this.reader.readArrayLimit(*this.resources.key_buffer, MaximumRecordSize))
+            {
+                throw this.inputException.set(
+                        "Error while reading the key: too large");
+            }
+            if (!this.reader.readArrayLimit(*this.resources.value_buffer, MaximumRecordSize))
+            {
+                throw this.inputException.set(
+                        "Error while reading the value: too large");
+            }
 
             // Forward value (unless end-of-flow marker)
             if ( this.resources.key_buffer.length )

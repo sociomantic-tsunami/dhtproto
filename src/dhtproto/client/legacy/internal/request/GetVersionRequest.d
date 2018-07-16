@@ -73,7 +73,11 @@ public scope class GetVersionRequest : IRequest
 
     override protected void handle__ ( )
     {
-        this.reader.readArray(*this.resources.value_buffer);
+        if (!this.reader.readArrayLimit(*this.resources.value_buffer, MaximumRecordSize))
+        {
+            throw this.inputException.set(
+                    "Error while reading the version value: too large");
+        }
 
         auto output = params.io_item.get_node_value();
         output(this.params.context, this.resources.conn_pool_info.address,

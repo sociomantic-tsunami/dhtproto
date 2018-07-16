@@ -22,6 +22,8 @@ module dhtproto.client.legacy.internal.request.model.IRequest;
 
 import Core = swarm.client.request.model.IRequest;
 
+import ocean.core.Exception;
+
 import dhtproto.client.legacy.DhtConst;
 
 import dhtproto.client.legacy.internal.request.params.RequestParams;
@@ -50,6 +52,44 @@ public scope class IRequest : Core.IRequest
     protected alias .RequestParams RequestParams;
 
     protected alias .IDhtRequestResources IDhtRequestResources;
+
+
+    /***************************************************************************
+
+        Absolute maximum array size. Used for sanitizing the data input.
+        All records larger than this will be discarded.
+
+    **************************************************************************/
+
+    protected const MaximumRecordSize = 10 * 1024 * 1024;
+
+
+    /***************************************************************************
+
+        Exception instance to throw in case of the input validation error.
+
+    ***************************************************************************/
+
+    public static class InputTooLongException : Exception
+    {
+        mixin ReusableExceptionImplementation!();
+    }
+
+
+    /// ditto
+    protected static InputTooLongException inputException;
+
+
+    /***************************************************************************
+
+        Static constructor.
+
+    ***************************************************************************/
+
+    static this ()
+    {
+        IRequest.inputException = new InputTooLongException;
+    }
 
 
     /***************************************************************************
