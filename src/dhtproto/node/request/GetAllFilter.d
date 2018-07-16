@@ -60,7 +60,11 @@ public abstract scope class GetAllFilter : CompressedBatch!(mstring, mstring)
     final override protected void readChannelRequestData ( )
     {
         auto filter = this.resources.getFilterBuffer();
-        this.reader.readArray(*filter);
+        if (!this.reader.readArrayLimit(*filter, MaximumRecordSize))
+        {
+            throw this.inputException.set(
+                    "Error while reading the request filter: too large");
+        }
         this.prepareFilter(*filter);
     }
 

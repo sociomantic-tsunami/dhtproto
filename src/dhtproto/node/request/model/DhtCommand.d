@@ -32,8 +32,44 @@ public abstract scope class DhtCommand : Command
 {
     import dhtproto.node.request.params.RedistributeNode;
 
+    import ocean.core.Exception;
     import swarm.util.RecordBatcher;
     import dhtproto.client.legacy.DhtConst;
+
+    /***************************************************************************
+
+        Absolute maximum record size. Used for sanitizing the data input.
+        All records larger than this will be discarded.
+
+    **************************************************************************/
+
+    protected const MaximumRecordSize = 10 * 1024 * 1024;
+
+    /***************************************************************************
+
+        Exception instance to throw in case of the input validation error.
+
+    ***************************************************************************/
+
+    public static class InputTooLongException : Exception
+    {
+        mixin ReusableExceptionImplementation!();
+    }
+
+    /// ditto
+    protected static InputTooLongException inputException;
+
+    /***************************************************************************
+
+        Static constructor.
+
+    ***************************************************************************/
+
+    static this ()
+    {
+        DhtCommand.inputException = new InputTooLongException;
+    }
+
 
     /***************************************************************************
     

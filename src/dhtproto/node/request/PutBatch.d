@@ -69,7 +69,11 @@ public abstract scope class PutBatch : SingleChannel
 
     override protected void readChannelRequestData ( )
     {
-        this.reader.readArray(*this.record_buffer);
+        if (!this.reader.readArrayLimit(*this.record_buffer, MaximumRecordSize))
+        {
+            throw this.inputException.set(
+                    "Error while reading the batch array: too large");
+        }
     }
 
     /***************************************************************************

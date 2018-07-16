@@ -174,7 +174,11 @@ abstract private class IBulkGetRequest : IChannelRequest, IStreamInfo
 
     private bool readBatch ( )
     {
-        this.reader.readArray(*this.resources.batch_buffer);
+        if (!this.reader.readArrayLimit(*this.resources.batch_buffer, MaximumRecordSize))
+        {
+            throw this.inputException.set(
+                    "Error while reading the batch: too large");
+        }
 
         if ( this.resources.batch_buffer.length )
         {
