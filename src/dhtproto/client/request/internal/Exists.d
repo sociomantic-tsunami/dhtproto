@@ -19,6 +19,7 @@ module dhtproto.client.request.internal.Exists;
 *******************************************************************************/
 
 import ocean.transition;
+import ocean.core.VersionCheck;
 import ocean.util.log.Logger;
 
 /*******************************************************************************
@@ -179,7 +180,9 @@ public struct Exists
                     payload.add(context.user_params.args.key);
                 }
             );
-            conn.flush();
+
+            static if (!hasFeaturesFrom!("swarm", 4, 7))
+                conn.flush();
 
             // Receive supported code from node
             auto supported = conn.receiveValue!(SupportedStatus)();

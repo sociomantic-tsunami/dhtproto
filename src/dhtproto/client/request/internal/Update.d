@@ -13,6 +13,7 @@
 module dhtproto.client.request.internal.Update;
 
 import ocean.transition;
+import ocean.core.VersionCheck;
 import ocean.util.log.Logger;
 import ocean.core.Verify;
 
@@ -408,7 +409,9 @@ private struct FirstROCHandler
                 payload.add(this.context.user_params.args.key);
             }
         );
-        conn.flush();
+
+        static if (!hasFeaturesFrom!("swarm", 4, 7))
+            conn.flush();
 
         // Receive supported code from node.
         auto supported = conn.receiveValue!(SupportedStatus)();
@@ -514,7 +517,9 @@ private struct FirstROCHandler
                 payload.addArray(*this.context.shared_working.updated_value);
             }
         );
-        conn.flush();
+
+        static if (!hasFeaturesFrom!("swarm", 4, 7))
+            conn.flush();
 
         // Handle response message.
         auto result = conn.receiveValue!(MessageType)();
@@ -597,7 +602,9 @@ private struct FirstROCHandler
                 payload.addCopy(MessageType.RemoveRecord);
             }
         );
-        conn.flush();
+
+        static if (!hasFeaturesFrom!("swarm", 4, 7))
+            conn.flush();
 
         // Handle response message.
         auto result = conn.receiveValue!(MessageType)();
@@ -647,7 +654,9 @@ private struct FirstROCHandler
                 payload.addCopy(MessageType.LeaveRecord);
             }
         );
-        conn.flush();
+
+        static if (!hasFeaturesFrom!("swarm", 4, 7))
+            conn.flush();
 
         auto result = conn.receiveValue!(MessageType)();
         with ( MessageType ) switch ( result )
@@ -736,7 +745,9 @@ private struct SecondROCHandler
                     payload.addArray(*this.context.shared_working.updated_value);
                 }
             );
-            conn.flush();
+
+            static if (!hasFeaturesFrom!("swarm", 4, 7))
+                conn.flush();
 
             // Receive supported code from node.
             auto supported = conn.receiveValue!(SupportedStatus)();

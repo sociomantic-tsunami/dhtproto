@@ -12,6 +12,7 @@
 
 module dhtproto.node.neo.request.Put;
 
+import ocean.core.VersionCheck;
 import swarm.neo.node.IRequestHandler;
 
 /*******************************************************************************
@@ -94,7 +95,9 @@ public abstract class PutProtocol_v0 : IRequestHandler
                 payload.add(response);
             }
         );
-        ed.flush();
+
+        static if (!hasFeaturesFrom!("swarm", 4, 7))
+            ed.flush();
     }
 
     /***************************************************************************
