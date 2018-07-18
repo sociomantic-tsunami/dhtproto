@@ -44,7 +44,7 @@ public class GetAllBlocking : NeoDhtTestCase
     {
         auto task = Task.getThis();
 
-        const num_records = 1000;
+        static immutable num_records = 1000;
         putRecords(this.dht, this.test_channel, num_records);
 
         void[] buf;
@@ -87,7 +87,7 @@ public class GetAllSuspend : NeoDhtTestCase
     {
         auto task = Task.getThis();
 
-        const num_records = 1000;
+        static immutable num_records = 1000;
         putRecords(this.dht, this.test_channel, num_records);
 
         auto getall = GetAll(this.dht);
@@ -168,7 +168,7 @@ public class GetAllConnError : NeoDhtTestCase
     {
         auto task = Task.getThis();
 
-        const num_records = 1000;
+        static immutable num_records = 1000;
         putRecords(this.dht, this.test_channel, num_records);
 
         uint disconnection_count;
@@ -272,16 +272,16 @@ private struct GetAll
     ***************************************************************************/
 
     public void start ( cstring channel,
-        DhtClient.Neo.GetAll.Notifier user_notifier )
+        scope DhtClient.Neo.GetAll.Notifier user_notifier )
     out
     {
-        assert(this.user_notifier !is null);
+        assert((&this).user_notifier !is null);
     }
     body
     {
-        verify(this.user_notifier is null);
-        this.user_notifier = user_notifier;
-        this.id = this.dht.neo.getAll(channel, &this.counterNotifier);
+        verify((&this).user_notifier is null);
+        (&this).user_notifier = user_notifier;
+        (&this).id = (&this).dht.neo.getAll(channel, &(&this).counterNotifier);
     }
 
     /***************************************************************************
@@ -294,8 +294,8 @@ private struct GetAll
 
     public void suspend ( )
     {
-        verify(this.id != this.id.init);
-        this.dht.neo.control(this.id,
+        verify((&this).id != (&this).id.init);
+        (&this).dht.neo.control((&this).id,
             ( DhtClient.Neo.GetAll.IController getall )
             {
                 getall.suspend();
@@ -313,8 +313,8 @@ private struct GetAll
 
     public void resume ( )
     {
-        verify(this.id != this.id.init);
-        this.dht.neo.control(this.id,
+        verify((&this).id != (&this).id.init);
+        (&this).dht.neo.control((&this).id,
             ( DhtClient.Neo.GetAll.IController getall )
             {
                 getall.resume();
@@ -331,8 +331,8 @@ private struct GetAll
 
     public void stop ( )
     {
-        verify(this.id != this.id.init);
-        this.dht.neo.control(this.id,
+        verify((&this).id != (&this).id.init);
+        (&this).dht.neo.control((&this).id,
             ( DhtClient.Neo.GetAll.IController getall )
             {
                 getall.stop();
@@ -357,15 +357,15 @@ private struct GetAll
         with ( info.Active ) switch ( info.active )
         {
             case received:
-                if ( info.received.key in this.received_keys )
-                    this.duplicate = true;
-                this.received_keys[info.received.key] = true;
+                if ( info.received.key in (&this).received_keys )
+                    (&this).duplicate = true;
+                (&this).received_keys[info.received.key] = true;
                 break;
 
             default:
                 break;
         }
 
-        this.user_notifier(info, args);
+        (&this).user_notifier(info, args);
     }
 }
