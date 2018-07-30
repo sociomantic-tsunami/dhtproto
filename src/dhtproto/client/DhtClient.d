@@ -106,7 +106,7 @@
     -debug=Raw: trace outputs noting raw data sent & received via epoll
 
     Copyright:
-        Copyright (c) 2011-2017 sociomantic labs GmbH. All rights reserved.
+        Copyright (c) 2011-2017 dunnhumby Germany GmbH. All rights reserved.
 
     License:
         Boost Software License Version 1.0. See LICENSE.txt for details.
