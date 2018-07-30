@@ -82,7 +82,7 @@ public class DhtNode
 
     public this ( DhtConst.NodeItem node_item, EpollSelectDispatcher epoll )
     {
-        const backlog = 20;
+        static immutable backlog = 20;
 
         auto params = new ConnectionSetupParams;
         params.epoll = epoll;
