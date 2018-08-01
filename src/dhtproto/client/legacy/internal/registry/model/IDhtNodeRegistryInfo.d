@@ -122,7 +122,7 @@ public interface IDhtNodeRegistryInfo : INodeRegistryInfo
 
     **************************************************************************/
 
-    public int opApply ( int delegate ( ref IDhtNodeConnectionPoolInfo ) dg );
+    public int opApply ( scope int delegate ( ref IDhtNodeConnectionPoolInfo ) dg );
 
 
     /***************************************************************************
