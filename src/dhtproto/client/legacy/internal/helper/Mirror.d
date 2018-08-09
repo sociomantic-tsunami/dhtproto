@@ -207,7 +207,9 @@ abstract public class Mirror ( Dht : DhtClient ) : MirrorBase!(Dht)
         /// Core single-node request functionality.
         private SingleNodeRequest core;
 
-        /// Has this request succeeded at least once?
+        /// Has this request succeeded at least once this cycle? (A cycle is
+        /// defined as the period between the GetAll requests starting and all
+        /// of them succeeding at least once.)
         private bool succeeded_;
 
         /// Reschedule once finished?
@@ -248,13 +250,26 @@ abstract public class Mirror ( Dht : DhtClient ) : MirrorBase!(Dht)
         /***********************************************************************
 
             Returns:
-                true if the request has finished successfully at least once
+                true if the request has finished successfully at least once this
+                cycle
 
         ***********************************************************************/
 
         public bool succeeded ( )
         {
             return this.succeeded_;
+        }
+
+        /***********************************************************************
+
+            Called at the start of a new cycle (i.e. when `succeeded_` is true
+            for all active instances).
+
+        ***********************************************************************/
+
+        public void newCycle ( )
+        {
+            this.succeeded_ = false;
         }
 
         /***********************************************************************
@@ -462,6 +477,11 @@ abstract public class Mirror ( Dht : DhtClient ) : MirrorBase!(Dht)
                 return;
 
         this.fillFinished();
+
+        // Reset the state of the getAll helpers so we start counting
+        // towards next fillFinished call.
+        foreach (get_all; this.get_alls)
+            get_all.newCycle();
     }
 
     /***************************************************************************
