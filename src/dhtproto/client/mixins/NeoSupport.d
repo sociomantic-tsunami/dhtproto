@@ -608,6 +608,42 @@ template NeoSupport ( )
         /***********************************************************************
 
             Suspends the current Task until a connection has been established to
+            the node listening on the specified address and port and its
+            hash-range queried.
+
+            Params:
+                addr = address of node to connect to
+                port = port of node to connect to
+
+        ***********************************************************************/
+
+        public void connect ( cstring addr, ushort port )
+        {
+            this.outer.neo.addNode(addr, port);
+            this.waitAllHashRangesKnown();
+        }
+
+        /***********************************************************************
+
+            Suspends the current Task until a connection has been established to
+            all nodes listed in the specified config file and their hash-ranges
+            queried. The config file is expected to be in the format accepted by
+            swarm.neo.client.mixins.ClientCore.addNodes().
+
+            Params:
+                nodes_file = name of config file to read
+
+        ***********************************************************************/
+
+        public void connect ( cstring nodes_file )
+        {
+            this.outer.neo.addNodes(nodes_file);
+            this.waitAllHashRangesKnown();
+        }
+
+        /***********************************************************************
+
+            Suspends the current Task until a connection has been established to
             all known nodes and their hash-ranges queried.
 
         ***********************************************************************/
