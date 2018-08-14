@@ -267,7 +267,7 @@ public class ExtensibleDhtClient ( Plugins ... ) : DhtClient
             conn_notifier = delegate which is called when a connection attempt
                 succeeds or fails (including when a connection is
                 re-established). Of type:
-                void delegate ( IPAddress node_address, Exception e )
+                void delegate ( Neo.DhtConnNotification )
             fiber_stack_size = size (in bytes) of stack of individual connection
                 fibers
 
@@ -302,7 +302,7 @@ public class ExtensibleDhtClient ( Plugins ... ) : DhtClient
             conn_notifier = delegate which is called when a connection attempt
                 succeeds or fails (including when a connection is
                 re-established). Of type:
-                void delegate ( IPAddress node_address, Exception e )
+                void delegate ( Neo.DhtConnNotification )
             conn_limit = maximum number of connections to each DHT node
             queue_size = maximum size of the per-node request queue
             fiber_stack_size = size of connection fibers' stack (in bytes)
@@ -412,7 +412,7 @@ public class SchedulingDhtClient : ExtensibleDhtClient!(RequestScheduler)
             conn_notifier = delegate which is called when a connection attempt
                 succeeds or fails (including when a connection is
                 re-established). Of type:
-                void delegate ( IPAddress node_address, Exception e )
+                void delegate ( Neo.DhtConnNotification )
             fiber_stack_size = size (in bytes) of stack of individual connection
                 fibers
 
@@ -445,7 +445,7 @@ public class SchedulingDhtClient : ExtensibleDhtClient!(RequestScheduler)
             conn_notifier = delegate which is called when a connection attempt
                 succeeds or fails (including when a connection is
                 re-established). Of type:
-                void delegate ( IPAddress node_address, Exception e )
+                void delegate ( Neo.DhtConnNotification )
             conn_limit = maximum number of connections to each DHT node
             queue_size = maximum size of the per-node request queue
             fiber_stack_size = size of connection fibers' stack (in bytes)
@@ -801,7 +801,7 @@ public class DhtClient : IClient
             conn_notifier = delegate which is called when a connection attempt
                 succeeds or fails (including when a connection is
                 re-established). Of type:
-                void delegate ( IPAddress node_address, Exception e )
+                void delegate ( Neo.DhtConnNotification )
             fiber_stack_size = size (in bytes) of stack of individual connection
                 fibers
 
@@ -839,7 +839,7 @@ public class DhtClient : IClient
             conn_notifier = delegate which is called when a connection attempt
                 succeeds or fails (including when a connection is
                 re-established). Of type:
-                void delegate ( IPAddress node_address, Exception e )
+                void delegate ( Neo.DhtConnNotification )
             conn_limit = maximum number of connections to each DHT node
             queue_size = maximum size of the per-node request queue
             fiber_stack_size = size of connection fibers' stack (in bytes)
