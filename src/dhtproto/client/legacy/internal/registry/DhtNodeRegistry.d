@@ -72,7 +72,7 @@ public class DhtNodeRegistry : NodeRegistry, IDhtNodeRegistryInfo
 
     ***************************************************************************/
 
-    private const expected_nodes = 100;
+    private static immutable expected_nodes = 100;
 
 
     /***************************************************************************
@@ -404,7 +404,7 @@ public class DhtNodeRegistry : NodeRegistry, IDhtNodeRegistryInfo
 
     **************************************************************************/
 
-    public int opApply ( int delegate ( ref IDhtNodeConnectionPoolInfo ) dg )
+    public int opApply ( scope int delegate ( ref IDhtNodeConnectionPoolInfo ) dg )
     {
         int ret;
 
@@ -583,7 +583,7 @@ public class DhtNodeRegistry : NodeRegistry, IDhtNodeRegistryInfo
 
     ***************************************************************************/
 
-    private int opApply ( int delegate ( ref DhtNodeConnectionPool ) dg )
+    private int opApply ( scope int delegate ( ref DhtNodeConnectionPool ) dg )
     {
         int res;
         foreach ( pool; this.nodes.list )
@@ -605,7 +605,7 @@ public class DhtNodeRegistry : NodeRegistry, IDhtNodeRegistryInfo
 
     ***************************************************************************/
 
-    private int opApply ( int delegate ( ref size_t, ref DhtNodeConnectionPool ) dg )
+    private int opApply ( scope int delegate ( ref size_t, ref DhtNodeConnectionPool ) dg )
     {
         int res;
         size_t i;

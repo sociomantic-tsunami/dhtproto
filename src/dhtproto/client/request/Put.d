@@ -47,7 +47,7 @@ import swarm.util.RecordBatcher;
 // calculating the required size of a record batch based on the size of a record
 // that can fit in it is lacking.
 // See https://github.com/sociomantic-tsunami/swarm/issues/142
-public const MaxRecordSize =
+public static immutable MaxRecordSize =
     RecordBatcher.DefaultMaxBatchSize - hash_t.sizeof - (size_t.sizeof * 2);
 
 /*******************************************************************************

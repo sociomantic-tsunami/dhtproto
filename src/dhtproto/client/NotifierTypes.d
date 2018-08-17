@@ -47,12 +47,12 @@ public struct RequestRecordInfo
 
     ***************************************************************************/
 
-    public void toString ( void delegate ( cstring chunk ) sink )
+    public void toString ( scope void delegate ( cstring chunk ) sink )
     {
         Formatter.sformat(
             sink,
             "Request #{} provided the record 0x{:x16}:{}",
-            this.request_id, this.key, this.value);
+            (&this).request_id, (&this).key, (&this).value);
     }
 }
 
@@ -92,12 +92,12 @@ public struct RequestDataUpdateInfo
 
     ***************************************************************************/
 
-    public void toString ( void delegate ( cstring chunk ) sink )
+    public void toString ( scope void delegate ( cstring chunk ) sink )
     {
         Formatter.sformat(
             sink,
             "Request #{} provided the record {} to be updated",
-            this.request_id, this.value);
+            (&this).request_id, (&this).value);
     }
 }
 
@@ -126,12 +126,12 @@ public struct RequestKeyInfo
 
     ***************************************************************************/
 
-    public void toString ( void delegate ( cstring chunk ) sink )
+    public void toString ( scope void delegate ( cstring chunk ) sink )
     {
         Formatter.sformat(
             sink,
             "Request #{} provided the key 0x{:x16}",
-            this.request_id, this.key);
+            (&this).request_id, (&this).key);
     }
 }
 

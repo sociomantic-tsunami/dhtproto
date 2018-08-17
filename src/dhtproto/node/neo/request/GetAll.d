@@ -89,8 +89,8 @@ public abstract class GetAllProtocol_v0 : IRequestHandler
         {
             if ( filter.length > 0 )
             {
-                this.matcher = search(cast(Const!(ubyte)[])filter);
-                this.active = true;
+                (&this).matcher = search(cast(Const!(ubyte)[])filter);
+                (&this).active = true;
             }
         }
 
@@ -109,8 +109,8 @@ public abstract class GetAllProtocol_v0 : IRequestHandler
 
         public bool match ( in void[] value )
         {
-            if ( this.active )
-                return this.matcher.forward(cast(Const!(ubyte)[])value)
+            if ( (&this).active )
+                return (&this).matcher.forward(cast(Const!(ubyte)[])value)
                     < value.length;
             else
                 return true;
@@ -269,7 +269,7 @@ public abstract class GetAllProtocol_v0 : IRequestHandler
     ***************************************************************************/
 
     abstract protected bool getNext (
-        void delegate ( hash_t key, Const!(void)[] value ) dg );
+        scope void delegate ( hash_t key, Const!(void)[] value ) dg );
 
     /***************************************************************************
 
@@ -292,7 +292,7 @@ public abstract class GetAllProtocol_v0 : IRequestHandler
         public DelayedSuspender suspender;
 
         /// Fiber resume code used to resume DelayedSuspender.
-        private const ResumeAfterSuspension = 1;
+        private static immutable ResumeAfterSuspension = 1;
 
         /***********************************************************************
 
