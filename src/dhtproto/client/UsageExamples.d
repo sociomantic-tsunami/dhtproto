@@ -165,6 +165,21 @@ struct UsageExamples
 {
 }
 
+/// Example of using the ultra-minimal constructor
+unittest
+{
+    void initDht ( )
+    {
+        // Uses the following default settings:
+        // * The task scheduler's epoll instance.
+        // * If the task scheduler has not been initialised, initialises it with
+        //   its default configuration.
+        // * For authentication, the name "test" and the init key are used.
+        // * A default connection notifier -- which logs all events.
+        auto dht = new DhtClient;
+    }
+}
+
 /// Example of neo Put request usage
 unittest
 {
