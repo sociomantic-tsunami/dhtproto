@@ -25,6 +25,7 @@ template NeoSupport ( )
     import dhtproto.client.internal.SharedResources;
     import dhtproto.client.internal.NodeHashRanges;
     import swarm.neo.AddrPort;
+    import Hmac = swarm.neo.authentication.HmacDef;
     import swarm.neo.client.NotifierTypes;
 
     /***************************************************************************

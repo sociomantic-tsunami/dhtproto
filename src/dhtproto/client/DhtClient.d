@@ -478,6 +478,10 @@ public class SchedulingDhtClient : ExtensibleDhtClient!(RequestScheduler)
 
 public class DhtClient : IClient
 {
+    import ocean.task.Scheduler;
+    import ocean.util.log.Logger;
+    import swarm.neo.client.requests.NotificationFormatter;
+
     /***************************************************************************
 
         Local alias definitions
@@ -718,6 +722,68 @@ public class DhtClient : IClient
     import dhtproto.client.mixins.NeoSupport;
 
     mixin NeoSupport!();
+
+
+    /***************************************************************************
+
+        Constructor with support for the neo and legacy protocols, using various
+        default settings for ease of construction.
+
+        This ultra-minimal constructor is for convenience of scripts and tests.
+        It uses the following default settings:
+        * Using the task scheduler's epoll instance. (If the scheduler is not
+          initialised prior to calling this ctor, it will be initialised with
+          default settings.)
+        * For authentication, the name "test" and the init key are used.
+        * Unless a connection notifier is provided, a default notifier -- which
+          logs all events -- is used (see this.defaultConnNotifier).
+
+        Params:
+            conn_notifier = delegate which is called when a connection-related
+                event occurs on a neo connection. Of type:
+                void delegate ( Neo.DhtConnNotification )
+
+    ***************************************************************************/
+
+    public this ( Neo.DhtConnectionNotifier conn_notifier = null )
+    {
+        if ( !isSchedulerUsed() )
+            initScheduler(Scheduler.Configuration.init);
+
+        auto auth_name = "test";
+        ubyte[] auth_key = Hmac.Key.init.content;
+        if ( conn_notifier is null )
+            conn_notifier = &this.defaultConnNotifier;
+        this(theScheduler.epoll, auth_name, auth_key, conn_notifier);
+    }
+
+
+    /***************************************************************************
+
+        Neo connection notifier used if a user-defined connection notifier is
+        not passed to the ctor.
+
+    ***************************************************************************/
+
+    private void defaultConnNotifier ( Neo.DhtConnNotification info )
+    {
+        auto log = Log.lookup("DHTClient");
+        formatNotification(info, this.msg_buf);
+
+        with ( info.Active ) final switch ( info.active )
+        {
+            case connected:
+            case hash_range_queried:
+                log.trace(this.msg_buf);
+                break;
+
+            case connection_error:
+                log.error(this.msg_buf);
+                break;
+
+            mixin(typeof(info).handleInvalidCases);
+        }
+    }
 
 
     /***************************************************************************
