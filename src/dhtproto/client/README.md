@@ -6,8 +6,8 @@ This package contains the client to connect to a Distributed Hash Table
 client) currently supports two protocols, known as the "legacy protocol" and the
 "neo procotol". Detailed documentation about the workings of swarm-based clients
 and the two protocols can be found
-[here (legacy protocol)](https://github.com/sociomantic-tsunami/swarm/blob/v4.x.x/src/swarm/README_client.rst)
-and [here (neo protocol)](https://github.com/sociomantic-tsunami/swarm/blob/v4.x.x/src/swarm/README_client_neo.rst).
+[here (legacy protocol)](https://github.com/sociomantic-tsunami/swarm/blob/v5.x.x/src/swarm/README_client.rst)
+and [here (neo protocol)](https://github.com/sociomantic-tsunami/swarm/blob/v5.x.x/src/swarm/README_client_neo.rst).
 
 The legacy protocol is to be phased out, so the remainder of this README focuses
 solely on the neo protocol.
