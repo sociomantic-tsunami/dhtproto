@@ -31,7 +31,7 @@ public class GetChannels : NeoDhtTestCase
     import ocean.task.Task;
     import ocean.core.array.Search : contains;
 
-    private const channels = ["channel1", "channel2", "channel3", "channel4"];
+    private static immutable channels = ["channel1", "channel2", "channel3", "channel4"];
 
     override public Description description ( )
     {
@@ -80,7 +80,7 @@ public class GetChannelsRemove : NeoDhtTestCase
     import ocean.task.Task;
     import ocean.core.array.Search : contains;
 
-    private const channels = ["channel1", "channel2", "channel3", "channel4"];
+    private static immutable channels = ["channel1", "channel2", "channel3", "channel4"];
 
     override public Description description ( )
     {

@@ -94,11 +94,11 @@ public struct GetChannels
 
             // Acquire the array of channel name slices that is shared by all
             // RoCs, if it's not already acquired.
-            if ( this.notified_channels == typeof(this.notified_channels).init )
-                this.notified_channels = resources.getBufferList();
+            if ( (&this).notified_channels == typeof((&this).notified_channels).init )
+                (&this).notified_channels = resources.getBufferList();
             else
                 already_notified =
-                    (this.notified_channels.array().contains(channel) == true);
+                    ((&this).notified_channels.array().contains(channel) == true);
 
             // If this channel name has not been seen before, copy it into a new
             // buffer and add a slice to that buffer to the array of channel
@@ -108,7 +108,7 @@ public struct GetChannels
                 auto buf = resources.getVoidBuffer();
                 auto void_channel = cast(void[])channel;
                 (*buf).copy(void_channel);
-                this.notified_channels ~= cast(char[])(*buf);
+                (&this).notified_channels ~= cast(char[])(*buf);
             }
 
             return !already_notified;
