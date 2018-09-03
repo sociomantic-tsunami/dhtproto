@@ -651,39 +651,15 @@ template NeoSupport ( )
 
         public void waitAllHashRangesKnown ( )
         {
-            auto task = Task.getThis();
-            verify(task !is null, "This method may only be called from inside a Task");
-
-            auto old_user_conn_notifier = this.outer.user_conn_notifier;
-
-            scope conn_notifier =
-                ( Neo.DhtConnNotification info )
-                {
-                    old_user_conn_notifier(info);
-
-                    with ( info.Active ) switch ( info.active )
-                    {
-                        case hash_range_queried:
-                            if ( task.suspended() )
-                                task.resume();
-                            break;
-
-                        case connected:
-                        case connection_error:
-                            break;
-
-                        default: assert(false);
-                    }
-                };
-
-            this.outer.user_conn_notifier = conn_notifier;
-            scope ( exit )
-                this.outer.user_conn_notifier = old_user_conn_notifier;
-
             scope stats = this.outer.neo.new DhtStats;
 
-            while ( stats.num_nodes_known_hash_range < stats.num_registered_nodes )
-                task.suspend();
+            bool finished ( )
+            {
+                return stats.num_nodes_known_hash_range ==
+                    stats.num_registered_nodes;
+            }
+
+            this.waitHashRangeQuery(&finished);
         }
 
         /***********************************************************************
@@ -758,10 +734,58 @@ template NeoSupport ( )
                         this.minimum_hr_known;
                 }
 
-                this.outer.waitConnect(&finished);
+                this.outer.waitHashRangeQuery(&finished);
 
                 this.result = stats.num_nodes_known_hash_range;
             }
+        }
+
+        /***********************************************************************
+
+            Suspends the current task until the specified finished condition is
+            satisifed.
+
+            Params:
+                finished = delegate specifying the condition under which the
+                    method will return. The delegate is called once when the
+                    method is called, and then again every time a hash-range
+                    query event occurs.
+
+        ***********************************************************************/
+
+        private void waitHashRangeQuery ( bool delegate ( ) finished )
+        {
+            auto task = Task.getThis();
+            verify(task !is null, "This method may only be called from inside a Task");
+
+            auto old_user_conn_notifier = this.outer.user_conn_notifier;
+
+            scope conn_notifier =
+                ( Neo.DhtConnNotification info )
+                {
+                    old_user_conn_notifier(info);
+
+                    with ( info.Active ) switch ( info.active )
+                    {
+                        case hash_range_queried:
+                            if ( task.suspended() )
+                                task.resume();
+                            break;
+
+                        case connected:
+                        case connection_error:
+                            break;
+
+                        default: assert(false);
+                    }
+                };
+
+            this.outer.user_conn_notifier = conn_notifier;
+            scope ( exit )
+                this.outer.user_conn_notifier = old_user_conn_notifier;
+
+            while ( !finished() )
+                task.suspend();
         }
 
         /***********************************************************************
