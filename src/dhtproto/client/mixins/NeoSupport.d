@@ -204,7 +204,7 @@ template NeoSupport ( )
         ***********************************************************************/
 
         public RequestId put ( cstring channel, hash_t key, Const!(void)[] value,
-            Put.Notifier notifier )
+            scope Put.Notifier notifier )
         {
             auto params = Const!(Internals.Put.UserSpecifiedParams)(
                 Const!(Put.Args)(channel, key, value), notifier);
@@ -237,7 +237,7 @@ template NeoSupport ( )
         ***********************************************************************/
 
         public RequestId get ( Options ... ) ( cstring channel, hash_t key,
-            Get.Notifier notifier, Options options )
+            scope Get.Notifier notifier, Options options )
         {
             auto params = Const!(Internals.Get.UserSpecifiedParams)(
                 Const!(Get.Args)(channel, key), notifier);
@@ -276,7 +276,7 @@ template NeoSupport ( )
         ***********************************************************************/
 
         public RequestId exists ( cstring channel, hash_t key,
-            Exists.Notifier notifier )
+            scope Exists.Notifier notifier )
         {
             auto params = Const!(Internals.Exists.UserSpecifiedParams)(
                 Const!(Exists.Args)(channel, key), notifier);
@@ -306,7 +306,7 @@ template NeoSupport ( )
         ***********************************************************************/
 
         public RequestId remove ( cstring channel, hash_t key,
-            Remove.Notifier notifier )
+            scope Remove.Notifier notifier )
         {
             auto params = Const!(Internals.Remove.UserSpecifiedParams)(
                 Const!(Remove.Args)(channel, key), notifier);
@@ -336,7 +336,7 @@ template NeoSupport ( )
         ***********************************************************************/
 
         public RequestId update ( cstring channel, hash_t key,
-            Update.Notifier notifier )
+            scope Update.Notifier notifier )
         {
             auto params = Const!(Internals.Update.UserSpecifiedParams)(
                 Const!(Update.Args)(channel, key), notifier);
@@ -369,7 +369,7 @@ template NeoSupport ( )
         ***********************************************************************/
 
         public RequestId mirror ( Options ... ) ( cstring channel,
-            Mirror.Notifier notifier, Options options )
+            scope Mirror.Notifier notifier, Options options )
         {
             Mirror.Settings settings;
 
@@ -414,7 +414,7 @@ template NeoSupport ( )
         ***********************************************************************/
 
         public RequestId getAll ( Options ... ) ( cstring channel,
-            GetAll.Notifier notifier, Options options )
+            scope GetAll.Notifier notifier, Options options )
         {
             GetAll.Settings settings;
 
@@ -453,7 +453,7 @@ template NeoSupport ( )
 
         ***********************************************************************/
 
-        public RequestId getChannels ( GetChannels.Notifier notifier )
+        public RequestId getChannels ( scope GetChannels.Notifier notifier )
         {
             auto params = Const!(Internals.GetChannels.UserSpecifiedParams)(
                 Const!(GetChannels.Args)(), notifier);
@@ -483,7 +483,7 @@ template NeoSupport ( )
         ***********************************************************************/
 
         public RequestId removeChannel ( cstring channel,
-            RemoveChannel.Notifier notifier )
+            scope RemoveChannel.Notifier notifier )
         {
             auto params = Const!(Internals.RemoveChannel.UserSpecifiedParams)(
                 Const!(RemoveChannel.Args)(channel), notifier);
@@ -554,7 +554,7 @@ template NeoSupport ( )
         ***********************************************************************/
 
         public bool control ( ControllerInterface ) ( RequestId id,
-            void delegate ( ControllerInterface ) dg )
+            scope void delegate ( ControllerInterface ) dg )
         {
             alias Request!(ControllerInterface) R;
 
@@ -716,7 +716,7 @@ template NeoSupport ( )
 
         ***********************************************************************/
 
-        private void waitHashRangeQuery ( bool delegate ( ) finished )
+        private void waitHashRangeQuery ( scope bool delegate ( ) finished )
         {
             auto task = Task.getThis();
             verify(task !is null, "This method may only be called from inside a Task");
@@ -767,7 +767,7 @@ template NeoSupport ( )
         ***********************************************************************/
 
         public void put ( cstring channel, hash_t key, Const!(void)[] value,
-            Neo.Put.Notifier user_notifier )
+            scope Neo.Put.Notifier user_notifier )
         {
             verify(user_notifier !is null);
             auto task = Task.getThis();
@@ -897,7 +897,7 @@ template NeoSupport ( )
         ***********************************************************************/
 
         public void get ( cstring channel, hash_t key,
-            Neo.Get.Notifier user_notifier )
+            scope Neo.Get.Notifier user_notifier )
         {
             verify(user_notifier !is null);
             auto task = Task.getThis();
@@ -1042,7 +1042,7 @@ template NeoSupport ( )
         ***********************************************************************/
 
         public void update ( cstring channel, hash_t key,
-            Neo.Update.Notifier user_notifier )
+            scope Neo.Update.Notifier user_notifier )
         {
             verify(user_notifier !is null);
             auto task = Task.getThis();
@@ -1093,7 +1093,7 @@ template NeoSupport ( )
         ***********************************************************************/
 
         public void exists ( cstring channel, hash_t key,
-            Neo.Exists.Notifier user_notifier )
+            scope Neo.Exists.Notifier user_notifier )
         {
             verify(user_notifier !is null);
             auto task = Task.getThis();
@@ -1229,7 +1229,7 @@ template NeoSupport ( )
         ***********************************************************************/
 
         public void remove ( cstring channel, hash_t key,
-            Neo.Remove.Notifier user_notifier )
+            scope Neo.Remove.Notifier user_notifier )
         {
             verify(user_notifier !is null);
             auto task = Task.getThis();
@@ -1427,17 +1427,17 @@ template NeoSupport ( )
                 {
                     case received:
                         // Ignore all received value on user break.
-                        if (this.state == State.Stopped)
+                        if ((&this).state == State.Stopped)
                             break;
 
                         // Store the received value.
-                        this.record_key = info.received.key;
+                        (&this).record_key = info.received.key;
 
-                        copy(*this.record_value, info.received.value);
+                        copy(*(&this).record_value, info.received.value);
 
-                        if (this.task.suspended())
+                        if ((&this).task.suspended())
                         {
-                            this.task.resume();
+                            (&this).task.resume();
                         }
                         break;
 
@@ -1445,8 +1445,8 @@ template NeoSupport ( )
                     case finished:
                         // Even if the user has requested stopping,
                         // but finished arrived, we will just finish and exit.
-                        this.state = State.Finished;
-                        this.task.resume();
+                        (&this).state = State.Finished;
+                        (&this).task.resume();
                         break;
 
                     case suspended: // Unexepected (unsupported by blocking API)
@@ -1455,12 +1455,12 @@ template NeoSupport ( )
                     case node_error:
                     case unsupported:
                         // Ignore all errors on user break.
-                        if (this.state == State.Stopped)
+                        if ((&this).state == State.Stopped)
                             break;
 
                         // Otherwise flag an error and allow the request to
                         // finish normally.
-                        this.error = true;
+                        (&this).error = true;
                         break;
 
                     case received_key:
@@ -1481,30 +1481,30 @@ template NeoSupport ( )
 
             *******************************************************************/
 
-            public int opApply ( int delegate ( ref hash_t key,
+            public int opApply ( scope int delegate ( ref hash_t key,
                 ref void[] value ) dg )
             {
                 int ret;
 
-                this.rq_id = this.neo.getAll(this.channel, &this.notifier);
+                (&this).rq_id = (&this).neo.getAll((&this).channel, &(&this).notifier);
 
-                while (this.state != State.Finished)
+                while ((&this).state != State.Finished)
                 {
                     Task.getThis().suspend();
 
                     // No more records.
-                    if (this.state == State.Finished
-                            || this.state == State.Stopped
-                            || this.error)
+                    if ((&this).state == State.Finished
+                            || (&this).state == State.Stopped
+                            || (&this).error)
                         break; 
 
-                    ret = dg(this.record_key, *this.record_value);
+                    ret = dg((&this).record_key, *(&this).record_value);
 
                     if (ret)
                     {
-                        this.state = State.Stopped;
+                        (&this).state = State.Stopped;
 
-                        this.neo.control(this.rq_id,
+                        (&this).neo.control((&this).rq_id,
                             ( Neo.GetAll.IController get_all )
                             {
                                 get_all.stop();
@@ -1613,33 +1613,33 @@ template NeoSupport ( )
                 {
                     case received:
                         // Ignore all received value on user break.
-                        if (this.state == State.Stopped)
+                        if ((&this).state == State.Stopped)
                             break;
 
-                        copy(*this.channel_name,
+                        copy(*(&this).channel_name,
                             cast(cstring)info.received.value);
 
-                        if (this.task.suspended())
+                        if ((&this).task.suspended())
                         {
-                            this.task.resume();
+                            (&this).task.resume();
                         }
                         break;
 
                     case finished:
-                        this.state = State.Finished;
-                        this.task.resume();
+                        (&this).state = State.Finished;
+                        (&this).task.resume();
                         break;
 
                     case node_disconnected:
                     case node_error:
                     case unsupported:
                         // Ignore all errors on user break.
-                        if (this.state == State.Stopped)
+                        if ((&this).state == State.Stopped)
                             break;
 
                         // Otherwise flag an error and allow the request to
                         // finish normally.
-                        this.error = true;
+                        (&this).error = true;
                         break;
 
                     mixin(typeof(info).handleInvalidCases);
@@ -1652,27 +1652,27 @@ template NeoSupport ( )
 
             *******************************************************************/
 
-            public int opApply ( int delegate ( ref mstring channel_name ) dg )
+            public int opApply ( scope int delegate ( ref mstring channel_name ) dg )
             {
                 int ret;
 
-                this.neo.getChannels(&this.notifier);
+                (&this).neo.getChannels(&(&this).notifier);
 
-                while (this.state != State.Finished)
+                while ((&this).state != State.Finished)
                 {
                     Task.getThis().suspend();
 
                     // No more records.
-                    if (this.state == State.Finished
-                            || this.state == State.Stopped
-                            || this.error)
+                    if ((&this).state == State.Finished
+                            || (&this).state == State.Stopped
+                            || (&this).error)
                         break; 
 
-                    ret = dg(*this.channel_name);
+                    ret = dg(*(&this).channel_name);
 
                     if (ret)
                     {
-                        this.state = State.Stopped;
+                        (&this).state = State.Stopped;
 
                         // Wait for the request to finish.
                         Task.getThis().suspend();

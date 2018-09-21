@@ -86,7 +86,7 @@ public abstract class GetProtocol_v0 : IRequestHandler
         auto ed = this.connection.event_dispatcher();
 
         void sendResponse ( MessageType status_code,
-            void delegate ( ed.Payload ) extra = null )
+            scope void delegate ( ed.Payload ) extra = null )
         {
             ed.send(
                 ( ed.Payload payload )
@@ -163,5 +163,5 @@ public abstract class GetProtocol_v0 : IRequestHandler
     ***************************************************************************/
 
     abstract protected bool get ( cstring channel, hash_t key,
-        void delegate ( Const!(void)[] value ) dg );
+        scope void delegate ( Const!(void)[] value ) dg );
 }
