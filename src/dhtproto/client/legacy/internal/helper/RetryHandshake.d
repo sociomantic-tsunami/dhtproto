@@ -32,7 +32,7 @@ class RetryHandshake
     /// result in a confusing mess). This is a highly unusual case, though,
     /// so is not specifically supported. We can add better support, if it's
     /// ever needed.
-    private Logger log;
+    private Logger retry_log;
 
     /// Timer to retry the handshake.
     protected TimerEvent timer;
@@ -90,7 +90,7 @@ class RetryHandshake
 
         this.timer = new TimerEvent(&this.tryHandshake);
 
-        this.log = Log.lookup("RetryHandshake");
+        this.retry_log = Log.lookup("RetryHandshake");
 
         this.tryHandshake();
     }
@@ -107,7 +107,7 @@ class RetryHandshake
 
     protected bool tryHandshake ( )
     {
-        this.log.info("Attempting handshake.");
+        this.retry_log.info("Attempting handshake.");
         this.dht.nodeHandshake(&this.result, &this.handshake_notifier);
 
         return false;
@@ -129,14 +129,14 @@ class RetryHandshake
         {
             this.error();
 
-            this.log.info("Handshake did not succeed for all nodes. Retrying in {}s",
+            this.retry_log.info("Handshake did not succeed for all nodes. Retrying in {}s",
                 this.wait_time);
             this.epoll.register(this.timer);
             this.timer.set(this.wait_time, 0, 0, 0);
         }
         else
         {
-            this.log.info("Handshake succeeded for all nodes.");
+            this.retry_log.info("Handshake succeeded for all nodes.");
             this.success();
 
             if ( this.handshake_complete_dg !is null )
@@ -159,7 +159,7 @@ class RetryHandshake
 
     private void handshake_notifier ( DhtClient.RequestNotification info )
     {
-        this.log.trace("Callback: {}", info.message(this.dht.msg_buf));
+        this.retry_log.trace("Callback: {}", info.message(this.dht.msg_buf));
 
         this.nodeHandshakeCB(info);
 
@@ -185,7 +185,7 @@ class RetryHandshake
             {
                 this.established_nodes[node_hash] = true;
                 this.one_node_handshake_dg(info.nodeitem);
-                this.log.info("Handshake succeeded on {}:{}.",
+                this.retry_log.info("Handshake succeeded on {}:{}.",
                     info.nodeitem.Address, info.nodeitem.Port);
             }
         }
