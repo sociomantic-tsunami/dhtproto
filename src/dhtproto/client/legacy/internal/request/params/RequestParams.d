@@ -126,6 +126,16 @@ public class RequestParams : IChannelRequestParams
 
     /***************************************************************************
 
+        Delegate which receives an ISuspendable interface when a suspendable
+        request finishes.
+
+    ***************************************************************************/
+
+    public RegisterSuspendableDg suspend_unregister;
+
+
+    /***************************************************************************
+
         Delegate which receives an IStreamInfo interface when a stream request
         has just started.
 
