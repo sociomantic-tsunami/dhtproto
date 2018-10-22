@@ -319,25 +319,14 @@ public class Dht : Node!(DhtNode, "dht")
         // won't be able to handle request from tested application even if
         // it attempts to modify the record before this method is called
         auto original = global_storage.getCreate(channel).get(str_key);
-        auto total_wait = 0.0;
 
-        do
-        {
-            .wait(cast(uint) (check_interval * 1_000_000));
-            total_wait += check_interval;
-
-            auto current = global_storage.getCreate(channel).get(str_key);
-            if (original != current)
-                return;
-        }
-        while (total_wait < timeout);
-
-        throw new TestException(.format(
-            "No change for record {} in channel '{}' during {} seconds",
-            str_key,
-            channel,
-            timeout
-        ));
+        this.waitForCondition(timeout, check_interval,
+            {
+                return original != global_storage.getCreate(channel).get(str_key);
+            },
+            .format("No change for record {} in channel '{}' during {} seconds",
+                str_key, channel, timeout)
+        );
     }
 
     /***************************************************************************
@@ -367,26 +356,13 @@ public class Dht : Node!(DhtNode, "dht")
         char[Hash.HashDigits] str_key;
         Hash.toHexString(key, str_key);
 
-        auto total_wait = 0.0;
-
-        do
-        {
-            .wait(cast(uint) (check_interval * 1_000_000));
-            total_wait += check_interval;
-
-            auto current = global_storage.getCreate(channel).get(str_key);
-            if (dg(current))
-                return;
-        }
-        while (total_wait < timeout);
-
-        throw new TestException(.format(
-            "Expected condition was not hit for record {} in channel '{}' " ~
-                "during {} seconds",
-            str_key,
-            channel,
-            timeout
-        ));
+        this.waitForCondition(timeout, check_interval,
+            {
+                return dg(global_storage.getCreate(channel).get(str_key));
+            },
+            .format("Expected condition was not hit for record {} in channel '{}' " ~
+                "during {} seconds", str_key, channel, timeout)
+        );
     }
 
     /***************************************************************************
