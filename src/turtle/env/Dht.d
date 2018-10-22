@@ -389,6 +389,62 @@ public class Dht : Node!(DhtNode, "dht")
         ));
     }
 
+    /***************************************************************************
+
+        Waits until the specified number of listeners are registered with the
+        specified channel.
+
+        Params:
+            channel = DHT channel to lookup
+            expected_listeners = number of listeners to wait for
+            timeout = limit of time to wait (seconds)
+            check_interval = how often to poll for changes (seconds)
+
+        Throws:
+            TestException if timeout has been hit
+
+    ***************************************************************************/
+
+    public void expectListeners ( cstring channel, uint expected_listeners,
+        double timeout = 1.0, double check_interval = 0.05 )
+    {
+        this.expectListeners((&channel)[0..1], expected_listeners, timeout,
+            check_interval);
+    }
+
+    /***************************************************************************
+
+        Waits until the specified number of listeners are registered with the
+        specified channels.
+
+        Params:
+            channels = DHT channels to lookup
+            expected_listeners = number of listeners to wait for per channel
+            timeout = limit of time to wait (seconds)
+            check_interval = how often to poll for changes (seconds)
+
+        Throws:
+            TestException if timeout has been hit
+
+    ***************************************************************************/
+
+    public void expectListeners ( cstring[] channels, uint expected_listeners,
+        double timeout = 1.0, double check_interval = 0.05 )
+    {
+        this.waitForCondition(timeout, check_interval,
+            {
+                foreach ( c; channels )
+                {
+                    auto channel = global_storage.getCreate(c);
+                    if ( channel.registered_listeners != expected_listeners )
+                        return false;
+                }
+                return true;
+            },
+            .format("Expected number of listeners on channels '{}' not reached" ~
+                "after {} seconds", channels, timeout)
+        );
+    }
 
     /***************************************************************************
 
