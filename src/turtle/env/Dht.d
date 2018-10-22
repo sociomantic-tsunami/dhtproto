@@ -389,6 +389,40 @@ public class Dht : Node!(DhtNode, "dht")
         ));
     }
 
+
+    /***************************************************************************
+
+        Waits until the specified condition is true or the specified timeout
+        occurs.
+
+        Params:
+            timeout = limit of time to wait (seconds)
+            check_interval = how often to poll for the condition (seconds)
+            condition = condition to check periodicially
+
+        Throws:
+            TestException if timeout has been hit
+
+    ***************************************************************************/
+
+    private void waitForCondition ( double timeout, double check_interval,
+        bool delegate ( ) condition, lazy istring err_msg )
+    {
+        auto total_wait = 0.0;
+
+        do
+        {
+            .wait(cast(uint)(check_interval * 1_000_000));
+            total_wait += check_interval;
+
+            if ( condition() )
+                return;
+        }
+        while ( total_wait < timeout );
+
+        throw new TestException(err_msg);
+    }
+
     /***************************************************************************
 
         Creates a fake node at the specified address/port.
