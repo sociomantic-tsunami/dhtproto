@@ -226,7 +226,7 @@ public class DhtConnectionHandler :
 
     ***************************************************************************/
 
-    public this (void delegate(IConnectionHandler) finalize_dg,
+    public this (scope void delegate(IConnectionHandler) finalize_dg,
         ConnectionSetupParams setup )
     {
         super(finalize_dg, setup);

@@ -55,7 +55,7 @@ public interface IRequestResources
 
     ***************************************************************************/
 
-    MessageFiber getFiber ( void delegate ( ) fiber_method );
+    MessageFiber getFiber ( scope void delegate ( ) fiber_method );
 
     /***************************************************************************
 
@@ -82,7 +82,7 @@ public interface IRequestResources
 
     ***************************************************************************/
 
-    ITimer getTimer ( uint period_s, uint period_ms, void delegate ( ) timer_dg );
+    ITimer getTimer ( uint period_s, uint period_ms, scope void delegate ( ) timer_dg );
 
     /***************************************************************************
 

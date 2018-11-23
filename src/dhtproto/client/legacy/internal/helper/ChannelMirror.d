@@ -79,7 +79,7 @@ abstract public class ChannelMirror ( Dht : DhtClient ) : MirrorBase!(Dht)
 
         ***********************************************************************/
 
-        public this ( Dht.RequestNotification.Callback notifier = null )
+        public this ( scope Dht.RequestNotification.Callback notifier = null )
         {
             super(this.outer.dht.listen(this.outer.channel_,
                                         &this.outer.listenReceiveRecord, notifier));
@@ -158,7 +158,7 @@ abstract public class ChannelMirror ( Dht : DhtClient ) : MirrorBase!(Dht)
 
         ***********************************************************************/
 
-        public this ( Dht.RequestNotification.Callback notifier = null )
+        public this ( scope Dht.RequestNotification.Callback notifier = null )
         {
             super(this.outer.dht.getAll(this.outer.channel_,
                                         &this.outer.getAllReceiveRecord,
@@ -273,7 +273,7 @@ abstract public class ChannelMirror ( Dht : DhtClient ) : MirrorBase!(Dht)
 
     public this ( Dht dht, cstring channel,
                   uint update_time_s, uint retry_time_s,
-                  Dht.RequestNotification.Callback notifier = null )
+                  scope Dht.RequestNotification.Callback notifier = null )
     {
         super(dht, channel, update_time_s, retry_time_s);
 
@@ -305,7 +305,7 @@ abstract public class ChannelMirror ( Dht : DhtClient ) : MirrorBase!(Dht)
     public this ( Dht dht, cstring channel,
                   uint update_time_s, uint retry_time_s,
                   lazy ListenRequest listen, lazy GetAllRequest get_all,
-                  Dht.RequestNotification.Callback notifier = null )
+                  scope Dht.RequestNotification.Callback notifier = null )
     {
         super(dht, channel, update_time_s, retry_time_s);
 
@@ -437,8 +437,8 @@ unittest
     // Dummy concrete channel mirror class
     class Mirror : ChannelMirror!(SchedulingDhtClient)
     {
-        const UpdatePeriod = 60; // do a GetAll every 60 seconds
-        const RetryPeriod = 3; // retry failed requests after 3 seconds
+        static immutable UpdatePeriod = 60; // do a GetAll every 60 seconds
+        static immutable RetryPeriod = 3; // retry failed requests after 3 seconds
 
         public this ( SchedulingDhtClient dht, in char[] channel )
         {
