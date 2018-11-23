@@ -3,7 +3,7 @@
     Implements very simple DHT storage based on built-in associative arrays.
 
     Copyright:
-        Copyright (c) 2015-2017 sociomantic labs GmbH. All rights reserved.
+        Copyright (c) 2015-2017 dunnhumby Germany GmbH. All rights reserved.
 
     License:
         Boost Software License Version 1.0. See LICENSE.txt for details.
@@ -270,6 +270,18 @@ class Channel
 
         /***********************************************************************
 
+            Returns:
+                the number of registered listeners
+
+        ***********************************************************************/
+
+        public size_t length ( )
+        {
+            return this.listeners.length;
+        }
+
+        /***********************************************************************
+
             Tracks the number of listeners in the sending state, in addition to
             the base class' trigger_() behaviour.
 
@@ -529,6 +541,18 @@ class Channel
     public void listenerFlushed ( )
     {
         this.listeners.listenerFlushed();
+    }
+
+    /***************************************************************************
+
+        Returns:
+            the number of listeners that are registered with the channel
+
+    ***************************************************************************/
+
+    public size_t registered_listeners ( )
+    {
+        return this.listeners.length;
     }
 
     /***************************************************************************

@@ -11,7 +11,7 @@
     the user of the DhtClient.
 
     Copyright:
-        Copyright (c) 2011-2017 sociomantic labs GmbH. All rights reserved.
+        Copyright (c) 2011-2017 dunnhumby Germany GmbH. All rights reserved.
 
     License:
         Boost Software License Version 1.0. See LICENSE.txt for details.
@@ -39,6 +39,10 @@ import swarm.client.request.model.IStreamInfo;
 import swarm.client.request.helper.RequestSuspender;
 
 import dhtproto.client.legacy.internal.request.model.IChannelRequest;
+
+import ocean.core.Verify;
+
+import ocean.core.VersionCheck;
 
 import ocean.io.select.client.FiberSelectEvent;
 
@@ -137,6 +141,20 @@ abstract private class IBulkGetRequest : IChannelRequest, IStreamInfo
         {
             this.params.suspend_register(this.params.context,
                 this.resources.request_suspender);
+        }
+
+        // deprecated: remove in dhtproto v15
+        static if (hasFeaturesFrom!("swarm", 5, 3))
+        {
+            scope (exit)
+            {
+                if ( this.params.suspend_unregister !is null )
+                {
+                    verify(this.params.suspend_register !is null);
+                    this.params.suspend_unregister(this.params.context,
+                        this.resources.request_suspender);
+                }
+            }
         }
 
         // Pass stream info interface to user.

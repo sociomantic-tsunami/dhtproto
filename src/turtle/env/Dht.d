@@ -6,7 +6,7 @@
     modify the contents of the fake node.
 
     Copyright:
-        Copyright (c) 2015-2017 sociomantic labs GmbH. All rights reserved.
+        Copyright (c) 2015-2017 dunnhumby Germany GmbH. All rights reserved.
 
     License:
         Boost Software License Version 1.0. See LICENSE.txt for details.
@@ -316,25 +316,14 @@ public class Dht : Node!(DhtNode, "dht")
         // won't be able to handle request from tested application even if
         // it attempts to modify the record before this method is called
         auto original = global_storage.getCreate(channel).get(str_key);
-        auto total_wait = 0.0;
 
-        do
-        {
-            .wait(cast(uint) (check_interval * 1_000_000));
-            total_wait += check_interval;
-
-            auto current = global_storage.getCreate(channel).get(str_key);
-            if (original != current)
-                return;
-        }
-        while (total_wait < timeout);
-
-        throw new TestException(.format(
-            "No change for record {} in channel '{}' during {} seconds",
-            str_key,
-            channel,
-            timeout
-        ));
+        this.waitForCondition(timeout, check_interval,
+            {
+                return original != global_storage.getCreate(channel).get(str_key);
+            },
+            .format("No change for record {} in channel '{}' during {} seconds",
+                str_key, channel, timeout)
+        );
     }
 
     /***************************************************************************
@@ -364,26 +353,103 @@ public class Dht : Node!(DhtNode, "dht")
         char[Hash.HashDigits] str_key;
         Hash.toHexString(key, str_key);
 
+        this.waitForCondition(timeout, check_interval,
+            {
+                return dg(global_storage.getCreate(channel).get(str_key));
+            },
+            .format("Expected condition was not hit for record {} in channel '{}' " ~
+                "during {} seconds", str_key, channel, timeout)
+        );
+    }
+
+    /***************************************************************************
+
+        Waits until the specified number of listeners are registered with the
+        specified channel.
+
+        Params:
+            channel = DHT channel to lookup
+            expected_listeners = number of listeners to wait for
+            timeout = limit of time to wait (seconds)
+            check_interval = how often to poll for changes (seconds)
+
+        Throws:
+            TestException if timeout has been hit
+
+    ***************************************************************************/
+
+    public void expectListeners ( cstring channel, uint expected_listeners,
+        double timeout = 1.0, double check_interval = 0.05 )
+    {
+        this.expectListeners((&channel)[0..1], expected_listeners, timeout,
+            check_interval);
+    }
+
+    /***************************************************************************
+
+        Waits until the specified number of listeners are registered with the
+        specified channels.
+
+        Params:
+            channels = DHT channels to lookup
+            expected_listeners = number of listeners to wait for per channel
+            timeout = limit of time to wait (seconds)
+            check_interval = how often to poll for changes (seconds)
+
+        Throws:
+            TestException if timeout has been hit
+
+    ***************************************************************************/
+
+    public void expectListeners ( cstring[] channels, uint expected_listeners,
+        double timeout = 1.0, double check_interval = 0.05 )
+    {
+        this.waitForCondition(timeout, check_interval,
+            {
+                foreach ( c; channels )
+                {
+                    auto channel = global_storage.getCreate(c);
+                    if ( channel.registered_listeners != expected_listeners )
+                        return false;
+                }
+                return true;
+            },
+            .format("Expected number of listeners on channels '{}' not reached" ~
+                "after {} seconds", channels, timeout)
+        );
+    }
+
+    /***************************************************************************
+
+        Waits until the specified condition is true or the specified timeout
+        occurs.
+
+        Params:
+            timeout = limit of time to wait (seconds)
+            check_interval = how often to poll for the condition (seconds)
+            condition = condition to check periodicially
+
+        Throws:
+            TestException if timeout has been hit
+
+    ***************************************************************************/
+
+    private void waitForCondition ( double timeout, double check_interval,
+        bool delegate ( ) condition, lazy istring err_msg )
+    {
         auto total_wait = 0.0;
 
         do
         {
-            .wait(cast(uint) (check_interval * 1_000_000));
+            .wait(cast(uint)(check_interval * 1_000_000));
             total_wait += check_interval;
 
-            auto current = global_storage.getCreate(channel).get(str_key);
-            if (dg(current))
+            if ( condition() )
                 return;
         }
-        while (total_wait < timeout);
+        while ( total_wait < timeout );
 
-        throw new TestException(.format(
-            "Expected condition was not hit for record {} in channel '{}' " ~
-                "during {} seconds",
-            str_key,
-            channel,
-            timeout
-        ));
+        throw new TestException(err_msg);
     }
 
     /***************************************************************************
