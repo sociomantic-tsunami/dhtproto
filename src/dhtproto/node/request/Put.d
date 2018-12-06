@@ -73,16 +73,28 @@ public abstract scope class Put : SingleKey
     /***************************************************************************
 
         Read the record value from the client, unless it exceeds the
-        per-record size limit (see DhtConst)
+        per-record size limit (see recordSizeLimit
 
     ***************************************************************************/
 
     override protected void readKeyRequestData ( )
     {
         this.record_read = this.reader.readArrayLimit(
-            *this.value_buffer,
-            DhtConst.RecordSizeLimit
+            *this.value_buffer, this.recordSizeLimit()
         );
+    }
+
+    /***************************************************************************
+
+        Returns:
+            the maximum size (in bytes) allowed for a record to be added to the
+            storage engine
+
+    ***************************************************************************/
+
+    protected size_t recordSizeLimit ( )
+    {
+        return DhtConst.RecordSizeLimit;
     }
 
     /***************************************************************************
