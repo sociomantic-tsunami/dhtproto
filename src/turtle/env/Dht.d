@@ -137,7 +137,7 @@ public class Dht : Node!(DhtNode, "dht")
     unittest
     {
         struct NotVersioned { int x; }
-        struct Versioned { const StructVersion = 0; int x; }
+        struct Versioned { enum StructVersion = 0; int x; }
 
         // ensures compilation
         void stub ( )
@@ -350,7 +350,7 @@ public class Dht : Node!(DhtNode, "dht")
     ***************************************************************************/
 
     public void expectRecordCondition ( cstring channel, hash_t key,
-        bool delegate ( in void[] record ) dg,
+        scope bool delegate ( in void[] record ) dg,
         double timeout = 1.0, double check_interval = 0.05 )
     {
         char[Hash.HashDigits] str_key;
@@ -438,7 +438,7 @@ public class Dht : Node!(DhtNode, "dht")
     ***************************************************************************/
 
     private void waitForCondition ( double timeout, double check_interval,
-        bool delegate ( ) condition, lazy istring err_msg )
+        scope bool delegate ( ) condition, lazy istring err_msg )
     {
         auto total_wait = 0.0;
 
@@ -671,7 +671,7 @@ unittest
 {
     struct Something
     {
-        const StructVersion = 1;
+        enum StructVersion = 1;
         int a, b;
     }
 
