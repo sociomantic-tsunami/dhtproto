@@ -173,7 +173,7 @@ public class RequestParams : IChannelRequestParams
 
     ***************************************************************************/
 
-    override protected void notify_ ( void delegate ( IRequestNotification ) info_dg )
+    override protected void notify_ ( scope void delegate ( IRequestNotification ) info_dg )
     {
         scope info = new RequestNotification(cast(DhtConst.Command.E)this.command,
             this.context);
