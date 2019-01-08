@@ -35,6 +35,11 @@ public struct Args
 
     Union of possible notifications.
 
+    The following notifications are considered fatal (i.e. the request will
+    almost certainly get the same error if retried):
+    * node_error
+    * unsupported
+
 *******************************************************************************/
 
 private union NotificationUnion
