@@ -209,9 +209,14 @@ unittest
                     break;
 
                 case failure:
-                case value_too_big:
                 case no_node:
                 case node_disconnected:
+                    this.log.error(this.msg_buf);
+                    break;
+
+                // Fatal errors. Retrying will almost certainly result in the
+                // same error.
+                case value_too_big:
                 case node_error:
                 case wrong_node:
                 case unsupported:
@@ -253,9 +258,14 @@ unittest
                     break;
 
                 case failure:
-                case value_too_big:
                 case no_node:
                 case node_disconnected:
+                    this.log.error(this.msg_buf);
+                    break;
+
+                // Fatal errors. Retrying will almost certainly result in the
+                // same error.
+                case value_too_big:
                 case node_error:
                 case wrong_node:
                 case unsupported:
@@ -325,10 +335,15 @@ unittest
                 case failure:
                 case no_node:
                 case node_disconnected:
+                case timed_out:
+                    this.log.error(this.msg_buf);
+                    break;
+
+                // Fatal errors. Retrying will almost certainly result in the
+                // same error.
                 case node_error:
                 case wrong_node:
                 case unsupported:
-                case timed_out:
                     this.log.error(this.msg_buf);
                     break;
 
@@ -388,10 +403,15 @@ unittest
                 case failure:
                 case no_node:
                 case node_disconnected:
+                case timed_out:
+                    this.log.error(this.msg_buf);
+                    break;
+
+                // Fatal errors. Retrying will almost certainly result in the
+                // same error.
                 case node_error:
                 case wrong_node:
                 case unsupported:
-                case timed_out:
                     this.log.error(this.msg_buf);
                     break;
 
@@ -435,10 +455,15 @@ unittest
                 case failure:
                 case no_node:
                 case node_disconnected:
+                case timed_out:
+                    this.log.error(this.msg_buf);
+                    break;
+
+                // Fatal errors. Retrying will almost certainly result in the
+                // same error.
                 case node_error:
                 case wrong_node:
                 case unsupported:
-                case timed_out:
                     this.log.error(this.msg_buf);
                     break;
 
@@ -511,6 +536,11 @@ unittest
                 case failure:
                 case no_node:
                 case node_disconnected:
+                    this.log.error(this.msg_buf);
+                    break;
+
+                // Fatal errors. Retrying will almost certainly result in the
+                // same error.
                 case node_error:
                 case wrong_node:
                 case unsupported:
@@ -556,6 +586,11 @@ unittest
                 case failure:
                 case no_node:
                 case node_disconnected:
+                    this.log.error(this.msg_buf);
+                    break;
+
+                // Fatal errors. Retrying will almost certainly result in the
+                // same error.
                 case node_error:
                 case wrong_node:
                 case unsupported:
@@ -628,6 +663,11 @@ unittest
                 case failure:
                 case no_node:
                 case node_disconnected:
+                    this.log.error(this.msg_buf);
+                    break;
+
+                // Fatal errors. Retrying will almost certainly result in the
+                // same error.
                 case node_error:
                 case wrong_node:
                 case unsupported:
@@ -672,6 +712,11 @@ unittest
                 case failure:
                 case no_node:
                 case node_disconnected:
+                    this.log.error(this.msg_buf);
+                    break;
+
+                // Fatal errors. Retrying will almost certainly result in the
+                // same error.
                 case node_error:
                 case wrong_node:
                 case unsupported:
@@ -771,6 +816,11 @@ unittest
                     break;
 
                 case node_disconnected:
+                    this.log.error(this.msg_buf);
+                    break;
+
+                // Fatal errors. Retrying will almost certainly result in the
+                // same error.
                 case node_error:
                 case unsupported:
                     this.log.error(this.msg_buf);
@@ -844,6 +894,11 @@ unittest
                     break;
 
                 case node_disconnected:
+                    this.log.error(this.msg_buf);
+                    break;
+
+                // Fatal errors. Retrying will almost certainly result in the
+                // same error.
                 case node_error:
                 case unsupported:
                     this.log.error(this.msg_buf);
@@ -937,6 +992,11 @@ unittest
                 case error:
                 case no_node:
                 case node_disconnected:
+                    this.log.error(this.msg_buf);
+                    break;
+
+                // Fatal errors. Retrying will almost certainly result in the
+                // same error.
                 case node_error:
                 case wrong_node:
                 case unsupported:
@@ -1009,6 +1069,11 @@ unittest
                 case error:
                 case no_node:
                 case node_disconnected:
+                    this.log.error(this.msg_buf);
+                    break;
+
+                // Fatal errors. Retrying will almost certainly result in the
+                // same error.
                 case node_error:
                 case wrong_node:
                 case unsupported:
@@ -1066,6 +1131,11 @@ unittest
                 case error:
                 case no_node:
                 case node_disconnected:
+                    this.log.error(this.msg_buf);
+                    break;
+
+                // Fatal errors. Retrying will almost certainly result in the
+                // same error.
                 case node_error:
                 case wrong_node:
                 case unsupported:
