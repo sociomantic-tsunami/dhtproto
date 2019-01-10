@@ -55,6 +55,9 @@ public class ChannelSerializer ( S )
     /// Path of the dump file.
     private istring path;
 
+    /// Buffer for formatting temporary paths (see forkEntryPoint()).
+    private mstring temp_path;
+
     /// Buffered output instance.
     private BufferedOutput buffered_output;
 
@@ -254,14 +257,16 @@ public class ChannelSerializer ( S )
     {
         size_t num_records;
 
-        scope file = new File(this.path, File.Style(File.Access.Write,
-            File.Open.Create, File.Share.None));
+        // Open file (with a temp name) and initialise buffer.
+        scope file = new TempFile(this.path, this.temp_path);
         this.buffered_output.output(file);
         this.buffered_output.clear();
 
-        scope ( exit )
+        // Once the file is written successfully, swap it to the real path.
+        scope ( success )
         {
             this.buffered_output.flush();
+            file.swap();
         }
 
         scope dumpRecord =
@@ -369,5 +374,67 @@ unittest
 
         auto ser = new ChannelSerializer!(S)("test_channel");
         ser.load(&containerInsert);
+    }
+}
+
+/// System call. (Not defined in the runtime.)
+extern ( C )
+{
+    int mkstemp(char *path_template);
+}
+
+/*******************************************************************************
+
+    Helper class to write to a file in two steps:
+        1. Opens a temp file to write to.
+        2. Once file writing has finished (and succeeded), swap the path of the
+           temp file to the final path.
+
+*******************************************************************************/
+
+private class TempFile : File
+{
+    import ocean.core.Array : concat;
+    import core.stdc.stdio : rename;
+
+    /// Final path of file.
+    private cstring final_path;
+
+    /// Pointer to buffer to format temp file name.
+    private mstring* temp_path;
+
+    /***************************************************************************
+
+        Opens a temp file ready for writing.
+
+        Params:
+            path = final file path
+            temp_path = pointer to buffer to format temp file name
+
+    ***************************************************************************/
+
+    public this ( cstring final_path, ref mstring temp_path )
+    {
+        this.final_path = final_path;
+        this.temp_path = &temp_path;
+
+        (*this.temp_path).concat(this.final_path, "XXXXXX", "\0");
+        auto fd = mkstemp(this.temp_path.ptr);
+        if ( fd == -1 )
+            this.error(); // Throws an IOException
+
+        // The oddly-named 'reopen' allows us to set the Device's fd.
+        this.reopen(cast(Handle)fd);
+    }
+
+    /***************************************************************************
+
+        Swaps the temp file to the final file path.
+
+    ***************************************************************************/
+
+    public void swap ( )
+    {
+        rename(this.temp_path.ptr, this.final_path.ptr);
     }
 }

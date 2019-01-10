@@ -22,6 +22,7 @@ import ocean.util.serialize.contiguous.Deserializer;
 import ocean.util.serialize.contiguous.Serializer;
 import ocean.util.test.DirectorySandbox;
 import ocean.util.container.map.HashMap;
+import Path = ocean.io.Path;
 
 version ( UnitTest ) { }
 else
@@ -44,14 +45,14 @@ int main ( istring[] args )
     Deserializer.deserialize(Serializer.serialize(s1_init, ser_buf), s1);
     Deserializer.deserialize(Serializer.serialize(s2_init, ser_buf), s2);
 
-    auto ser = new ChannelSerializer!(S)("test_channel");
-
     // AA dump / load test
     {
+        auto ser = new ChannelSerializer!(S)("test_channel");
         Contiguous!(S)[hash_t] out_aa;
         out_aa[0] = s1;
         out_aa[1] = s2;
         ser.dump(out_aa, true);
+        test(Path.exists("test_channel"));
 
         Contiguous!(S)[hash_t] in_aa;
         ser.load(in_aa);
@@ -64,10 +65,12 @@ int main ( istring[] args )
 
     // Map dump / load test
     {
+        auto ser = new ChannelSerializer!(S)("test_channel");
         auto map = new HashMap!(Contiguous!(S))(10);
         *map.put(0) = s1;
         *map.put(1) = s2;
         ser.dump(map, true);
+        test(Path.exists("test_channel"));
 
         map.clear();
         ser.load(map);
@@ -76,6 +79,19 @@ int main ( istring[] args )
         test(deepEquals(*(map[1].ptr), *(s2.ptr)));
         test!("!=")(map[0].ptr.str.ptr, s1.ptr.str.ptr);
         test!("!=")(map[1].ptr.str.ptr, s2.ptr.str.ptr);
+    }
+
+    // Broken dump test
+    {
+        auto ser = new ChannelSerializer!(S)("failed_channel");
+
+        void dumpRecord ( void delegate ( hash_t, ref Contiguous!(S) ) record_dg )
+        {
+            throw new Exception("File write error");
+        }
+
+        testThrown!()(ser.dump(&dumpRecord, true));
+        test(!Path.exists("failed_channel"));
     }
 
     return 0;
