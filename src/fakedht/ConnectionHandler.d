@@ -72,6 +72,8 @@ public class DhtConnectionHandler :
     import fakedht.request.Remove;
     import fakedht.request.RemoveChannel;
 
+    import ocean.core.Enforce;
+    import ocean.core.Verify;
     import ocean.io.Stdout : Stderr;
     import core.stdc.stdlib : abort;
 
@@ -199,7 +201,8 @@ public class DhtConnectionHandler :
 
         RedistributeNode[]* getRedistributeNodeBuffer ( )
         {
-            assert (false);
+            enforce(false);
+            return null;
         }
     }
 
