@@ -26,7 +26,7 @@ import ocean.core.Test;
 import ocean.io.select.fiber.SelectFiber;
 import ocean.io.select.client.FiberTimerEvent;
 
-const PRIORITY = 90;
+static immutable PRIORITY = 90;
 
 /*******************************************************************************
 
@@ -51,7 +51,7 @@ class ListenRemovedChannel : DhtTestCase
     override public void run ( )
     {
         auto listener = this.dht.startListen(this.test_channel);
-        const key = 0;
+        static immutable key = 0;
         this.dht.put(this.test_channel, key, "whatever"[]);
         listener.waitNextEvent();
         test(!listener.finished);
@@ -87,7 +87,7 @@ class ListenTrigger : DhtTestCase
     {
         auto listener = this.dht.startListen(this.test_channel);
 
-        const key = 5;
+        static immutable key = 5;
         this.dht.put(this.test_channel, key, "value"[]);
         listener.waitNextEvent();
         test!("==")(listener.data.length, 1);
