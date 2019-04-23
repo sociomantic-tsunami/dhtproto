@@ -47,15 +47,15 @@ public struct NodeAvailabilty
 
     public void error ( NodeItem node )
     {
-        if ( auto tracker = node.toHash() in this.error_trackers )
+        if ( auto tracker = node.toHash() in (&this).error_trackers )
         {
             tracker.error();
         }
         else
         {
-            auto tracker = NodeErrorTracker(this);
+            auto tracker = NodeErrorTracker((&this));
             tracker.error();
-            this.error_trackers[node.toHash()] = tracker;
+            (&this).error_trackers[node.toHash()] = tracker;
         }
     }
 
@@ -104,7 +104,7 @@ public struct NodeAvailabilty
 
     public bool available ( NodeItem node )
     {
-        if ( auto tracker = node.toHash() in this.error_trackers )
+        if ( auto tracker = node.toHash() in (&this).error_trackers )
             return tracker.available();
         else
             return true;
@@ -128,7 +128,7 @@ public struct NodeAvailabilty
 
         public void error ( )
         {
-            this.last_error_timestamp = time();
+            (&this).last_error_timestamp = time();
         }
 
         /***********************************************************************
@@ -144,8 +144,8 @@ public struct NodeAvailabilty
 
         public bool available ( )
         {
-            auto diff = time() - this.last_error_timestamp;
-            return diff >= this.outer.retry_delay_s;
+            auto diff = time() - (&this).last_error_timestamp;
+            return diff >= (&this).outer.retry_delay_s;
         }
 
         /***********************************************************************
