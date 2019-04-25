@@ -22,7 +22,6 @@ import turtle.env.model.Node;
 import fakedht.DhtNode;
 import fakedht.Storage;
 
-import ocean.core.Verify;
 import ocean.core.Test;
 import ocean.task.Scheduler;
 import ocean.task.util.Timer;
@@ -51,8 +50,12 @@ public alias fakedht.Storage.MissingRecordException MissingRecordException;
 *******************************************************************************/
 
 public Dht dht()
+in
 {
-    verify(_dht !is null, "Must call `Dht.initialize` first");
+    assert (_dht !is null, "Must call `Dht.initialize` first");
+}
+body
+{
     return _dht;
 }
 
@@ -484,7 +487,7 @@ public class Dht : Node!(DhtNode, "dht")
 
     override public AddrPort node_addrport ( )
     {
-        verify(this.node !is null);
+        assert(this.node);
 
         AddrPort addrport;
         addrport.setAddress(this.node.node_item.Address);
