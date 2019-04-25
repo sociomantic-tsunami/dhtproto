@@ -66,7 +66,7 @@ static:
 
     ***************************************************************************/
 
-    public const RecordSizeLimit = RecordBatcher.DefaultMaxBatchSize;
+    public const RecordSizeLimit = RecordBatch.DefaultMaxBatchSize;
 
 
     /***************************************************************************

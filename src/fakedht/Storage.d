@@ -200,9 +200,6 @@ struct DHT
 
 class Channel
 {
-    import ocean.core.Verify;
-    import ocean.text.convert.Formatter;
-
     /***************************************************************************
 
         Defines a channel listener type which expects one argument for
@@ -259,7 +256,7 @@ class Channel
 
         public void listenerFlushed ( )
         {
-            verify(this.sending_listeners > 0);
+            assert(this.sending_listeners);
             this.sending_listeners--;
 
             if ( this.sending_listeners == 0 && (this.caller !is null) )
@@ -366,19 +363,6 @@ class Channel
 
     /***************************************************************************
 
-        Ditto
-
-    ***************************************************************************/
-
-    public ValueType get ( hash_t key )
-    {
-        mstring key_str;
-        sformat(key_str, "{:x16}", key);
-        return this.get(key_str);
-    }
-
-    /***************************************************************************
-
         Params:
             key = record key to look for
 
@@ -395,19 +379,6 @@ class Channel
         auto value = key in this.data;
         enforce!(MissingRecordException)(value !is null, idup(key));
         return *value;
-    }
-
-    /***************************************************************************
-
-        Ditto
-
-    ***************************************************************************/
-
-    public ValueType getVerify ( hash_t key )
-    {
-        mstring key_str;
-        sformat(key_str, "{:x16}", key);
-        return this.getVerify(key_str);
     }
 
     /***************************************************************************
@@ -433,19 +404,6 @@ class Channel
 
     /***************************************************************************
 
-        Ditto
-
-    ***************************************************************************/
-
-    public void put ( hash_t key, ValueType value )
-    {
-        mstring key_str;
-        sformat(key_str, "{:x16}", key);
-        this.put(key_str, value);
-    }
-
-    /***************************************************************************
-
         Counts total size taken by all records
 
         Params:
@@ -466,39 +424,11 @@ class Channel
         Params:
             key = key of the record to remove
 
-        Returns:
-            true if the record existed or false if it did not
-
     ***************************************************************************/
 
-    public bool remove ( cstring key )
-    out ( existed )
+    public void remove ( cstring key )
     {
-        assert((key in this.data) is null);
-    }
-    body
-    {
-        auto existed = (key in this.data) !is null;
         this.data.remove(idup(key));
-
-        this.listeners.trigger(Listeners.Listener.Code.Deletion, key);
-        if (Task.getThis() !is null)
-            this.listeners.waitUntilFlushed();
-
-        return existed;
-    }
-
-    /***************************************************************************
-
-        Ditto
-
-    ***************************************************************************/
-
-    public bool remove ( hash_t key )
-    {
-        mstring key_str;
-        sformat(key_str, "{:x16}", key);
-        return this.remove(key_str);
     }
 
     /***************************************************************************
