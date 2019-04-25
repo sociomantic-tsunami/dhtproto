@@ -32,7 +32,6 @@ import ocean.util.log.Logger;
 class DhtClient
 {
     import ocean.core.Enforce;
-    import ocean.core.Verify;
     import ocean.core.Array : copy;
     import ocean.task.Task;
     import ocean.task.Scheduler;
@@ -79,7 +78,7 @@ class DhtClient
         public this ( )
         {
             this.task = Task.getThis();
-            verify(this.task !is null);
+            assert(this.task !is null);
         }
 
         /***********************************************************************
@@ -204,7 +203,7 @@ class DhtClient
         this.swarm_client.addNode("127.0.0.1".dup, port);
 
         auto task = Task.getThis();
-        verify(task !is null);
+        assert(task !is null);
 
         bool finished;
 
@@ -629,7 +628,7 @@ class DhtClient
         public this ( )
         {
             this.task = Task.getThis();
-            verify(this.task !is null);
+            assert(this.task !is null);
         }
 
         /***********************************************************************
