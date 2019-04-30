@@ -229,7 +229,7 @@ public class DhtRequestConnection :
 
         override protected mstring new_batch_buffer ( )
         {
-            return new char[RecordBatch.DefaultMaxBatchSize];
+            return new char[DhtConst.RecordSizeLimit];
         }
 
 
