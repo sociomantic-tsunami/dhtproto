@@ -66,6 +66,7 @@ static:
 
     ***************************************************************************/
 
+    deprecated("The record size limit is now specified as a config variable. Drop usage of this constant.")
     public const RecordSizeLimit = RecordBatcher.DefaultMaxBatchSize;
 
 
