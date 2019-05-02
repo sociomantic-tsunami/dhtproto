@@ -34,6 +34,8 @@ public abstract scope class Put : SingleKey
 
     import dhtproto.client.legacy.DhtConst;
 
+    import swarm.util.RecordBatcher;
+
     /***************************************************************************
 
         Flag that indicates if it was actually possible to read the record
@@ -94,7 +96,7 @@ public abstract scope class Put : SingleKey
 
     protected size_t recordSizeLimit ( )
     {
-        return DhtConst.RecordSizeLimit;
+        return RecordBatcher.DefaultMaxBatchSize;
     }
 
     /***************************************************************************
