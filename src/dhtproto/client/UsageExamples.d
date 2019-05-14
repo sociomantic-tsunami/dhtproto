@@ -149,7 +149,8 @@ version ( UnitTest )
                     this.log.error(this.msg_buf);
                     break;
 
-                mixin(typeof(info).handleInvalidCases);
+                case none:
+                    break;
             }
         }
     }
@@ -223,7 +224,8 @@ unittest
                     this.log.error(this.msg_buf);
                     break;
 
-                mixin(typeof(info).handleInvalidCases);
+                case none:
+                    break;
             }
         }
     }
@@ -272,7 +274,8 @@ unittest
                     this.log.error(this.msg_buf);
                     break;
 
-                mixin(typeof(info).handleInvalidCases);
+                case none:
+                    break;
             }
         }
     }
@@ -347,7 +350,8 @@ unittest
                     this.log.error(this.msg_buf);
                     break;
 
-                mixin(typeof(info).handleInvalidCases);
+                case none:
+                    break;
             }
         }
     }
@@ -415,7 +419,8 @@ unittest
                     this.log.error(this.msg_buf);
                     break;
 
-                mixin(typeof(info).handleInvalidCases);
+                case none:
+                    break;
             }
         }
     }
@@ -467,7 +472,8 @@ unittest
                     this.log.error(this.msg_buf);
                     break;
 
-                mixin(typeof(info).handleInvalidCases);
+                case none:
+                    break;
             }
         }
     }
@@ -547,7 +553,8 @@ unittest
                     this.log.error(this.msg_buf);
                     break;
 
-                mixin(typeof(info).handleInvalidCases);
+                case none:
+                    break;
             }
         }
     }
@@ -597,7 +604,8 @@ unittest
                     this.log.error(this.msg_buf);
                     break;
 
-                mixin(typeof(info).handleInvalidCases);
+                case none:
+                    break;
             }
         }
     }
@@ -674,7 +682,8 @@ unittest
                     this.log.error(this.msg_buf);
                     break;
 
-                mixin(typeof(info).handleInvalidCases);
+                case none:
+                    break;
             }
         }
     }
@@ -723,7 +732,8 @@ unittest
                     this.log.error(this.msg_buf);
                     break;
 
-                mixin(typeof(info).handleInvalidCases);
+                case none:
+                    break;
             }
         }
     }
@@ -826,7 +836,8 @@ unittest
                     this.log.error(this.msg_buf);
                     break;
 
-                mixin(typeof(info).handleInvalidCases);
+                case none:
+                    break;
             }
         }
 
@@ -904,7 +915,8 @@ unittest
                     this.log.error(this.msg_buf);
                     break;
 
-                mixin(typeof(info).handleInvalidCases);
+                case none:
+                    break;
             }
         }
     }
@@ -1003,7 +1015,8 @@ unittest
                     this.log.error(this.msg_buf);
                     break;
 
-                mixin(typeof(info).handleInvalidCases);
+                case none:
+                    break;
             }
         }
     }
@@ -1080,7 +1093,8 @@ unittest
                     this.log.error(this.msg_buf);
                     break;
 
-                mixin(typeof(info).handleInvalidCases);
+                case none:
+                    break;
             }
         }
     }
@@ -1142,7 +1156,8 @@ unittest
                     this.log.error(this.msg_buf);
                     break;
 
-                mixin(typeof(info).handleInvalidCases);
+                case none:
+                    break;
             }
         }
     }

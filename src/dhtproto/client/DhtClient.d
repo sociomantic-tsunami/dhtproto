@@ -781,7 +781,8 @@ public class DhtClient : IClient
                 log.error(this.msg_buf);
                 break;
 
-            mixin(typeof(info).handleInvalidCases);
+            case none:
+                break;
         }
     }
 

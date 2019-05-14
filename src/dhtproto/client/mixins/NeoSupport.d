@@ -905,7 +905,8 @@ template NeoSupport ( )
                             task.resume();
                         break;
 
-                    mixin(typeof(info).handleInvalidCases);
+                    case none:
+                        break;
                 }
             }
 
@@ -1051,7 +1052,8 @@ template NeoSupport ( )
                             task.resume();
                         break;
 
-                    mixin(typeof(info).handleInvalidCases);
+                    case none:
+                        break;
                 }
             }
 
@@ -1233,7 +1235,8 @@ template NeoSupport ( )
                         res.succeeded = false;
                         break;
 
-                    mixin(typeof(info).handleInvalidCases);
+                    case none:
+                        break;
                 }
 
                 // All Exists notifications indicate that the request has
@@ -1508,7 +1511,8 @@ template NeoSupport ( )
                         // Irrelevant.
                         break;
 
-                    mixin(typeof(info).handleInvalidCases);
+                    case none:
+                        break;
                 }
             }
 
@@ -1533,7 +1537,7 @@ template NeoSupport ( )
                     if (this.state == State.Finished
                             || this.state == State.Stopped
                             || this.error)
-                        break; 
+                        break;
 
                     ret = dg(this.record_key, *this.record_value);
 
@@ -1679,7 +1683,8 @@ template NeoSupport ( )
                         this.error = true;
                         break;
 
-                    mixin(typeof(info).handleInvalidCases);
+                    case none:
+                        break;
                 }
             }
 
@@ -1703,7 +1708,7 @@ template NeoSupport ( )
                     if (this.state == State.Finished
                             || this.state == State.Stopped
                             || this.error)
-                        break; 
+                        break;
 
                     ret = dg(*this.channel_name);
 
@@ -1821,7 +1826,8 @@ template NeoSupport ( )
                             task.resume();
                         break;
 
-                    mixin(typeof(info).handleInvalidCases);
+                    case none:
+                        break;
                 }
             }
 
@@ -1967,7 +1973,9 @@ template NeoSupport ( )
                     info.error_while_connecting.node_addr,
                     info.error_while_connecting.e);
                 break;
-            mixin(typeof(info).handleInvalidCases);
+
+            case none:
+                break;
         }
 
         this.user_conn_notifier(n);

@@ -70,7 +70,7 @@ public abstract class GetAllProtocol_v0 : IRequestHandler
         import ocean.text.Search;
 
         /// Sub-array matcher. (Type ubyte as doesn't compile with void.)
-        private SearchFruct!(Const!(ubyte)) matcher;
+        private SearchFruct matcher;
 
         /// Filtering active?
         private bool active;
@@ -89,7 +89,7 @@ public abstract class GetAllProtocol_v0 : IRequestHandler
         {
             if ( filter.length > 0 )
             {
-                this.matcher = search(cast(Const!(ubyte)[])filter);
+                this.matcher = search(cast(Const!(char)[])filter);
                 this.active = true;
             }
         }
@@ -110,7 +110,7 @@ public abstract class GetAllProtocol_v0 : IRequestHandler
         public bool match ( in void[] value )
         {
             if ( this.active )
-                return this.matcher.forward(cast(Const!(ubyte)[])value)
+                return this.matcher.forward(cast(Const!(char)[])value)
                     < value.length;
             else
                 return true;
