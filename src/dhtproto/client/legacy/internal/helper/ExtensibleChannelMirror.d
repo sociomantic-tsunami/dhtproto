@@ -72,7 +72,7 @@ public class ExtensibleMirror
     ( Dht : DhtClient, MirrorImpl : MirrorBase!(Dht), Plugins ... ) : MirrorImpl
 {
     import ocean.core.Exception;
-    import ocean.core.Traits : ctfe_i2a;
+    import CTFE = ocean.meta.codegen.CTFE;
 
     import swarm.util.Hash : isHash, straightToHash;
 
@@ -226,9 +226,9 @@ public class ExtensibleMirror
         {
             auto input = i == 0
                 ? "raw" // feed the initial, raw record into the first plugin
-                : "r" ~ ctfe_i2a(i - 1); // subsequently, use output of previous
-            auto output = "r" ~ ctfe_i2a(i);
-            auto plugin = "this.plugin_instances[" ~ ctfe_i2a(i) ~ "]";
+                : "r" ~ CTFE.toString(i - 1); // subsequently, use output of previous
+            auto output = "r" ~ CTFE.toString(i);
+            auto plugin = "this.plugin_instances[" ~ CTFE.toString(i) ~ "]";
 
             code ~= "auto " ~ output ~ " = " ~ plugin ~ "(" ~ input ~ ");";
         }

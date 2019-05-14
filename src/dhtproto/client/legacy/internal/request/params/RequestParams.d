@@ -39,7 +39,6 @@ import dhtproto.client.legacy.DhtConst;
 import dhtproto.client.legacy.internal.request.notifier.RequestNotification;
 
 import ocean.core.SmartUnion;
-import ocean.core.Traits;
 
 import swarm.util.Hash;
 
@@ -199,7 +198,7 @@ public class RequestParams : IChannelRequestParams
     override protected void copy__ ( IRequestParams params )
     {
         auto dht_params = cast(RequestParams)params;
-        copyClassFields(this, dht_params);
+        this.tupleof[] = dht_params.tupleof[];
     }
 
 

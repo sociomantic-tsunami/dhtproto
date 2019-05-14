@@ -19,7 +19,7 @@ module dhtproto.node.request.Listen;
 *******************************************************************************/
 
 import ocean.transition;
-import ocean.core.Traits;
+import ocean.meta.traits.Aggregates : hasMethod;
 import ocean.io.select.client.model.ISelectClient;
 
 import dhtproto.node.request.model.SingleChannel;
