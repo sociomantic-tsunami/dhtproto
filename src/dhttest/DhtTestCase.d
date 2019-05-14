@@ -1,5 +1,5 @@
 /*******************************************************************************
-    
+
     Common base for all dhttest test cases. Provides DHT client instance and
     defines standard name for tested channel. Automatically performs DHT
     client handshake before test starts.
@@ -303,7 +303,7 @@ abstract class NeoDhtTestCase : TestCase
                 this.log.warn("Neo connection error on {}:{}: {} @ {}:{}",
                     info.connection_error.node_addr.address_bytes,
                     info.connection_error.node_addr.port,
-                    getMsg(info.connection_error.e),
+                    info.connection_error.e.message,
                     info.connection_error.e.file, info.connection_error.e.line);
                 break;
 

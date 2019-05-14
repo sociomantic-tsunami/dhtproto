@@ -58,9 +58,8 @@ class NoRecord : NeoDhtTestCase
                 case node_error:
                 case wrong_node:
                 case unsupported:
+                case none:
                     break;
-
-                mixin(typeof(info).handleInvalidCases);
             }
         }
 
@@ -114,9 +113,8 @@ class Update : NeoDhtTestCase
                 case node_error:
                 case wrong_node:
                 case unsupported:
+                case none:
                     break;
-
-                mixin(typeof(info).handleInvalidCases);
             }
         }
 
@@ -197,9 +195,8 @@ class SerializerUpdate : NeoDhtTestCase
                 case node_error:
                 case wrong_node:
                 case unsupported:
+                case none:
                     break;
-
-                mixin(typeof(info).handleInvalidCases);
             }
         }
 
