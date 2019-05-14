@@ -297,9 +297,6 @@ private struct FirstROCHandler
                         case Retry:
                             // No record on this node, retry on the next one.
                             break;
-                        version (D_Version2){} else {
-                            default: assert(false);
-                        }
                     }
                 };
             this.use_node(node_hash_range.addr, conn_dg);
