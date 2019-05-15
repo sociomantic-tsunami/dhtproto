@@ -53,7 +53,7 @@ public final class NodeHashRanges : NodeHashRangesBase
 
     ***************************************************************************/
 
-    public this ( ConnectionSet connections, NewNodeNotifier new_node_dg )
+    public this ( ConnectionSet connections, scope NewNodeNotifier new_node_dg )
     {
         this.connections = connections;
         this.new_node_dg = new_node_dg;
@@ -89,7 +89,7 @@ public final class NodeHashRanges : NodeHashRangesBase
 
     public void getFromNode ( hash_t h,
         VoidBufferAsArrayOf!(NodeHashRange) node_hash_ranges, UseNodeDg use_node,
-        bool delegate ( RequestOnConn.EventDispatcher ) get )
+        scope bool delegate ( RequestOnConn.EventDispatcher ) get )
     {
         auto nodes = this.getNodesForHash(h, node_hash_ranges);
         if ( nodes.length == 0 )
@@ -147,7 +147,7 @@ public final class NodeHashRanges : NodeHashRangesBase
 
     public void removeFromNodes ( hash_t h,
         VoidBufferAsArrayOf!(NodeHashRange) node_hash_ranges, UseNodeDg use_node,
-        bool delegate ( RequestOnConn.EventDispatcher ) remove )
+        scope bool delegate ( RequestOnConn.EventDispatcher ) remove )
     {
         auto nodes = this.getNodesForHash(h, node_hash_ranges);
         if ( nodes.length == 0 )
@@ -191,7 +191,7 @@ public final class NodeHashRanges : NodeHashRangesBase
 
     public void putToNode ( hash_t h,
         VoidBufferAsArrayOf!(NodeHashRange) node_hash_ranges, UseNodeDg use_node,
-        void delegate ( RequestOnConn.EventDispatcher ) put )
+        scope void delegate ( RequestOnConn.EventDispatcher ) put )
     {
         auto nodes = this.getNodesForHash(h, node_hash_ranges);
         if ( nodes.length == 0 )

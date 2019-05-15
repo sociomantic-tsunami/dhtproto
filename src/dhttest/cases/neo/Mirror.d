@@ -50,7 +50,7 @@ public class MirrorRemove : NeoDhtTestCase
 
         void delNotifier ( DhtClient.RequestNotification info ) { }
 
-        const end_after_deletions = 5;
+        static immutable end_after_deletions = 5;
         auto mirror = Mirror(this.dht);
         mirror.start(mirror_settings, this.test_channel,
             ( DhtClient.Neo.Mirror.Notification info,
@@ -120,7 +120,7 @@ public class MirrorUpdate : NeoDhtTestCase
         void putNotifier ( DhtClient.Neo.Put.Notification info,
             Const!(DhtClient.Neo.Put.Args) args ) { }
 
-        const num_written = 100;
+        static immutable num_written = 100;
         auto mirror = Mirror(this.dht);
         mirror.start(mirror_settings, this.test_channel,
             ( DhtClient.Neo.Mirror.Notification info,
@@ -181,7 +181,7 @@ public class MirrorConnError : NeoDhtTestCase
     {
         auto task = Task.getThis();
 
-        const num_written = 100;
+        static immutable num_written = 100;
         putRecords(this.dht, this.test_channel, num_written);
 
         DhtClient.Neo.Mirror.Settings mirror_settings;
@@ -261,7 +261,7 @@ public class MirrorSuspend : NeoDhtTestCase
         mirror_settings.initial_refresh = false;
         mirror_settings.periodic_refresh_s = 0;
 
-        const end_after_updates = 1_000;
+        static immutable end_after_updates = 1_000;
         size_t num_written;
         auto mirror = Mirror(this.dht);
 
@@ -372,10 +372,10 @@ public class MirrorRefresh : NeoDhtTestCase
         mirror_settings.initial_refresh = false;
         mirror_settings.periodic_refresh_s = 1;
 
-        const num_written = 1_000;
+        static immutable num_written = 1_000;
         putRecords(this.dht, this.test_channel, num_written);
 
-        const end_after_refreshes = num_written * 3;
+        static immutable end_after_refreshes = num_written * 3;
         auto mirror = Mirror(this.dht);
         mirror.start(mirror_settings, this.test_channel,
             ( DhtClient.Neo.Mirror.Notification info,
@@ -434,7 +434,7 @@ public class MirrorRefreshSuspend : NeoDhtTestCase
         mirror_settings.initial_refresh = false;
         mirror_settings.periodic_refresh_s = 1;
 
-        const num_written = 500;
+        static immutable num_written = 500;
         putRecords(this.dht, this.test_channel, num_written);
 
         auto mirror = Mirror(this.dht);
@@ -448,7 +448,7 @@ public class MirrorRefreshSuspend : NeoDhtTestCase
         );
 
         bool mirror_suspended;
-        const end_after_refreshes = num_written * 3;
+        static immutable end_after_refreshes = num_written * 3;
         bool received_while_suspended;
         mirror.start(mirror_settings, this.test_channel,
             ( DhtClient.Neo.Mirror.Notification info,
@@ -577,7 +577,7 @@ public class MirrorRemoveChannel : NeoDhtTestCase
 *******************************************************************************/
 
 private void putRecords ( DhtClient dht, cstring channel, size_t num_records,
-    DhtClient.Neo.Put.Notifier notifier = null )
+    scope DhtClient.Neo.Put.Notifier notifier = null )
 {
     ubyte[] val;
     val.length = 128;
@@ -631,7 +631,7 @@ private struct Mirror
     ***************************************************************************/
 
     public void start ( DhtClient.Neo.Mirror.Settings mirror_settings,
-        cstring channel, DhtClient.Neo.Mirror.Notifier user_notifier )
+        cstring channel, scope DhtClient.Neo.Mirror.Notifier user_notifier )
     out
     {
         assert(this.user_notifier !is null);

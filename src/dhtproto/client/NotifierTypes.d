@@ -47,7 +47,7 @@ public struct RequestRecordInfo
 
     ***************************************************************************/
 
-    public void toString ( void delegate ( cstring chunk ) sink )
+    public void toString ( scope void delegate ( cstring chunk ) sink )
     {
         Formatter.sformat(
             sink,
@@ -92,7 +92,7 @@ public struct RequestDataUpdateInfo
 
     ***************************************************************************/
 
-    public void toString ( void delegate ( cstring chunk ) sink )
+    public void toString ( scope void delegate ( cstring chunk ) sink )
     {
         Formatter.sformat(
             sink,
@@ -126,7 +126,7 @@ public struct RequestKeyInfo
 
     ***************************************************************************/
 
-    public void toString ( void delegate ( cstring chunk ) sink )
+    public void toString ( scope void delegate ( cstring chunk ) sink )
     {
         Formatter.sformat(
             sink,

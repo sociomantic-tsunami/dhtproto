@@ -44,7 +44,7 @@ public class GetAllBlocking : NeoDhtTestCase
     {
         auto task = Task.getThis();
 
-        const num_records = 1000;
+        static immutable num_records = 1000;
         putRecords(this.dht, this.test_channel, num_records);
 
         void[] buf;
@@ -87,7 +87,7 @@ public class GetAllSuspend : NeoDhtTestCase
     {
         auto task = Task.getThis();
 
-        const num_records = 1000;
+        static immutable num_records = 1000;
         putRecords(this.dht, this.test_channel, num_records);
 
         auto getall = GetAll(this.dht);
@@ -168,7 +168,7 @@ public class GetAllConnError : NeoDhtTestCase
     {
         auto task = Task.getThis();
 
-        const num_records = 1000;
+        static immutable num_records = 1000;
         putRecords(this.dht, this.test_channel, num_records);
 
         uint disconnection_count;
@@ -272,7 +272,7 @@ private struct GetAll
     ***************************************************************************/
 
     public void start ( cstring channel,
-        DhtClient.Neo.GetAll.Notifier user_notifier )
+        scope DhtClient.Neo.GetAll.Notifier user_notifier )
     out
     {
         assert(this.user_notifier !is null);

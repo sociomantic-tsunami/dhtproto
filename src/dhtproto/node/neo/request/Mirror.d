@@ -86,7 +86,7 @@ public abstract class MirrorProtocol_v0 : IRequestHandler
         private E[] queue;
 
         /// Maximum allowed size of the queue in bytes.
-        private const max_size = 256 * 1024;
+        private enum max_size = 256 * 1024;
 
         /// Maximum allowed elements of type E of the queue.
         private size_t max_elems;
@@ -222,7 +222,7 @@ public abstract class MirrorProtocol_v0 : IRequestHandler
         Queue!(Update) q;
         q.initialise(backing);
 
-        const elems_per_cycle = 7;
+        static immutable elems_per_cycle = 7;
         uint write_wraps, read_wraps;
         Update update;
         for ( uint i; i < q.max_elems; i++ )
@@ -419,7 +419,7 @@ public abstract class MirrorProtocol_v0 : IRequestHandler
         this.value_buffer = this.resources.getVoidBuffer();
         this.update_queue.initialise(*this.resources.getVoidBuffer());
         this.refresh_queue.initialise(*this.resources.getVoidBuffer());
-        const max_batch_size = 64 * 1024; // TODO: read from config
+        static immutable max_batch_size = 64 * 1024; // TODO: read from config
         this.refresh_batch.initialise(this.resources.getVoidBuffer(),
             max_batch_size);
         this.compress_buffer = this.resources.getVoidBuffer();

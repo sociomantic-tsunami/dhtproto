@@ -76,8 +76,8 @@ class RetryHandshake
     ***************************************************************************/
 
     public this ( EpollSelectDispatcher epoll, DhtClient dht,
-        size_t wait_time, void delegate ( ) handshake_complete_dg = null,
-        void delegate ( NodeItem ) one_node_handshake_dg = null )
+        size_t wait_time, scope void delegate ( ) handshake_complete_dg = null,
+        scope void delegate ( NodeItem ) one_node_handshake_dg = null )
     {
         this.wait_time = wait_time;
 

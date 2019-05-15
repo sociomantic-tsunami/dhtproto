@@ -158,8 +158,8 @@ public class ExtensibleMirror
 
     public this ( Dht dht, cstring channel,
         uint update_time_s, uint retry_time_s,
-        Dht.RequestNotification.Callback request_notifier,
-        PluginNotifier plugin_notifier,
+        scope Dht.RequestNotification.Callback request_notifier,
+        scope PluginNotifier plugin_notifier,
         Plugins plugin_instances )
     {
         super(dht, channel, update_time_s, retry_time_s, request_notifier);
@@ -331,7 +331,7 @@ unittest
         enforce(handshake_ok);
 
         // Add some records to the channel being mirrored
-        const num_records = 10;
+        static immutable num_records = 10;
         for ( hash_t i = 0; i < num_records; i++ )
         {
             mstring put_dg ( DhtClient.RequestContext c )
@@ -520,7 +520,7 @@ public class RawRecordDeserializer ( T )
 
     ***************************************************************************/
 
-    private const bool isVersioned = Version.Info!(T).exists;
+    private static immutable bool isVersioned = Version.Info!(T).exists;
 
     static if (isVersioned)
     {

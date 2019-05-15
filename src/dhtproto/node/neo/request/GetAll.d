@@ -269,7 +269,7 @@ public abstract class GetAllProtocol_v0 : IRequestHandler
     ***************************************************************************/
 
     abstract protected bool getNext (
-        void delegate ( hash_t key, Const!(void)[] value ) dg );
+        scope void delegate ( hash_t key, Const!(void)[] value ) dg );
 
     /***************************************************************************
 
@@ -292,7 +292,7 @@ public abstract class GetAllProtocol_v0 : IRequestHandler
         public DelayedSuspender suspender;
 
         /// Fiber resume code used to resume DelayedSuspender.
-        private const ResumeAfterSuspension = 1;
+        private static immutable ResumeAfterSuspension = 1;
 
         /***********************************************************************
 

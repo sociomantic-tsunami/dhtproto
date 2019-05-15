@@ -96,5 +96,5 @@ public abstract class GetChannelsProtocol_v0 : IRequestHandler
 
     ***************************************************************************/
 
-    protected abstract int opApply ( int delegate ( ref cstring ) dg );
+    protected abstract int opApply ( scope int delegate ( ref cstring ) dg );
 }

@@ -119,7 +119,7 @@ public struct Update
         SharedWorking, Notification);
 
     /// Fiber resume code.
-    const SecondROCFinished = 1;
+    enum SecondROCFinished = 1;
 
     /***************************************************************************
 
@@ -142,7 +142,7 @@ public struct Update
     ***************************************************************************/
 
     public static void handler ( UseNodeDg use_node,
-        NewRequestOnConnDg new_request_on_conn, void[] context_blob )
+        scope NewRequestOnConnDg new_request_on_conn, void[] context_blob )
     {
         auto context = Update.getContext(context_blob);
         context.shared_working.result = SharedWorking.Result.Error;
