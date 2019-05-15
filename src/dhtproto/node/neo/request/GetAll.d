@@ -146,30 +146,8 @@ public abstract class GetAllProtocol_v0 : IRequest
     public void handle ( RequestOnConn connection, Object resources,
         Const!(void)[] init_payload )
     {
-        // Dummy implementation to satisfy interface definition
-    }
+        this.initialise(connection, resources);
 
-    /***************************************************************************
-
-        Called by the connection handler immediately after the request code and
-        version have been parsed from a message received over the connection.
-        Allows the request handler to process the remainder of the incoming
-        message, before the connection handler sends the supported code back to
-        the client.
-
-        Note: the initial payload is a slice of the connection's read buffer.
-        This means that when the request-on-conn fiber suspends, the contents of
-        the buffer (hence the slice) may change. It is thus *absolutely
-        essential* that this method does not suspend the fiber. (This precludes
-        all I/O operations on the connection.)
-
-        Params:
-            init_payload = initial message payload read from the connection
-
-    ***************************************************************************/
-
-    public void preSupportedCodeSent ( Const!(void)[] init_payload )
-    {
         bool continuing;
         hash_t continue_from;
         cstring channel;
@@ -185,17 +163,7 @@ public abstract class GetAllProtocol_v0 : IRequest
 
         // Set up filtering.
         this.filter.init(value_filter);
-    }
 
-    /***************************************************************************
-
-        Called by the connection handler after the supported code has been sent
-        back to the client.
-
-    ***************************************************************************/
-
-    public void postSupportedCodeSent ( )
-    {
         // Send status code
         this.connection.event_dispatcher.send(
             ( RequestOnConnBase.EventDispatcher.Payload payload )

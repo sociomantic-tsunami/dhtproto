@@ -100,42 +100,8 @@ public abstract scope class GetHashRangeProtocol_v0 : IRequest
     public void handle ( RequestOnConn connection, Object resources,
         Const!(void)[] init_payload )
     {
-        // Dummy implementation to satisfy interface definition
-    }
+        this.initialise(connection, resources);
 
-    /***************************************************************************
-
-        Called by the connection handler immediately after the request code and
-        version have been parsed from a message received over the connection.
-        Allows the request handler to process the remainder of the incoming
-        message, before the connection handler sends the supported code back to
-        the client.
-
-        Note: the initial payload is a slice of the connection's read buffer.
-        This means that when the request-on-conn fiber suspends, the contents of
-        the buffer (hence the slice) may change. It is thus *absolutely
-        essential* that this method does not suspend the fiber. (This precludes
-        all I/O operations on the connection.)
-
-        Params:
-            init_payload = initial message payload read from the connection
-
-    ***************************************************************************/
-
-    public void preSupportedCodeSent ( Const!(void)[] init_payload )
-    {
-        // Nothing more to parse from the payload.
-    }
-
-    /***************************************************************************
-
-        Called by the connection handler after the supported code has been sent
-        back to the client.
-
-    ***************************************************************************/
-
-    public void postSupportedCodeSent ( )
-    {
         hash_t min, max;
         this.getCurrentHashRange(min, max);
 
@@ -165,7 +131,7 @@ public abstract scope class GetHashRangeProtocol_v0 : IRequest
 
             // Wait for updates about the hash range
             this.resume_fiber_on_update = true;
-            auto resume_code = connection.suspendFiber();
+            auto resume_code = this.connection.suspendFiber();
             verify(resume_code == NodeFiberResumeCode.HashRangeUpdate,
                 "Unexpected fiber resume code");
             this.resume_fiber_on_update = false;
