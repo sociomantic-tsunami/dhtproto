@@ -186,7 +186,7 @@ public struct LegacyVerifier
 
     private void verifyGetAllFilter ( DhtClient dht, cstring channel )
     {
-        const filter = "0";
+        enum filter = "0";
 
         hash_t[] local;
         foreach ( k, v; this.local.data )
@@ -541,7 +541,7 @@ public struct NeoVerifier
         log.trace("\tVerifying channel with GetAll, filtering");
         auto task = Task.getThis();
 
-        const filter = "0";
+        enum filter = "0";
 
         hash_t[] local_filtered;
         foreach ( k, v; this.local.data )

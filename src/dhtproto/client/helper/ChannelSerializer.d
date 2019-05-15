@@ -97,7 +97,7 @@ public class ChannelSerializer ( S )
 
     public this ( istring path )
     {
-        const buffer_size = 64 * 1024;
+        static immutable buffer_size = 64 * 1024;
 
         this.path = path;
         this.buffered_output = new BufferedOutput(null, buffer_size);
@@ -124,7 +124,7 @@ public class ChannelSerializer ( S )
 
     public bool dump ( Contiguous!(S)[hash_t] aa, bool block = false )
     {
-        void dumpAA ( void delegate ( hash_t, ref Contiguous!(S) ) dump_record )
+        void dumpAA ( scope void delegate ( hash_t, ref Contiguous!(S) ) dump_record )
         {
             foreach ( k, v; aa)
                 dump_record(k, v);
@@ -148,7 +148,7 @@ public class ChannelSerializer ( S )
 
     public bool dump ( Map!(Contiguous!(S), hash_t) map, bool block = false )
     {
-        void dumpMap ( void delegate ( hash_t, ref Contiguous!(S) ) dump_record )
+        void dumpMap ( scope void delegate ( hash_t, ref Contiguous!(S) ) dump_record )
         {
             foreach ( k, v; map)
                 dump_record(k, v);
@@ -171,7 +171,7 @@ public class ChannelSerializer ( S )
 
     ***************************************************************************/
 
-    public bool dump ( DumpRecordDg record_dump_dg, bool block = false )
+    public bool dump ( scope DumpRecordDg record_dump_dg, bool block = false )
     {
         this.record_dump_dg = record_dump_dg;
         return this.fork.call(block);
@@ -222,7 +222,7 @@ public class ChannelSerializer ( S )
 
     ***************************************************************************/
 
-    public void load ( LoadRecordDg record_load_dg )
+    public void load ( scope LoadRecordDg record_load_dg )
     {
         size_t num_records;
         scope file = new File(this.path, File.ReadExisting);
@@ -346,7 +346,7 @@ unittest
     void dumpChannelFromContainer ( )
     {
         void containerIterator (
-            void delegate ( hash_t, ref Contiguous!(S) ) dump_record )
+            scope void delegate ( hash_t, ref Contiguous!(S) ) dump_record )
         {
             Contiguous!(S) v;
 

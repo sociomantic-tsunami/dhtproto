@@ -65,7 +65,7 @@ public class UpdateImpl_v0 : UpdateProtocol_v0
     ***************************************************************************/
 
     override protected bool get ( cstring channel, hash_t key,
-        void delegate ( Const!(void)[] value ) dg )
+        scope void delegate ( Const!(void)[] value ) dg )
     {
         auto value_in_channel = global_storage.getCreate(channel).get(key);
         if ( value_in_channel !is null )

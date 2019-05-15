@@ -56,7 +56,7 @@ static:
 
     ***************************************************************************/
 
-    public const ApiVersion = "20110401";
+    public enum ApiVersion = "20110401";
 
 
     /***************************************************************************
@@ -67,7 +67,7 @@ static:
     ***************************************************************************/
 
     deprecated("The record size limit is now specified as a config variable. Drop usage of this constant.")
-    public const RecordSizeLimit = RecordBatcher.DefaultMaxBatchSize;
+    public enum RecordSizeLimit = RecordBatcher.DefaultMaxBatchSize;
 
 
     /***************************************************************************

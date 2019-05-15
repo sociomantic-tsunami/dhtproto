@@ -205,7 +205,7 @@ template NeoSupport ( )
         ***********************************************************************/
 
         public RequestId put ( cstring channel, hash_t key, Const!(void)[] value,
-            Put.Notifier notifier )
+            scope Put.Notifier notifier )
         {
             auto params = Const!(Internals.Put.UserSpecifiedParams)(
                 Const!(Put.Args)(channel, key, value), notifier);
@@ -238,7 +238,7 @@ template NeoSupport ( )
         ***********************************************************************/
 
         public RequestId get ( Options ... ) ( cstring channel, hash_t key,
-            Get.Notifier notifier, Options options )
+            scope Get.Notifier notifier, Options options )
         {
             auto params = Const!(Internals.Get.UserSpecifiedParams)(
                 Const!(Get.Args)(channel, key), notifier);
@@ -277,7 +277,7 @@ template NeoSupport ( )
         ***********************************************************************/
 
         public RequestId exists ( cstring channel, hash_t key,
-            Exists.Notifier notifier )
+            scope Exists.Notifier notifier )
         {
             auto params = Const!(Internals.Exists.UserSpecifiedParams)(
                 Const!(Exists.Args)(channel, key), notifier);
@@ -307,7 +307,7 @@ template NeoSupport ( )
         ***********************************************************************/
 
         public RequestId remove ( cstring channel, hash_t key,
-            Remove.Notifier notifier )
+            scope Remove.Notifier notifier )
         {
             auto params = Const!(Internals.Remove.UserSpecifiedParams)(
                 Const!(Remove.Args)(channel, key), notifier);
@@ -337,7 +337,7 @@ template NeoSupport ( )
         ***********************************************************************/
 
         public RequestId update ( cstring channel, hash_t key,
-            Update.Notifier notifier )
+            scope Update.Notifier notifier )
         {
             auto params = Const!(Internals.Update.UserSpecifiedParams)(
                 Const!(Update.Args)(channel, key), notifier);
@@ -370,7 +370,7 @@ template NeoSupport ( )
         ***********************************************************************/
 
         public RequestId mirror ( Options ... ) ( cstring channel,
-            Mirror.Notifier notifier, Options options )
+            scope Mirror.Notifier notifier, Options options )
         {
             Mirror.Settings settings;
 
@@ -415,7 +415,7 @@ template NeoSupport ( )
         ***********************************************************************/
 
         public RequestId getAll ( Options ... ) ( cstring channel,
-            GetAll.Notifier notifier, Options options )
+            scope GetAll.Notifier notifier, Options options )
         {
             GetAll.Settings settings;
 
@@ -454,7 +454,7 @@ template NeoSupport ( )
 
         ***********************************************************************/
 
-        public RequestId getChannels ( GetChannels.Notifier notifier )
+        public RequestId getChannels ( scope GetChannels.Notifier notifier )
         {
             auto params = Const!(Internals.GetChannels.UserSpecifiedParams)(
                 Const!(GetChannels.Args)(), notifier);
@@ -484,7 +484,7 @@ template NeoSupport ( )
         ***********************************************************************/
 
         public RequestId removeChannel ( cstring channel,
-            RemoveChannel.Notifier notifier )
+            scope RemoveChannel.Notifier notifier )
         {
             auto params = Const!(Internals.RemoveChannel.UserSpecifiedParams)(
                 Const!(RemoveChannel.Args)(channel), notifier);
@@ -555,7 +555,7 @@ template NeoSupport ( )
         ***********************************************************************/
 
         public bool control ( ControllerInterface ) ( RequestId id,
-            void delegate ( ControllerInterface ) dg )
+            scope void delegate ( ControllerInterface ) dg )
         {
             alias Request!(ControllerInterface) R;
 
@@ -753,7 +753,7 @@ template NeoSupport ( )
 
         ***********************************************************************/
 
-        private void waitHashRangeQuery ( bool delegate ( ) finished )
+        private void waitHashRangeQuery ( scope bool delegate ( ) finished )
         {
             auto task = Task.getThis();
             verify(task !is null, "This method may only be called from inside a Task");
@@ -804,7 +804,7 @@ template NeoSupport ( )
         ***********************************************************************/
 
         public void put ( cstring channel, hash_t key, Const!(void)[] value,
-            Neo.Put.Notifier user_notifier )
+            scope Neo.Put.Notifier user_notifier )
         {
             verify(user_notifier !is null);
             auto task = Task.getThis();
@@ -934,7 +934,7 @@ template NeoSupport ( )
         ***********************************************************************/
 
         public void get ( cstring channel, hash_t key,
-            Neo.Get.Notifier user_notifier )
+            scope Neo.Get.Notifier user_notifier )
         {
             verify(user_notifier !is null);
             auto task = Task.getThis();
@@ -1079,7 +1079,7 @@ template NeoSupport ( )
         ***********************************************************************/
 
         public void update ( cstring channel, hash_t key,
-            Neo.Update.Notifier user_notifier )
+            scope Neo.Update.Notifier user_notifier )
         {
             verify(user_notifier !is null);
             auto task = Task.getThis();
@@ -1130,7 +1130,7 @@ template NeoSupport ( )
         ***********************************************************************/
 
         public void exists ( cstring channel, hash_t key,
-            Neo.Exists.Notifier user_notifier )
+            scope Neo.Exists.Notifier user_notifier )
         {
             verify(user_notifier !is null);
             auto task = Task.getThis();
@@ -1266,7 +1266,7 @@ template NeoSupport ( )
         ***********************************************************************/
 
         public void remove ( cstring channel, hash_t key,
-            Neo.Remove.Notifier user_notifier )
+            scope Neo.Remove.Notifier user_notifier )
         {
             verify(user_notifier !is null);
             auto task = Task.getThis();
@@ -1518,7 +1518,7 @@ template NeoSupport ( )
 
             *******************************************************************/
 
-            public int opApply ( int delegate ( ref hash_t key,
+            public int opApply ( scope int delegate ( ref hash_t key,
                 ref void[] value ) dg )
             {
                 int ret;
@@ -1689,7 +1689,7 @@ template NeoSupport ( )
 
             *******************************************************************/
 
-            public int opApply ( int delegate ( ref mstring channel_name ) dg )
+            public int opApply ( scope int delegate ( ref mstring channel_name ) dg )
             {
                 int ret;
 
@@ -1888,7 +1888,7 @@ template NeoSupport ( )
     ***************************************************************************/
 
     private void neoInit ( Neo.Config config,
-        Neo.DhtConnectionNotifier user_conn_notifier )
+        scope Neo.DhtConnectionNotifier user_conn_notifier )
     {
         verify(user_conn_notifier !is null);
         this.user_conn_notifier = user_conn_notifier;
@@ -1926,7 +1926,7 @@ template NeoSupport ( )
     ***************************************************************************/
 
     private void neoInit ( cstring auth_name, ubyte[] auth_key,
-        Neo.DhtConnectionNotifier user_conn_notifier )
+        scope Neo.DhtConnectionNotifier user_conn_notifier )
     {
         verify(user_conn_notifier !is null);
         this.user_conn_notifier = user_conn_notifier;
