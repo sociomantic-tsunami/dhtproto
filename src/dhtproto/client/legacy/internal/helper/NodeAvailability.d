@@ -53,7 +53,7 @@ public struct NodeAvailabilty
         }
         else
         {
-            auto tracker = NodeErrorTracker(this);
+            auto tracker = NodeErrorTracker(&this);
             tracker.error();
             this.error_trackers[node.toHash()] = tracker;
         }
