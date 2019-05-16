@@ -143,17 +143,13 @@ abstract private class IBulkGetRequest : IChannelRequest, IStreamInfo
                 this.resources.request_suspender);
         }
 
-        // deprecated: remove in dhtproto v15
-        static if (hasFeaturesFrom!("swarm", 5, 3))
+        scope (exit)
         {
-            scope (exit)
+            if ( this.params.suspend_unregister !is null )
             {
-                if ( this.params.suspend_unregister !is null )
-                {
-                    verify(this.params.suspend_register !is null);
-                    this.params.suspend_unregister(this.params.context,
-                        this.resources.request_suspender);
-                }
+                verify(this.params.suspend_register !is null);
+                this.params.suspend_unregister(this.params.context,
+                    this.resources.request_suspender);
             }
         }
 

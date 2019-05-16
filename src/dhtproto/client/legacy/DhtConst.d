@@ -58,18 +58,6 @@ static:
 
     public enum ApiVersion = "20110401";
 
-
-    /***************************************************************************
-
-        Maximum record size accepted by the dht node. Set to the size of a bulk
-        request batch so that all records can fit inside a batch.
-
-    ***************************************************************************/
-
-    deprecated("The record size limit is now specified as a config variable. Drop usage of this constant.")
-    public enum RecordSizeLimit = RecordBatcher.DefaultMaxBatchSize;
-
-
     /***************************************************************************
 
         Command Code definitions
