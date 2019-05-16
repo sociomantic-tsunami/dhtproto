@@ -14,7 +14,7 @@ module dhtproto.node.neo.request.GetHashRange;
 
 import ocean.core.VersionCheck;
 import swarm.neo.AddrPort;
-import swarm.neo.node.IRequestHandler;
+import swarm.neo.node.IRequest;
 
 /*******************************************************************************
 
@@ -47,7 +47,7 @@ public struct HashRangeUpdate
 
 *******************************************************************************/
 
-public abstract scope class GetHashRangeProtocol_v0 : IRequestHandler
+public abstract scope class GetHashRangeProtocol_v0 : IRequest
 {
     import swarm.neo.node.RequestOnConn;
     import dhtproto.common.GetHashRange;
@@ -79,6 +79,29 @@ public abstract scope class GetHashRangeProtocol_v0 : IRequestHandler
     ***************************************************************************/
 
     private bool resume_fiber_on_update;
+
+    /***************************************************************************
+
+        Called by the connection handler after the request code and version have
+        been parsed from a message received over the connection, and the
+        request-supported code sent in response.
+
+        Note: the initial payload passed to this method is a slice of a buffer
+        owned by the RequestOnConn. It is thus safe to assume that the contents
+        of the buffer will not change over the lifetime of the request.
+
+        Params:
+            connection = request-on-conn in which the request handler is called
+            resources = request resources acquirer
+            init_payload = initial message payload read from the connection
+
+    ***************************************************************************/
+
+    public void handle ( RequestOnConn connection, Object resources,
+        Const!(void)[] init_payload )
+    {
+        // Dummy implementation to satisfy interface definition
+    }
 
     /***************************************************************************
 

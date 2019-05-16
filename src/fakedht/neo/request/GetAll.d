@@ -35,8 +35,23 @@ import ocean.transition;
 public class GetAllImpl_v0 : GetAllProtocol_v0
 {
     import fakedht.Storage;
+    import dhtproto.common.RequestCodes : RequestCode;
     import ocean.core.Verify;
     import ocean.text.convert.Hash : toHashT;
+
+    /// Request code / version. Required by ConnectionHandler.
+    static immutable Command command = Command(RequestCode.GetAll, 0);
+
+    /// Request name for stats tracking. Required by ConnectionHandler.
+    static immutable istring name = "GetAll";
+
+    /// Flag indicating whether timing stats should be gathered for requests of
+    /// this type.
+    static immutable bool timing = false;
+
+    /// Flag indicating whether this request type is scheduled for removal. (If
+    /// true, clients will be warned.)
+    static immutable bool scheduled_for_removal = false;
 
     /// Reference to channel being iterated over.
     private Channel channel;
