@@ -67,6 +67,7 @@ public struct RequestDataUpdateInfo
 {
     import swarm.neo.protocol.Message : RequestId;
     import swarm.neo.client.mixins.DeserializeMethod;
+    import swarm.neo.client.mixins.SerializeMethod;
 
     /// ID of the request for which the notification is occurring.
     RequestId request_id;
@@ -132,42 +133,5 @@ public struct RequestKeyInfo
             sink,
             "Request #{} provided the key 0x{:x16}",
             this.request_id, this.key);
-    }
-}
-
-/*******************************************************************************
-
-    Mixin for method to serialize a record value.
-
-    Params:
-        dst = pointer to the buffer to be serialized into
-
-    TODO: deprecated, replace with implementation in swarm
-
-*******************************************************************************/
-
-template SerializeMethod ( alias dst )
-{
-    import ocean.util.serialize.contiguous.Contiguous;
-    import ocean.util.serialize.Version;
-    import ocean.util.serialize.contiguous.Serializer;
-    import ocean.util.serialize.contiguous.MultiVersionDecorator;
-
-    /***************************************************************************
-
-        Serializes `src` into `dst`, using a version decorater, if required.
-
-        Params:
-            T = type of struct to serialize
-            src = instance to serialize
-
-    ***************************************************************************/
-
-    public void serialize ( T ) ( T src )
-    {
-        static if ( Version.Info!(T).exists )
-            VersionDecorator.store!(T)(src, *dst);
-        else
-            Serializer.serialize(src, *dst);
     }
 }
