@@ -32,6 +32,7 @@ public scope class Put : Protocol.Put
 {
     import fakedht.mixins.RequestConstruction;
     import fakedht.Storage;
+    import swarm.util.RecordBatcher;
 
     /***************************************************************************
 
@@ -95,5 +96,18 @@ public scope class Put : Protocol.Put
     {
         global_storage.getCreate(channel).put(key, value);
         return true;
+    }
+
+    /***************************************************************************
+
+        Returns:
+            the maximum size (in bytes) allowed for a record to be added to the
+            storage engine
+
+    ***************************************************************************/
+
+    override protected size_t recordSizeLimit ( )
+    {
+        return 128 * 1024;
     }
 }
