@@ -35,7 +35,22 @@ import ocean.transition;
 public class GetImpl_v0 : GetProtocol_v0
 {
     import fakedht.Storage;
+    import dhtproto.common.RequestCodes : RequestCode;
     import ocean.core.Array : copy;
+
+    /// Request code / version. Required by ConnectionHandler.
+    static immutable Command command = Command(RequestCode.Get, 0);
+
+    /// Request name for stats tracking. Required by ConnectionHandler.
+    static immutable istring name = "Get";
+
+    /// Flag indicating whether timing stats should be gathered for requests of
+    /// this type.
+    static immutable bool timing = false;
+
+    /// Flag indicating whether this request type is scheduled for removal. (If
+    /// true, clients will be warned.)
+    static immutable bool scheduled_for_removal = false;
 
     /***************************************************************************
 

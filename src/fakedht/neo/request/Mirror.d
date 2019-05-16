@@ -37,9 +37,24 @@ import fakedht.Storage; // DhtListener
 public class MirrorImpl_v0 : MirrorProtocol_v0, DhtListener
 {
     import fakedht.Storage;
+    import dhtproto.common.RequestCodes : RequestCode;
     import ocean.core.Verify;
     import ocean.core.array.Mutation : copy;
     import ocean.text.convert.Hash : toHashT;
+
+    /// Request code / version. Required by ConnectionHandler.
+    static immutable Command command = Command(RequestCode.Mirror, 0);
+
+    /// Request name for stats tracking. Required by ConnectionHandler.
+    static immutable istring name = "Mirror";
+
+    /// Flag indicating whether timing stats should be gathered for requests of
+    /// this type.
+    static immutable bool timing = false;
+
+    /// Flag indicating whether this request type is scheduled for removal. (If
+    /// true, clients will be warned.)
+    static immutable bool scheduled_for_removal = false;
 
     /// Reference to channel being mirrored.
     private Channel channel;
