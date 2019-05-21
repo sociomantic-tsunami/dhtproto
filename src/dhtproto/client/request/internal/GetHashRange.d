@@ -294,7 +294,7 @@ private scope class GetHashRangeHandler
         // Receive and store node's current hash range
         hash_t min, max;
         this.conn.receive(
-            ( in void[] payload )
+            ( const(void)[] payload )
             {
                 Const!(void)[] payload_slice = payload;
                 min = *this.conn.message_parser.getValue!(hash_t)(payload_slice);
@@ -307,7 +307,7 @@ private scope class GetHashRangeHandler
         while ( true )
         {
             this.conn.receive(
-                ( in void[] payload )
+                ( const(void)[] payload )
                 {
                     Const!(void)[] payload_slice = payload;
                     auto msg_type = *this.conn.message_parser.
@@ -337,7 +337,7 @@ private scope class GetHashRangeHandler
 
                         default:
                             log.error("Unknown message code {} received", msg_type);
-                            throw this.conn.shutdownWithProtocolError(
+                            this.conn.shutdownWithProtocolError(
                                 "Message parsing error");
                     }
                 }

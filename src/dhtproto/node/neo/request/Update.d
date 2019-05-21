@@ -164,7 +164,7 @@ public abstract class UpdateProtocol_v0 : IRequestHandler
         // Wait for the client's response.
         MessageType ret;
         ed.receive(
-            ( in void[] payload )
+            ( const(void)[] payload )
             {
                 Const!(void)[] payload_slice = payload;
 
