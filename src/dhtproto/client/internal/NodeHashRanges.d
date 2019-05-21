@@ -21,7 +21,7 @@
 module dhtproto.client.internal.NodeHashRanges;
 
 import ocean.transition;
-import swarm.neo.util.VoidBufferAsArrayOf;
+import ocean.util.container.VoidBufferAsArrayOf;
 
 /// ditto
 public final class NodeHashRanges : NodeHashRangesBase

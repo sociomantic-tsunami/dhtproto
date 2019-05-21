@@ -222,7 +222,7 @@ public struct Get
 
                         // Receive record value from node.
                         conn.receive(
-                            ( in void[] const_payload )
+                            ( const(void)[] const_payload )
                             {
                                 Const!(void)[] payload = const_payload;
                                 auto value =

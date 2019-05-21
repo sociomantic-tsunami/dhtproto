@@ -1227,7 +1227,7 @@ unittest
             {
                 // See swarm.neo.client.requests.Stats
                 this.log.info("{} {} requests handled, mean time: {}μs",
-                    stats.count, name, stats.mean_handled_time_micros);
+                    stats.count, name, stats.mean_time_micros());
             }
         }
 

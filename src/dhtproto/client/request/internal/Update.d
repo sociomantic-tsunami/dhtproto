@@ -347,7 +347,7 @@ private struct FirstROCHandler
             // node.
             ret = Action.Abort;
             conn.receive(
-                ( in void[] const_payload )
+                ( const(void)[] const_payload )
                 {
                     ret = this.handleResponse(conn, const_payload,
                         acquired_resources);

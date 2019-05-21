@@ -17,7 +17,7 @@ import ocean.transition;
 /// ditto
 public final class SharedResources
 {
-    import swarm.neo.util.AcquiredResources;
+    import ocean.util.container.pool.AcquiredResources;
     import dhtproto.client.internal.NodeHashRanges;
     import swarm.neo.client.ConnectionSet;
     import ocean.util.container.pool.FreeList;
@@ -25,7 +25,7 @@ public final class SharedResources
     import ocean.core.Verify;
     import ocean.io.compress.Lzo;
     import swarm.neo.util.MessageFiber;
-    import swarm.neo.util.VoidBufferAsArrayOf;
+    import ocean.util.container.VoidBufferAsArrayOf;
     import swarm.util.RecordBatcher;
 
     /// Global NodeHashRanges instance
@@ -216,7 +216,7 @@ public final class SharedResources
 
         public VoidBufferAsArrayOf!(void[]) getBufferList ( )
         {
-            return this.acquired_buffer_lists.acquireWrapped();
+            return this.acquired_buffer_lists.acquire();
         }
 
         /***********************************************************************
@@ -229,7 +229,7 @@ public final class SharedResources
 
         public VoidBufferAsArrayOf!(NodeHashRange) getNodeHashRangeBuffer ( )
         {
-            return this.acquired_node_hash_range_buffers.acquireWrapped();
+            return this.acquired_node_hash_range_buffers.acquire();
         }
 
         /***********************************************************************
