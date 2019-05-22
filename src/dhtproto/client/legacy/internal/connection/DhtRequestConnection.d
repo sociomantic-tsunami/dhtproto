@@ -47,8 +47,6 @@ import swarm.client.request.GetChannelSizeRequest;
 import swarm.client.request.GetSizeRequest;
 import swarm.client.request.RemoveChannelRequest;
 
-import swarm.util.RecordBatcher;
-
 import dhtproto.client.legacy.internal.request.model.IDhtRequestResources;
 import dhtproto.client.legacy.internal.request.GetVersionRequest;
 import dhtproto.client.legacy.internal.request.GetResponsibleRangeRequest;
@@ -231,7 +229,7 @@ public class DhtRequestConnection :
 
         override protected mstring new_batch_buffer ( )
         {
-            return new char[RecordBatcher.DefaultMaxBatchSize];
+            return new char[RecordBatch.DefaultMaxBatchSize];
         }
 
 

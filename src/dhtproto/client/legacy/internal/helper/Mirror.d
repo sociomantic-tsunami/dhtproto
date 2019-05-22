@@ -107,14 +107,14 @@ abstract public class Mirror ( Dht : DhtClient ) : MirrorBase!(Dht)
             if ( start_in_ms == 0 )
             {
                 this.log.info("Starting.");
-                this.outer.dht.assign(rq);
                 this.state = State.Assigned;
+                this.outer.dht.assign(rq);
             }
             else
             {
                 this.log.info("Starting in {}ms.", start_in_ms);
-                this.outer.dht.schedule(rq, start_in_ms);
                 this.state = State.Scheduled;
+                this.outer.dht.schedule(rq, start_in_ms);
             }
         }
 

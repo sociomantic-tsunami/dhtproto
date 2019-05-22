@@ -26,7 +26,6 @@ import dhtproto.client.legacy.DhtConst;
 import ocean.io.select.EpollSelectDispatcher;
 import ocean.io.select.client.TimerEvent;
 import ocean.core.MessageFiber;
-import ocean.task.Scheduler;
 
 import ocean.util.log.Logger;
 import ocean.util.log.AppendConsole;
@@ -53,16 +52,13 @@ version ( UnitTest ) { }
 else
 void main ( )
 {
-    SchedulerConfiguration config;
-    initScheduler(config);
-
-    auto node = new DhtNode(DhtConst.NodeItem("127.0.0.1".dup, 10000),
-        theScheduler.epoll);
+    auto epoll = new EpollSelectDispatcher;
+    auto node = new DhtNode(DhtConst.NodeItem("127.0.0.1".dup, 10000), epoll);
 
     auto log = Log.lookup("fakedht.main");
     log.info("Registering fake node");
-    node.register(theScheduler.epoll);
+    node.register(epoll);
 
     log.info("Starting infinite event loop, kill the process if not needed anymore");
-    theScheduler.epoll.eventLoop();
+    epoll.eventLoop();
 }
