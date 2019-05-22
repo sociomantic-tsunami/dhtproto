@@ -95,10 +95,10 @@ public class NodeRecordBatcher
     {
         private hash_t[] hashes;
 
-        public int opApply ( int delegate ( ref hash_t hash ) dg )
+        public int opApply ( scope int delegate ( ref hash_t hash ) dg )
         {
             int r;
-            foreach ( h; this.hashes )
+            foreach ( h; (&this).hashes )
             {
                 r = dg(h);
                 if ( r ) break;

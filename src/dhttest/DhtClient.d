@@ -184,7 +184,7 @@ class DhtClient
     {
         this.log = Log.lookup("dhttest");
 
-        const max_connections = 2;
+        static immutable max_connections = 2;
         this.swarm_client = new SwarmClient(theScheduler.epoll, max_connections);
     }
 
@@ -550,7 +550,7 @@ class DhtClient
 
     public Listener startListen ( cstring channel )
     {
-        const hash_t key = 0xDEAD;
+        static immutable hash_t key = 0xDEAD;
 
         auto listener = new Listener;
 

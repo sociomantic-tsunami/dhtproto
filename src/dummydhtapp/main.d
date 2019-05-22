@@ -108,13 +108,13 @@ void main ( istring[] args )
     fiber = new SelectFiber(epoll, &handshakeAndRegister, 256 * 1024);
     event = new FiberSelectEvent(fiber);
 
-    void ping_handler ( cstring args, void delegate ( cstring
+    void ping_handler ( cstring args, scope void delegate ( cstring
         response ) send_response )
     {
         send_response("pong " ~ args);
     }
 
-    void reset_handler ( cstring args, void delegate ( cstring
+    void reset_handler ( cstring args, scope void delegate ( cstring
         response ) send_response )
     {
         send_response("ACK");
