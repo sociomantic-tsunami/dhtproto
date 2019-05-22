@@ -119,7 +119,7 @@ public struct Update
         SharedWorking, Notification);
 
     /// Fiber resume code.
-    const SecondROCFinished = 1;
+    enum SecondROCFinished = 1;
 
     /***************************************************************************
 
@@ -141,8 +141,8 @@ public struct Update
 
     ***************************************************************************/
 
-    public static void handler ( UseNodeDg use_node,
-        NewRequestOnConnDg new_request_on_conn, void[] context_blob )
+    public static void handler ( scope UseNodeDg use_node,
+        scope NewRequestOnConnDg new_request_on_conn, void[] context_blob )
     {
         auto context = Update.getContext(context_blob);
         context.shared_working.result = SharedWorking.Result.Error;
@@ -255,18 +255,18 @@ private struct FirstROCHandler
     public void handle ( )
     {
         auto shared_resources = SharedResources.fromObject(
-            this.context.shared_resources);
+            (&this).context.shared_resources);
         scope acquired_resources = shared_resources.new RequestResources;
 
         // Get the list of nodes reponsible for this hash.
         auto nodes = shared_resources.node_hash_ranges.getNodesForHash(
-            this.context.user_params.args.key,
+            (&this).context.user_params.args.key,
             acquired_resources.getNodeHashRangeBuffer());
 
         // If no node covers the record's hash, exit.
         if ( nodes.array.length == 0 )
         {
-            this.context.shared_working.result =
+            (&this).context.shared_working.result =
                 Update.SharedWorking.Result.NoNode;
             return;
         }
@@ -279,12 +279,12 @@ private struct FirstROCHandler
             scope conn_dg =
                 ( RequestOnConn.EventDispatcher conn )
                 {
-                    auto ret = this.tryConnection(conn, nodes.array[0].addr,
+                    auto ret = (&this).tryConnection(conn, nodes.array[0].addr,
                         acquired_resources);
                     with ( Action ) final switch ( ret )
                     {
                         case Success:
-                            this.context.shared_working.result =
+                            (&this).context.shared_working.result =
                                 Update.SharedWorking.Result.Succeeded;
                             success = true;
                             break;
@@ -302,7 +302,7 @@ private struct FirstROCHandler
                         }
                     }
                 };
-            this.use_node(node_hash_range.addr, conn_dg);
+            (&this).use_node(node_hash_range.addr, conn_dg);
 
             if ( error )
                 break;
@@ -310,7 +310,7 @@ private struct FirstROCHandler
 
         // The specified record does not currently exist in the DHT. Do nothing.
         if ( !success && !error )
-            this.context.shared_working.result =
+            (&this).context.shared_working.result =
                 Update.SharedWorking.Result.NoRecord;
     }
 
@@ -339,7 +339,7 @@ private struct FirstROCHandler
         try
         {
             // Start the request on this node.
-            auto ret = this.queryValueFromNode(conn);
+            auto ret = (&this).queryValueFromNode(conn);
             if ( ret != Action.Success )
                 return ret;
 
@@ -349,7 +349,7 @@ private struct FirstROCHandler
             conn.receive(
                 ( in void[] const_payload )
                 {
-                    ret = this.handleResponse(conn, const_payload,
+                    ret = (&this).handleResponse(conn, const_payload,
                         acquired_resources);
                 }
             );
@@ -358,18 +358,18 @@ private struct FirstROCHandler
 
             // If a value was received, send the updated value to the DHT.
             bool success;
-            if ( this.context.shared_working.updated_value !is null )
+            if ( (&this).context.shared_working.updated_value !is null )
             {
                 if ( conn.remote_address == newest_responsible_node_addr )
-                    success = this.updateOnNode(conn);
+                    success = (&this).updateOnNode(conn);
                 else
-                    success = this.updateOnDifferentNode(conn,
+                    success = (&this).updateOnDifferentNode(conn,
                         newest_responsible_node_addr);
             }
             // If the user did not provide an updated value, tell the node to
             // leave the record as is.
             else
-                success = this.leaveRecordOnNode(conn);
+                success = (&this).leaveRecordOnNode(conn);
 
             return success ? Action.Success : Action.Abort;
         }
@@ -378,8 +378,8 @@ private struct FirstROCHandler
             // Notify user of connection error.
             Update.Notification n;
             n.node_disconnected = RequestNodeExceptionInfo(
-                this.context.request_id, conn.remote_address, e);
-            Update.notify(this.context.user_params, n);
+                (&this).context.request_id, conn.remote_address, e);
+            Update.notify((&this).context.user_params, n);
             return Action.Abort;
         }
     }
@@ -405,8 +405,8 @@ private struct FirstROCHandler
                 payload.add(Update.cmd.code);
                 payload.add(Update.cmd.ver);
                 payload.addCopy(MessageType.GetRecord);
-                payload.addArray(this.context.user_params.args.channel);
-                payload.add(this.context.user_params.args.key);
+                payload.addArray((&this).context.user_params.args.channel);
+                payload.add((&this).context.user_params.args.key);
             }
         );
 
@@ -415,7 +415,7 @@ private struct FirstROCHandler
 
         // Receive supported code from node.
         auto supported = conn.receiveValue!(SupportedStatus)();
-        if ( !Update.handleSupportedCodes(supported, this.context,
+        if ( !Update.handleSupportedCodes(supported, (&this).context,
             conn.remote_address) )
         {
             // Unsupported; abort request.
@@ -453,16 +453,16 @@ private struct FirstROCHandler
             case RecordValue:
                 auto value = conn.message_parser.getArray!(void)(payload);
 
-                this.context.shared_working.original_hash = Fnv1a(value);
-                verify(this.context.shared_working.updated_value is null);
-                this.context.shared_working.updated_value =
+                (&this).context.shared_working.original_hash = Fnv1a(value);
+                verify((&this).context.shared_working.updated_value is null);
+                (&this).context.shared_working.updated_value =
                     acquired_resources.getVoidBuffer();
 
                 Update.Notification n;
                 n.received = RequestDataUpdateInfo(
-                    this.context.request_id, value,
-                    this.context.shared_working.updated_value);
-                Update.notify(this.context.user_params, n);
+                    (&this).context.request_id, value,
+                    (&this).context.shared_working.updated_value);
+                Update.notify((&this).context.user_params, n);
 
                 return Action.Success;
 
@@ -473,17 +473,17 @@ private struct FirstROCHandler
             case WrongNode:
                 // The node is not reponsible for the key. Notify the user.
                 Update.Notification n;
-                n.wrong_node = RequestNodeInfo(this.context.request_id,
+                n.wrong_node = RequestNodeInfo((&this).context.request_id,
                     conn.remote_address);
-                Update.notify(this.context.user_params, n);
+                Update.notify((&this).context.user_params, n);
                 return Action.Abort;
 
             case Error:
                 // The node returned an error code. Notify the user.
                 Update.Notification n;
-                n.node_error = RequestNodeInfo(this.context.request_id,
+                n.node_error = RequestNodeInfo((&this).context.request_id,
                     conn.remote_address);
-                Update.notify(this.context.user_params, n);
+                Update.notify((&this).context.user_params, n);
                 return Action.Abort;
 
             default:
@@ -513,8 +513,8 @@ private struct FirstROCHandler
             ( conn.Payload payload )
             {
                 payload.addCopy(MessageType.UpdateRecord);
-                payload.add(this.context.shared_working.original_hash);
-                payload.addArray(*this.context.shared_working.updated_value);
+                payload.add((&this).context.shared_working.original_hash);
+                payload.addArray(*(&this).context.shared_working.updated_value);
             }
         );
 
@@ -529,16 +529,16 @@ private struct FirstROCHandler
                 return true;
 
             case UpdateConflict:
-                this.context.shared_working.result =
+                (&this).context.shared_working.result =
                     Update.SharedWorking.Result.Conflict;
                 return false;
 
             case Error:
                 // The node returned an error code. Notify the user.
                 Update.Notification n;
-                n.node_error = RequestNodeInfo(this.context.request_id,
+                n.node_error = RequestNodeInfo((&this).context.request_id,
                     conn.remote_address);
-                Update.notify(this.context.user_params, n);
+                Update.notify((&this).context.user_params, n);
                 return false;
 
             default:
@@ -571,8 +571,8 @@ private struct FirstROCHandler
     private bool updateOnDifferentNode ( RequestOnConn.EventDispatcher conn,
         AddrPort second_node_addr )
     {
-        this.context.shared_working.first_request_on_conn = conn;
-        this.context.shared_working.second_node_addr = second_node_addr;
+        (&this).context.shared_working.first_request_on_conn = conn;
+        (&this).context.shared_working.second_node_addr = second_node_addr;
 
         // Start a new request-on-conn to write to the other node. This will
         // cause the static `handler()` function to be called again in a new
@@ -591,7 +591,7 @@ private struct FirstROCHandler
 
         // If the request on the second request-on-conn failed, the result code
         // will already have been set in the shared working data.
-        if ( this.context.shared_working.second_node_failed )
+        if ( (&this).context.shared_working.second_node_failed )
             return false;
 
         // Send message to the node that was read from, informing it that the
@@ -616,9 +616,9 @@ private struct FirstROCHandler
             case Error:
                 // The node returned an error code. Notify the user.
                 Update.Notification n;
-                n.node_error = RequestNodeInfo(this.context.request_id,
+                n.node_error = RequestNodeInfo((&this).context.request_id,
                     conn.remote_address);
-                Update.notify(this.context.user_params, n);
+                Update.notify((&this).context.user_params, n);
                 return false;
 
             default:
@@ -667,9 +667,9 @@ private struct FirstROCHandler
             case Error:
                 // The node returned an error code. Notify the user.
                 Update.Notification n;
-                n.node_error = RequestNodeInfo(this.context.request_id,
+                n.node_error = RequestNodeInfo((&this).context.request_id,
                     conn.remote_address);
-                Update.notify(this.context.user_params, n);
+                Update.notify((&this).context.user_params, n);
                 return false;
 
             default:
@@ -709,10 +709,10 @@ private struct SecondROCHandler
         scope conn_dg =
             ( RequestOnConn.EventDispatcher conn )
             {
-                if ( !this.handleRequest(conn) )
-                    this.context.shared_working.second_node_failed = true;
+                if ( !(&this).handleRequest(conn) )
+                    (&this).context.shared_working.second_node_failed = true;
             };
-        this.use_node(this.context.shared_working.second_node_addr, conn_dg);
+        (&this).use_node((&this).context.shared_working.second_node_addr, conn_dg);
     }
 
     /***************************************************************************
@@ -739,10 +739,10 @@ private struct SecondROCHandler
                     payload.add(Update.cmd.code);
                     payload.add(Update.cmd.ver);
                     payload.addCopy(MessageType.UpdateRecord);
-                    payload.addArray(this.context.user_params.args.channel);
-                    payload.add(this.context.user_params.args.key);
-                    payload.add(this.context.shared_working.original_hash);
-                    payload.addArray(*this.context.shared_working.updated_value);
+                    payload.addArray((&this).context.user_params.args.channel);
+                    payload.add((&this).context.user_params.args.key);
+                    payload.add((&this).context.shared_working.original_hash);
+                    payload.addArray(*(&this).context.shared_working.updated_value);
                 }
             );
 
@@ -751,7 +751,7 @@ private struct SecondROCHandler
 
             // Receive supported code from node.
             auto supported = conn.receiveValue!(SupportedStatus)();
-            if ( !Update.handleSupportedCodes(supported, this.context,
+            if ( !Update.handleSupportedCodes(supported, (&this).context,
                 conn.remote_address) )
             {
                 // Request not supported; abort further handling.
@@ -766,24 +766,24 @@ private struct SecondROCHandler
                     return true;
 
                 case UpdateConflict:
-                    this.context.shared_working.result =
+                    (&this).context.shared_working.result =
                         Update.SharedWorking.Result.Conflict;
                     return false;
 
                 case WrongNode:
                     // The node is not reponsible for the key. Notify the user.
                     Update.Notification n;
-                    n.wrong_node = RequestNodeInfo(this.context.request_id,
+                    n.wrong_node = RequestNodeInfo((&this).context.request_id,
                         conn.remote_address);
-                    Update.notify(this.context.user_params, n);
+                    Update.notify((&this).context.user_params, n);
                     return false;
 
                 case Error:
                     // The node returned an error code. Notify the user.
                     Update.Notification n;
-                    n.node_error = RequestNodeInfo(this.context.request_id,
+                    n.node_error = RequestNodeInfo((&this).context.request_id,
                         conn.remote_address);
-                    Update.notify(this.context.user_params, n);
+                    Update.notify((&this).context.user_params, n);
                     return false;
 
                 default:
@@ -798,8 +798,8 @@ private struct SecondROCHandler
             // Notify user of connection error.
             Update.Notification n;
             n.node_disconnected = RequestNodeExceptionInfo(
-                this.context.request_id, conn.remote_address, e);
-            Update.notify(this.context.user_params, n);
+                (&this).context.request_id, conn.remote_address, e);
+            Update.notify((&this).context.user_params, n);
             return false;
         }
 

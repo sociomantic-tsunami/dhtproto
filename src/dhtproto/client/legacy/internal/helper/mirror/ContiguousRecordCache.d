@@ -152,7 +152,7 @@ unittest
 
         equals_t opEquals ( S rhs )
         {
-            return this.x == rhs.x && this.y == rhs.y && this.s == rhs.s;
+            return (&this).x == rhs.x && (&this).y == rhs.y && (&this).s == rhs.s;
         }
     }
 
