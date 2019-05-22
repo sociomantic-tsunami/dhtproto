@@ -46,6 +46,7 @@ static this ( )
 
 public scope class Listen : Protocol.Listen, DhtListener
 {
+    import ocean.core.Verify;
     import fakedht.mixins.RequestConstruction;
 
     /***************************************************************************
@@ -143,7 +144,7 @@ public scope class Listen : Protocol.Listen, DhtListener
     override protected bool getNextRecord( cstring channel_name, mstring key,
         out Const!(void)[] value )
     {
-        assert (key.length == HashDigits);
+        verify(key.length == HashDigits);
 
         if (this.remaining_keys.length == 0)
             return false;

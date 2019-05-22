@@ -20,7 +20,7 @@ module dhttest.cases.Basic;
 
 import ocean.core.Test;
 import ocean.transition;
-
+import ocean.core.Test;
 import dhttest.DhtTestCase;
 
 const PRIORITY = 100;
