@@ -39,10 +39,10 @@ import dhtproto.client.legacy.internal.helper.mirror.model.MirrorBase;
 
 abstract public class Mirror ( Dht : DhtClient ) : MirrorBase!(Dht)
 {
+    import ocean.core.Verify;
     import ocean.util.log.Logger;
     import ocean.text.convert.Formatter;
     import swarm.Const : NodeItem;
-    import dhtproto.util.Verify;
 
     /// Core functionality shared by Listen and GetAll handlers.
     private final class SingleNodeRequest
