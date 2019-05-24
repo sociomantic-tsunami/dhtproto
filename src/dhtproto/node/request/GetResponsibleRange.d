@@ -63,23 +63,26 @@ public abstract scope class GetResponsibleRange : DhtCommand
 
     final override protected void handleRequest ( )
     {
-        this.writer.write(DhtConst.Status.E.Ok);
-        hash_t min, max;
-        this.getRangeLimits(min, max);
-        this.writer.write(min);
-        this.writer.write(max);
+        this.getRangeLimits(
+            ( hash_t min, hash_t max )
+            {
+                this.writer.write(DhtConst.Status.E.Ok);
+                this.writer.write(min);
+                this.writer.write(max);
+            });
     }
 
     /***************************************************************************
 
-        Must return minimum and maximum allowed hash value this node
+        Get the minimum and maximum allowed hash value this node
         is responsible for.
 
         Params:
-            min = minimal allowed hash
-            max = maximal allowed hash
+            value_getter_dg = The delegate that is called with the minimum and
+                              the maximum allowed hashes.
 
     ***************************************************************************/
 
-    abstract protected void getRangeLimits ( out hash_t min, out hash_t max );
+    abstract protected void getRangeLimits (
+        scope void delegate ( hash_t min, hash_t max ) value_getter_dg );
 }

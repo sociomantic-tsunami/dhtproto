@@ -66,10 +66,11 @@ public abstract scope class GetChannels : DhtCommand
     final override protected void handleRequest ( )
     {
         this.writer.write(DhtConst.Status.E.Ok);
-        foreach (id; this.getChannelsIds())
-        {
-            this.writer.writeArray(id);
-        }
+        this.getChannelsIds(
+            ( const(void)[] id )
+            {
+                this.writer.writeArray(id);
+            });
         this.writer.writeArray(""); // End of list
     }
 
@@ -77,10 +78,12 @@ public abstract scope class GetChannels : DhtCommand
 
         Must return list of all channels stored in this node.
 
-        Returns:
-            list of channel names
+        Params:
+            value_getter_dg = The delegate that is called with the list of
+                              channel names.
 
     ***************************************************************************/
 
-    abstract protected Const!(char[][]) getChannelsIds ( );
+    abstract protected void getChannelsIds (
+        scope void delegate ( const(void)[] ) value_getter_dg );
 }

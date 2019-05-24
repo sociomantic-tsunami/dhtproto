@@ -42,17 +42,18 @@ public scope class GetNumConnections : Protocol.GetNumConnections
 
     /***************************************************************************
 
-        Must return total num_conns of established connections to this node.
+        Gets the total num_conns of established connections to this node.
 
-        Returns:
-            metadata that includes number of established connections
+        Params:
+            value_getter_dg = The delegate that is called with the metadata
+                              that includes number of established connections.
 
     ***************************************************************************/
 
-    override protected NumConnectionsData getConnectionsData ( )
+    override protected void getConnectionsData (
+        scope void delegate ( NumConnectionsData ) /* value_getter_dg */ )
     {
         enforce(false,
             "GetNumConnections is not supported by the fake DHT node");
-        return NumConnectionsData.init;
     }
 }

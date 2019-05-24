@@ -78,13 +78,16 @@ public abstract scope class GetChannelSize : SingleChannel
     {
         this.writer.write(DhtConst.Status.E.Ok);
 
-        auto data = this.getChannelData(channel_name);
-
-        // TODO: is there a need to send the addr/port? surely the client knows this anyway?
-        this.writer.writeArray(data.address);
-        this.writer.write(data.port);
-        this.writer.write(data.records);
-        this.writer.write(data.bytes);
+        this.getChannelData(channel_name,
+            ( ChannelSizeData data )
+            {
+                // TODO: is there a need to send the addr/port?
+                // surely the client knows this anyway?
+                this.writer.writeArray(data.address);
+                this.writer.write(data.port);
+                this.writer.write(data.records);
+                this.writer.write(data.bytes);
+            });
     }
 
     /***************************************************************************
@@ -94,8 +97,10 @@ public abstract scope class GetChannelSize : SingleChannel
 
         Params:
             channel_name = name of channel to be queried
+            value_getter_dg = The delegate that is called with the channel data.
 
     ***************************************************************************/
 
-    abstract protected ChannelSizeData getChannelData ( cstring channel_name );
+    abstract protected void getChannelData ( cstring channel_name,
+        scope void delegate ( ChannelSizeData ) value_getter_dg );
 }

@@ -49,15 +49,17 @@ public scope class GetChannelSize : Protocol.GetChannelSize
 
         Params:
             channel_name = name of channel to be queried
+            value_getter_dg = The delegate that is called with the channel data.
 
     ***************************************************************************/
 
-    override protected ChannelSizeData getChannelData ( cstring channel_name )
+    override protected void getChannelData ( cstring channel_name,
+        scope void delegate ( ChannelSizeData ) value_getter_dg )
     {
         ChannelSizeData result;
         auto channel = global_storage.get(channel_name);
         if (channel !is null)
             channel.countSize(result.records, result.bytes);
-        return result;
+        value_getter_dg(result);
     }
 }

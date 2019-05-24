@@ -91,7 +91,12 @@ public abstract scope class Get : SingleKey
         cstring key )
     {
         this.writer.write(DhtConst.Status.E.Ok);
-        this.writer.writeArray(this.getValue(channel_name, key));
+        this.getValue(channel_name, key,
+            ( const(void)[] value )
+            {
+                this.writer.writeArray(value);
+            }
+        );
     }
 
     /***************************************************************************
@@ -102,11 +107,13 @@ public abstract scope class Get : SingleKey
         Params:
             channel_name = name of channel to query
             key = key of record to find
+            value_getter_dg = The delegate that is called with the value.
 
         Returns:
             value of queried record, empty array if not found
 
     ***************************************************************************/
 
-    abstract protected Const!(void)[] getValue ( cstring channel_name, cstring key );
+    abstract protected void getValue ( cstring channel_name, cstring key,
+        scope void delegate ( const(void)[] ) value_getter_dg );
 }

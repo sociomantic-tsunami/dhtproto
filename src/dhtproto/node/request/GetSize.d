@@ -51,7 +51,7 @@ public abstract scope class GetSize : DhtCommand
 
     /***************************************************************************
 
-        Payload structs that holds requested metadata 
+        Payload structs that holds requested metadata
 
     ***************************************************************************/
 
@@ -79,25 +79,30 @@ public abstract scope class GetSize : DhtCommand
 
     final override protected void handleRequest ( )
     {
-        auto data = this.getSizeData();
+        this.getSizeData(
+            ( SizeData data )
+            {
+                this.writer.write(DhtConst.Status.E.Ok);
 
-        this.writer.write(DhtConst.Status.E.Ok);
-
-        // TODO: is there a need to send the addr/port? surely the client knows this anyway?
-        this.writer.writeArray(data.address);
-        this.writer.write(data.port);
-        this.writer.write(data.records);
-        this.writer.write(data.bytes);
+                // TODO: is there a need to send the addr/port?
+                // surely the client knows this anyway?
+                this.writer.writeArray(data.address);
+                this.writer.write(data.port);
+                this.writer.write(data.records);
+                this.writer.write(data.bytes);
+            });
     }
 
     /***************************************************************************
 
-        Must return aggregated size of all channels.
+        Gets the aggregated size of all channels.
 
-        Returns:
-            metadata that includes the size
+        Params:
+            value_getter_dg = The delegate that is called with the metadata
+                              that includes the size.
 
     ***************************************************************************/
 
-    abstract protected SizeData getSizeData ( );
+    abstract protected void getSizeData (
+        scope void delegate ( SizeData ) value_getter_dg );
 }
