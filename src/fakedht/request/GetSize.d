@@ -42,14 +42,16 @@ public scope class GetSize : Protocol.GetSize
  
     /***************************************************************************
 
-        Must return aggregated size of all channels.
+        Gets the aggregated size of all channels.
 
-        Returns:
-            metadata that includes the size
+        Params:
+            value_getter_dg = The delegate that is called with the metadata
+                              that includes the size.
 
     ***************************************************************************/
 
-    override protected SizeData getSizeData ( )
+    override protected void getSizeData (
+        scope void delegate ( SizeData ) value_getter_dg )
     {
         SizeData result;
         auto channels = global_storage.getChannelList();
@@ -62,6 +64,6 @@ public scope class GetSize : Protocol.GetSize
             result.bytes += bytes;
         }
 
-        return result;
+        value_getter_dg(result);
     }
 }

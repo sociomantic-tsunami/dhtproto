@@ -78,24 +78,30 @@ public abstract scope class GetNumConnections : DhtCommand
 
     final override protected void handleRequest ( )
     {
-        auto data = this.getConnectionsData();
+        this.getConnectionsData(
+            ( NumConnectionsData data )
+            {
+                this.writer.write(DhtConst.Status.E.Ok);
 
-        this.writer.write(DhtConst.Status.E.Ok);
-
-        // TODO: is there a need to send the addr/port? surely the client knows this anyway?
-        this.writer.writeArray(data.address);
-        this.writer.write(data.port);
-        this.writer.write(data.num_conns);
+                // TODO: is there a need to send the addr/port?
+                // surely the client knows this anyway?
+                this.writer.writeArray(data.address);
+                this.writer.write(data.port);
+                this.writer.write(data.num_conns);
+            }
+        );
     }
 
     /***************************************************************************
 
-        Must return total num_conns of established connections to this node.
+        Gets the total num_conns of established connections to this node.
 
-        Returns:
-            metadata that includes number of established connections
+        Params:
+            value_getter_dg = The delegate that is called with the metadata
+                              that includes number of established connections.
 
     ***************************************************************************/
 
-    abstract protected NumConnectionsData getConnectionsData ( );
+    abstract protected void getConnectionsData (
+        scope void delegate ( NumConnectionsData ) value_getter_dg );
 }

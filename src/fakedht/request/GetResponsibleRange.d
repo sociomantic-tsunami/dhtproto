@@ -41,7 +41,7 @@ public scope class GetResponsibleRange : Protocol.GetResponsibleRange
 
     /***************************************************************************
 
-        Must return minimum and maximum allowed hash value this node
+        Get the return minimum and maximum allowed hash value this node
         is responsible for.
 
         Params:
@@ -50,9 +50,9 @@ public scope class GetResponsibleRange : Protocol.GetResponsibleRange
 
     ***************************************************************************/
 
-    override protected void getRangeLimits ( out hash_t min, out hash_t max )
+    override protected void getRangeLimits (
+        scope void delegate ( hash_t min, hash_t max ) value_getter_dg )
     {
-        min = hash_t.min;
-        max = hash_t.max;
+        value_getter_dg(hash_t.min, hash_t.max);
     }
 }

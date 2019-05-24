@@ -50,17 +50,18 @@ public scope class Get : Protocol.Get
         Params:
             channel_name = name of channel to query
             key = key of record to find
-
-        Returns:
-            value of queried record, empty array if not found
+            value_getter_dg = The delegate that is called with the value.
 
     ***************************************************************************/
 
-    override protected Const!(void)[] getValue ( cstring channel_name, cstring key )
+    override protected void getValue ( cstring channel_name, cstring key,
+        scope void delegate ( const(void)[] ) value_getter_dg )
     {
         auto channel = global_storage.get(channel_name);
-        if (channel is null)
-            return null;
-        return channel.get(key);
+
+        if (channel !is null)
+        {
+            value_getter_dg(channel.get(key));
+        }
     }
 }
