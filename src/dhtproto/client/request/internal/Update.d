@@ -55,7 +55,7 @@ public struct Update
 {
     import dhtproto.common.Update;
     import dhtproto.common.RequestCodes;
-    import dhtproto.client.request.Update;
+    public import dhtproto.client.request.Update;
     import swarm.neo.AddrPort;
     import swarm.neo.client.mixins.RequestCore;
     import swarm.neo.client.RequestHandlers;

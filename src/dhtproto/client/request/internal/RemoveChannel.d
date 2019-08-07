@@ -40,7 +40,7 @@ import ocean.util.log.Logger;
 public struct RemoveChannel
 {
     import dhtproto.common.RemoveChannel;
-    import dhtproto.client.request.RemoveChannel;
+    public import dhtproto.client.request.RemoveChannel;
     import dhtproto.common.RequestCodes;
     import dhtproto.client.NotifierTypes;
     import swarm.neo.client.mixins.RequestCore;

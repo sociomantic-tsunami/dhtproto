@@ -41,7 +41,7 @@ import ocean.core.Verify;
 public struct GetAll
 {
     import dhtproto.common.GetAll;
-    import dhtproto.client.request.GetAll;
+    public import dhtproto.client.request.GetAll;
     import dhtproto.common.RequestCodes;
     import dhtproto.client.NotifierTypes;
     import swarm.util.RecordBatcher;

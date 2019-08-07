@@ -41,7 +41,7 @@ import ocean.core.Verify;
 public struct Mirror
 {
     import dhtproto.common.Mirror;
-    import dhtproto.client.request.Mirror;
+    public import dhtproto.client.request.Mirror;
     import dhtproto.common.RequestCodes;
     import dhtproto.client.NotifierTypes;
     import swarm.neo.client.mixins.RequestCore;
