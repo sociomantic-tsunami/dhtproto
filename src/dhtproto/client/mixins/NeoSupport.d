@@ -103,16 +103,16 @@ template NeoSupport ( )
 
         private struct Internals
         {
-            import dhtproto.client.request.internal.GetHashRange;
-            import dhtproto.client.request.internal.Put;
-            import dhtproto.client.request.internal.Get;
-            import dhtproto.client.request.internal.Remove;
-            import dhtproto.client.request.internal.Mirror;
-            import dhtproto.client.request.internal.GetAll;
-            import dhtproto.client.request.internal.GetChannels;
-            import dhtproto.client.request.internal.Exists;
-            import dhtproto.client.request.internal.RemoveChannel;
-            import dhtproto.client.request.internal.Update;
+            public import dhtproto.client.request.internal.GetHashRange;
+            public import dhtproto.client.request.internal.Put;
+            public import dhtproto.client.request.internal.Get;
+            public import dhtproto.client.request.internal.Remove;
+            public import dhtproto.client.request.internal.Mirror;
+            public import dhtproto.client.request.internal.GetAll;
+            public import dhtproto.client.request.internal.GetChannels;
+            public import dhtproto.client.request.internal.Exists;
+            public import dhtproto.client.request.internal.RemoveChannel;
+            public import dhtproto.client.request.internal.Update;
         }
 
         /***********************************************************************
