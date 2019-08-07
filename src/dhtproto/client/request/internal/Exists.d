@@ -59,7 +59,7 @@ static this ( )
 public struct Exists
 {
     import dhtproto.common.Exists;
-    import dhtproto.client.request.Exists;
+    public import dhtproto.client.request.Exists;
     import dhtproto.common.RequestCodes;
     import swarm.neo.client.mixins.RequestCore;
     import swarm.neo.client.RequestHandlers;

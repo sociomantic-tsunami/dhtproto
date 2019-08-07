@@ -40,7 +40,7 @@ import ocean.util.log.Logger;
 public struct GetChannels
 {
     import dhtproto.common.GetChannels;
-    import dhtproto.client.request.GetChannels;
+    public import dhtproto.client.request.GetChannels;
     import dhtproto.common.RequestCodes;
     import dhtproto.client.NotifierTypes;
     import swarm.neo.client.mixins.RequestCore;

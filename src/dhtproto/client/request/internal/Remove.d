@@ -53,7 +53,7 @@ static this ( )
 public struct Remove
 {
     import dhtproto.common.Remove;
-    import dhtproto.client.request.Remove;
+    public import dhtproto.client.request.Remove;
     import dhtproto.common.RequestCodes;
     import swarm.neo.client.mixins.RequestCore;
     import swarm.neo.client.RequestHandlers;
