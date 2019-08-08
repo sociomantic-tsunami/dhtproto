@@ -23,7 +23,7 @@ import ocean.transition;
 import dhtproto.node.request.model.CompressedBatch;
 
 /*******************************************************************************
-    
+
     Request protocol
 
 *******************************************************************************/
@@ -52,7 +52,7 @@ public abstract scope class GetAllFilter : CompressedBatch!(mstring, mstring)
     }
 
     /***************************************************************************
-    
+
         Read filter data from the client
 
     ***************************************************************************/
@@ -65,7 +65,7 @@ public abstract scope class GetAllFilter : CompressedBatch!(mstring, mstring)
     }
 
     /***************************************************************************
-        
+
         Allows request to process read filter string into more efficient form
         and save it before starting actual record iteration.
 

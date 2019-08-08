@@ -106,7 +106,7 @@ public abstract scope class CompressedBatch(T...) : SingleChannel
         Params:
             channel_name = channel name for request that was read and validated
                 earlier
-        
+
     ***************************************************************************/
 
     final override protected void handleChannelRequest ( cstring channel_name )
@@ -152,7 +152,7 @@ public abstract scope class CompressedBatch(T...) : SingleChannel
                     assert(false, "Invalid AddResult in switch");
             }
         }
-        
+
         // handle last pending batch at the end of iteration (does nothing if no records are pending)
         writeBatch();
 
@@ -161,7 +161,7 @@ public abstract scope class CompressedBatch(T...) : SingleChannel
     }
 
     /***************************************************************************
-        
+
         Returns current record to be sent to the client. May handle fiber
         context switches and event loop internally if necessary. Always returns
         same record until this.fetchNext gets called.
@@ -181,7 +181,7 @@ public abstract scope class CompressedBatch(T...) : SingleChannel
 /******************************************************************************
 
     Params:
-        args = variadic list of array arguments 
+        args = variadic list of array arguments
 
     Returns:
         length of largest array among arguments
