@@ -52,7 +52,7 @@ public abstract scope class Exists : SingleKey
     }
 
     /***************************************************************************
-    
+
         Params:
             channel_name = channel name for request that was read and validated
                 earlier
@@ -70,11 +70,11 @@ public abstract scope class Exists : SingleKey
     /***************************************************************************
 
         Force "accept-all" behaviour for `isAllowed`
-        
+
         Hash range check isn't done for read requests (including 'Exists').
         It's a practical concern to keep the dht running as best as possible,
         while a redistribution is in progress.
-        
+
         The situation is as follows:
         1. all writing clients are shut down. Readers stay active.
         2. a redistribution is triggered

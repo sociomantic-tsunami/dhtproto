@@ -52,7 +52,7 @@ public abstract scope class Remove : SingleKey
     }
 
     /***************************************************************************
-    
+
         Params:
             channel_name = channel name for request that was read and validated
                 earlier

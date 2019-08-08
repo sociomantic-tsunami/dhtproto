@@ -98,7 +98,7 @@ public abstract scope class Put : SingleKey
     }
 
     /***************************************************************************
-    
+
         Stores incoming record
 
         Params:
@@ -124,7 +124,7 @@ public abstract scope class Put : SingleKey
             this.writer.write(DhtConst.Status.E.EmptyValue);
             return;
         }
-        
+
         if (!this.isSizeAllowed(value.length))
         {
             this.writer.write(DhtConst.Status.E.OutOfMemory);

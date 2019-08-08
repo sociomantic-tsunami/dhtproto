@@ -70,7 +70,7 @@ public abstract scope class Redistribute : DhtCommand
     private hash_t min, max;
 
     /***************************************************************************
-        
+
         Pointer to external data buffer used to store incoming redistribution
         data
 
@@ -151,7 +151,7 @@ public abstract scope class Redistribute : DhtCommand
     }
 
     /***************************************************************************
-    
+
         Validates hash ranges and forward to derivative methods to do actual
         redistribution which is 100% implementation-defined
 
