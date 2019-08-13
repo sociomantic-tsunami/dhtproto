@@ -59,7 +59,7 @@ static this ( )
 public struct Get
 {
     import dhtproto.common.Get;
-    import dhtproto.client.request.Get;
+    public import dhtproto.client.request.Get;
     import dhtproto.common.RequestCodes;
     import swarm.neo.client.mixins.RequestCore;
     import swarm.neo.client.RequestHandlers;
