@@ -67,9 +67,12 @@ public abstract scope class GetChannels : DhtCommand
     {
         this.writer.write(DhtConst.Status.E.Ok);
         this.getChannelsIds(
-            ( const(void)[] id )
+            ( const(char)[][] channel_list )
             {
-                this.writer.writeArray(id);
+                foreach (id; channel_list)
+                {
+                    this.writer.writeArray(id);
+                }
             });
         this.writer.writeArray(""); // End of list
     }
@@ -85,5 +88,5 @@ public abstract scope class GetChannels : DhtCommand
     ***************************************************************************/
 
     abstract protected void getChannelsIds (
-        scope void delegate ( const(void)[] ) value_getter_dg );
+        scope void delegate ( const(char)[][] ) value_getter_dg );
 }
