@@ -39,7 +39,7 @@ public scope class GetSize : Protocol.GetSize
     ***************************************************************************/
 
     mixin RequestConstruction!();
- 
+
     /***************************************************************************
 
         Gets the aggregated size of all channels.

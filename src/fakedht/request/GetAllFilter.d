@@ -53,7 +53,7 @@ public scope class GetAllFilter : Protocol.GetAllFilter
     mixin RequestConstruction!();
 
     /***************************************************************************
-    
+
         Predicate that accepts records that match filter defined by this.match
 
         Params:
@@ -80,7 +80,7 @@ public scope class GetAllFilter : Protocol.GetAllFilter
     mixin ChannelIteration!(IterationKind.KeyValue, filterPredicate);
 
     /***************************************************************************
-        
+
         Initialized regex match based on provided filter string
 
         Params:

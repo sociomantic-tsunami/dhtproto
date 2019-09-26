@@ -50,7 +50,7 @@ public abstract scope class GetNumConnections : DhtCommand
     }
 
     /***************************************************************************
-    
+
         Payload struct that holds the data requested
 
     ***************************************************************************/

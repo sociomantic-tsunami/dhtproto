@@ -59,7 +59,7 @@ public scope class Put : Protocol.Put
     {
         return true;
     }
- 
+
     /***************************************************************************
 
         Verifies that this node is allowed to store records of given size
