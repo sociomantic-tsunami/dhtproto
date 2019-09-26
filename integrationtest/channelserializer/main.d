@@ -85,7 +85,7 @@ int main ( istring[] args )
     {
         auto ser = new ChannelSerializer!(S)("failed_channel");
 
-        void dumpRecord ( void delegate ( hash_t, ref Contiguous!(S) ) record_dg )
+        void dumpRecord ( scope void delegate ( hash_t, ref Contiguous!(S) ) record_dg )
         {
             throw new Exception("File write error");
         }
