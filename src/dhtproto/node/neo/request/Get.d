@@ -63,7 +63,7 @@ public abstract class GetProtocol_v0 : IRequest
     ***************************************************************************/
 
     public void handle ( RequestOnConn connection, Object resources,
-        Const!(void)[] init_payload )
+        const(void)[] init_payload )
     {
         this.initialise(connection, resources);
 
@@ -95,7 +95,7 @@ public abstract class GetProtocol_v0 : IRequest
         {
             bool sent;
             auto ok = this.get(cast(char[])*this.channel, this.key,
-                ( Const!(void)[] value )
+                ( const(void)[] value )
                 {
                     verify(value !is null);
                     verify(value.length > 0);
@@ -152,5 +152,5 @@ public abstract class GetProtocol_v0 : IRequest
     ***************************************************************************/
 
     abstract protected bool get ( cstring channel, hash_t key,
-        scope void delegate ( Const!(void)[] value ) dg );
+        scope void delegate ( const(void)[] value ) dg );
 }

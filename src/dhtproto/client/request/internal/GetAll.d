@@ -460,14 +460,14 @@ private scope class GetAllHandler
 
         ***********************************************************************/
 
-        private void receivedBatch ( Const!(void)[] compressed_batch )
+        private void receivedBatch ( const(void)[] compressed_batch )
         {
             this.outer.received_a_batch = true;
 
             auto suspendable_control =
                 &this.outer.context.shared_working.suspendable_control;
 
-            this.outer.batch.decompress(cast(Const!(ubyte)[])compressed_batch);
+            this.outer.batch.decompress(cast(const(ubyte)[])compressed_batch);
 
             void notify ( GetAll.Notification notification )
             {

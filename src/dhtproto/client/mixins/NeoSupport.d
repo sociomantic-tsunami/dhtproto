@@ -204,11 +204,11 @@ template NeoSupport ( )
 
         ***********************************************************************/
 
-        public RequestId put ( cstring channel, hash_t key, Const!(void)[] value,
+        public RequestId put ( cstring channel, hash_t key, const(void)[] value,
             scope Put.Notifier notifier )
         {
-            auto params = Const!(Internals.Put.UserSpecifiedParams)(
-                Const!(Put.Args)(channel, key, value), notifier);
+            auto params = const(Internals.Put.UserSpecifiedParams)(
+                const(Put.Args)(channel, key, value), notifier);
 
             auto id = this.assign!(Internals.Put)(params);
             return id;
@@ -240,8 +240,8 @@ template NeoSupport ( )
         public RequestId get ( Options ... ) ( cstring channel, hash_t key,
             scope Get.Notifier notifier, Options options )
         {
-            auto params = Const!(Internals.Get.UserSpecifiedParams)(
-                Const!(Get.Args)(channel, key), notifier);
+            auto params = const(Internals.Get.UserSpecifiedParams)(
+                const(Get.Args)(channel, key), notifier);
 
             auto id = this.assign!(Internals.Get)(params);
 
@@ -279,8 +279,8 @@ template NeoSupport ( )
         public RequestId exists ( cstring channel, hash_t key,
             scope Exists.Notifier notifier )
         {
-            auto params = Const!(Internals.Exists.UserSpecifiedParams)(
-                Const!(Exists.Args)(channel, key), notifier);
+            auto params = const(Internals.Exists.UserSpecifiedParams)(
+                const(Exists.Args)(channel, key), notifier);
 
             auto id = this.assign!(Internals.Exists)(params);
             return id;
@@ -309,8 +309,8 @@ template NeoSupport ( )
         public RequestId remove ( cstring channel, hash_t key,
             scope Remove.Notifier notifier )
         {
-            auto params = Const!(Internals.Remove.UserSpecifiedParams)(
-                Const!(Remove.Args)(channel, key), notifier);
+            auto params = const(Internals.Remove.UserSpecifiedParams)(
+                const(Remove.Args)(channel, key), notifier);
 
             auto id = this.assign!(Internals.Remove)(params);
             return id;
@@ -339,8 +339,8 @@ template NeoSupport ( )
         public RequestId update ( cstring channel, hash_t key,
             scope Update.Notifier notifier )
         {
-            auto params = Const!(Internals.Update.UserSpecifiedParams)(
-                Const!(Update.Args)(channel, key), notifier);
+            auto params = const(Internals.Update.UserSpecifiedParams)(
+                const(Update.Args)(channel, key), notifier);
 
             auto id = this.assign!(Internals.Update)(params);
             return id;
@@ -381,8 +381,8 @@ template NeoSupport ( )
                 };
             setupOptionalArgs!(options.length)(options, args_visitor);
 
-            auto params = Const!(Internals.Mirror.UserSpecifiedParams)(
-                Const!(Mirror.Args)(
+            auto params = const(Internals.Mirror.UserSpecifiedParams)(
+                const(Mirror.Args)(
                     channel,
                     settings
                 ), notifier);
@@ -426,8 +426,8 @@ template NeoSupport ( )
                 };
             setupOptionalArgs!(options.length)(options, args_visitor);
 
-            auto params = Const!(Internals.GetAll.UserSpecifiedParams)(
-                Const!(GetAll.Args)(
+            auto params = const(Internals.GetAll.UserSpecifiedParams)(
+                const(GetAll.Args)(
                     channel,
                     settings
                 ), notifier);
@@ -456,8 +456,8 @@ template NeoSupport ( )
 
         public RequestId getChannels ( scope GetChannels.Notifier notifier )
         {
-            auto params = Const!(Internals.GetChannels.UserSpecifiedParams)(
-                Const!(GetChannels.Args)(), notifier);
+            auto params = const(Internals.GetChannels.UserSpecifiedParams)(
+                const(GetChannels.Args)(), notifier);
 
             auto id = this.assign!(Internals.GetChannels)(params);
             return id;
@@ -486,8 +486,8 @@ template NeoSupport ( )
         public RequestId removeChannel ( cstring channel,
             scope RemoveChannel.Notifier notifier )
         {
-            auto params = Const!(Internals.RemoveChannel.UserSpecifiedParams)(
-                Const!(RemoveChannel.Args)(channel), notifier);
+            auto params = const(Internals.RemoveChannel.UserSpecifiedParams)(
+                const(RemoveChannel.Args)(channel), notifier);
 
             auto id = this.assign!(Internals.RemoveChannel)(params);
             return id;
@@ -803,7 +803,7 @@ template NeoSupport ( )
 
         ***********************************************************************/
 
-        public void put ( cstring channel, hash_t key, Const!(void)[] value,
+        public void put ( cstring channel, hash_t key, const(void)[] value,
             scope Neo.Put.Notifier user_notifier )
         {
             verify(user_notifier !is null);
@@ -812,7 +812,7 @@ template NeoSupport ( )
 
             bool finished;
 
-            void notifier ( Neo.Put.Notification info, Const!(Neo.Put.Args) args )
+            void notifier ( Neo.Put.Notification info, const(Neo.Put.Args) args )
             {
                 user_notifier(info, args);
 
@@ -869,7 +869,7 @@ template NeoSupport ( )
 
         ***********************************************************************/
 
-        public PutResult put ( cstring channel, hash_t key, Const!(void)[] value )
+        public PutResult put ( cstring channel, hash_t key, const(void)[] value )
         {
             auto task = Task.getThis();
             verify(task !is null, "This method may only be called from inside a Task");
@@ -883,7 +883,7 @@ template NeoSupport ( )
 
             FinishedStatus state;
 
-            void notifier ( Neo.Put.Notification info, Const!(Neo.Put.Args) args )
+            void notifier ( Neo.Put.Notification info, const(Neo.Put.Args) args )
             {
                 with ( info.Active ) final switch ( info.active )
                 {
@@ -943,7 +943,7 @@ template NeoSupport ( )
 
             bool finished;
 
-            void notifier ( Neo.Get.Notification info, Const!(Neo.Get.Args) args )
+            void notifier ( Neo.Get.Notification info, const(Neo.Get.Args) args )
             {
                 user_notifier(info, args);
 
@@ -1025,7 +1025,7 @@ template NeoSupport ( )
             GetResult res;
             FinishedStatus state;
 
-            void notifier ( Neo.Get.Notification info, Const!(Neo.Get.Args) args )
+            void notifier ( Neo.Get.Notification info, const(Neo.Get.Args) args )
             {
                 with ( info.Active ) final switch ( info.active )
                 {
@@ -1090,7 +1090,7 @@ template NeoSupport ( )
             bool finished;
 
             void notifier ( Neo.Update.Notification info,
-                Const!(Neo.Update.Args) args )
+                const(Neo.Update.Args) args )
             {
                 user_notifier(info, args);
 
@@ -1141,7 +1141,7 @@ template NeoSupport ( )
             bool finished;
 
             void notifier ( Neo.Exists.Notification info,
-                Const!(Neo.Exists.Args) args )
+                const(Neo.Exists.Args) args )
             {
                 user_notifier(info, args);
 
@@ -1212,7 +1212,7 @@ template NeoSupport ( )
             bool finished;
             ExistsResult res;
 
-            void notifier ( Neo.Exists.Notification info, Const!(Neo.Exists.Args) args )
+            void notifier ( Neo.Exists.Notification info, const(Neo.Exists.Args) args )
             {
                 with ( info.Active ) final switch ( info.active )
                 {
@@ -1278,7 +1278,7 @@ template NeoSupport ( )
             bool finished;
 
             void notifier ( Neo.Remove.Notification info,
-                Const!(Neo.Remove.Args) args )
+                const(Neo.Remove.Args) args )
             {
                 user_notifier(info, args);
 
@@ -1357,7 +1357,7 @@ template NeoSupport ( )
             FinishedStatus state;
 
             void notifier ( Neo.Remove.Notification info,
-                Const!(Neo.Remove.Args) args )
+                const(Neo.Remove.Args) args )
             {
                 with ( info.Active ) switch ( info.active )
                 {
@@ -1461,7 +1461,7 @@ template NeoSupport ( )
             *******************************************************************/
 
             private void notifier ( Neo.GetAll.Notification info,
-                Const!(Neo.GetAll.Args) args )
+                const(Neo.GetAll.Args) args )
             {
                 with ( info.Active ) final switch ( info.active )
                 {
@@ -1648,7 +1648,7 @@ template NeoSupport ( )
             *******************************************************************/
 
             private void notifier ( Neo.GetChannels.Notification info,
-                Const!(Neo.GetChannels.Args) args )
+                const(Neo.GetChannels.Args) args )
             {
                 with ( info.Active ) final switch ( info.active )
                 {

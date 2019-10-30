@@ -443,7 +443,7 @@ private struct FirstROCHandler
         in void[] const_payload,
         SharedResources.RequestResources acquired_resources )
     {
-        Const!(void)[] payload = const_payload;
+        const(void)[] payload = const_payload;
         auto result = conn.message_parser.getValue!(MessageType)(payload);
         with ( MessageType ) switch ( *result )
         {

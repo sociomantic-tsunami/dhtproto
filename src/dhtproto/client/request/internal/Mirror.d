@@ -451,7 +451,7 @@ private scope class MirrorHandler
 
         ***********************************************************************/
 
-        private void recordChanged ( hash_t key, Const!(void)[] value )
+        private void recordChanged ( hash_t key, const(void)[] value )
         {
             Mirror.Notification n;
             n.updated = RequestRecordInfo(
@@ -468,9 +468,9 @@ private scope class MirrorHandler
 
         ***********************************************************************/
 
-        private void recordRefreshedBatch ( Const!(void)[] batch_data )
+        private void recordRefreshedBatch ( const(void)[] batch_data )
         {
-            scope batch = new BatchReader!(hash_t, Const!(void)[])(
+            scope batch = new BatchReader!(hash_t, const(void)[])(
                 this.outer.resources.lzo, batch_data,
                 *this.outer.decompress_buffer);
             foreach ( key, value; batch )

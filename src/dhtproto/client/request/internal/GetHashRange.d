@@ -296,7 +296,7 @@ private scope class GetHashRangeHandler
         this.conn.receive(
             ( const(void)[] payload )
             {
-                Const!(void)[] payload_slice = payload;
+                const(void)[] payload_slice = payload;
                 min = *this.conn.message_parser.getValue!(hash_t)(payload_slice);
                 max = *this.conn.message_parser.getValue!(hash_t)(payload_slice);
             }
@@ -309,7 +309,7 @@ private scope class GetHashRangeHandler
             this.conn.receive(
                 ( const(void)[] payload )
                 {
-                    Const!(void)[] payload_slice = payload;
+                    const(void)[] payload_slice = payload;
                     auto msg_type = *this.conn.message_parser.
                         getValue!(MessageType)(payload_slice);
 

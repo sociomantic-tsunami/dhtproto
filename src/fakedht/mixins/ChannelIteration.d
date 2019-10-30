@@ -136,7 +136,7 @@ public template ChannelIteration ( IterationKind kind,
             else
             {
                 args[0] = this.remaining_keys[0].dup;
-                args[1] = castFrom!(Const!(void)[]).to!(cstring)(
+                args[1] = castFrom!(const(void)[]).to!(cstring)(
                     this.channel.get(this.remaining_keys[0])).dup;
             }
 

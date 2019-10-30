@@ -89,7 +89,7 @@ public abstract class GetAllProtocol_v0 : IRequest
         {
             if ( filter.length > 0 )
             {
-                this.matcher = search(cast(Const!(char)[])filter);
+                this.matcher = search(cast(const(char)[])filter);
                 this.active = true;
             }
         }
@@ -110,7 +110,7 @@ public abstract class GetAllProtocol_v0 : IRequest
         public bool match ( in void[] value )
         {
             if ( this.active )
-                return this.matcher.forward(cast(Const!(char)[])value)
+                return this.matcher.forward(cast(const(char)[])value)
                     < value.length;
             else
                 return true;
@@ -144,14 +144,14 @@ public abstract class GetAllProtocol_v0 : IRequest
     ***************************************************************************/
 
     public void handle ( RequestOnConn connection, Object resources,
-        Const!(void)[] init_payload )
+        const(void)[] init_payload )
     {
         this.initialise(connection, resources);
 
         bool continuing;
         hash_t continue_from;
         cstring channel;
-        Const!(void)[] value_filter;
+        const(void)[] value_filter;
         this.connection.event_dispatcher.message_parser.parseBody(init_payload,
             this.start_suspended, channel, continuing, continue_from,
             this.keys_only, value_filter);
@@ -260,7 +260,7 @@ public abstract class GetAllProtocol_v0 : IRequest
     ***************************************************************************/
 
     abstract protected bool getNext (
-        scope void delegate ( hash_t key, Const!(void)[] value ) dg );
+        scope void delegate ( hash_t key, const(void)[] value ) dg );
 
     /***************************************************************************
 
@@ -316,7 +316,7 @@ public abstract class GetAllProtocol_v0 : IRequest
             do
             {
                 more = this.outer.getNext(
-                    ( hash_t key, Const!(void)[] value )
+                    ( hash_t key, const(void)[] value )
                     {
                         if ( !this.outer.filter.match(cast(cstring)value) )
                             return;

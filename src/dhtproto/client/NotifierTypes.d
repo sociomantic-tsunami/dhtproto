@@ -33,7 +33,7 @@ public struct RequestRecordInfo
     hash_t key;
 
     /// Record value.
-    Const!(void)[] value;
+    const(void)[] value;
 
     /// Template method to deserialize `value` as a given struct.
     mixin DeserializeMethod!(value);
@@ -73,7 +73,7 @@ public struct RequestDataUpdateInfo
     RequestId request_id;
 
     /// Record value.
-    Const!(void)[] value;
+    const(void)[] value;
 
     /// Buffer to receive updated value.
     void[]* updated_value;

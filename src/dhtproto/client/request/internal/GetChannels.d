@@ -87,7 +87,7 @@ public struct GetChannels
 
         ***********************************************************************/
 
-        bool shouldNotifyChannel ( Const!(void)[] channel,
+        bool shouldNotifyChannel ( const(void)[] channel,
             SharedResources.RequestResources resources )
         {
             bool already_notified = false;
@@ -317,14 +317,14 @@ private scope class GetChannelsHandler
 
     ***************************************************************************/
 
-    private bool handleMessage ( Const!(void)[] payload )
+    private bool handleMessage ( const(void)[] payload )
     {
         auto msg_type =
             *this.conn.message_parser.getValue!(MessageType)(payload);
         with ( MessageType ) switch ( msg_type )
         {
             case ChannelName:
-                Const!(void)[] channel;
+                const(void)[] channel;
                 this.conn.message_parser.parseBody(payload, channel);
 
                 if ( this.context.shared_working.shouldNotifyChannel(channel,

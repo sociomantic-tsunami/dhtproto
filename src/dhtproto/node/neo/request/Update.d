@@ -36,7 +36,7 @@ public abstract class UpdateProtocol_v0 : IRequest
 
     /// Slice of acquired buffer into which the initial payload received from
     /// the client is copied.
-    private Const!(void)[] init_payload;
+    private const(void)[] init_payload;
 
     /***************************************************************************
 
@@ -56,7 +56,7 @@ public abstract class UpdateProtocol_v0 : IRequest
     ***************************************************************************/
 
     public void handle ( RequestOnConn connection, Object resources,
-        Const!(void)[] init_payload )
+        const(void)[] init_payload )
     {
         this.initialise(connection, resources);
 
@@ -127,7 +127,7 @@ public abstract class UpdateProtocol_v0 : IRequest
         // Get record value from storage and send it to the client.
         bool exists;
         auto success = this.get(channel, key,
-            ( Const!(void)[] value )
+            ( const(void)[] value )
             {
                 exists = true;
 
@@ -157,7 +157,7 @@ public abstract class UpdateProtocol_v0 : IRequest
         ed.receive(
             ( const(void)[] payload )
             {
-                Const!(void)[] payload_slice = payload;
+                const(void)[] payload_slice = payload;
 
                 auto message = *ed.message_parser.getValue!(MessageType)(
                     payload_slice);
@@ -212,19 +212,19 @@ public abstract class UpdateProtocol_v0 : IRequest
     ***************************************************************************/
 
     private MessageType update ( cstring channel, hash_t key,
-        Const!(void)[] payload )
+        const(void)[] payload )
     {
         // Read original record value hash and updated value from client.
         auto ed = this.connection.event_dispatcher();
         hash_t original_hash;
-        Const!(void)[] new_value;
+        const(void)[] new_value;
         ed.message_parser.parseBody(payload, original_hash, new_value);
 
         // Get the currently stored record value and hash it.
         bool exists;
         hash_t stored_hash;
         auto ok = this.get(channel, key,
-            ( Const!(void)[] value )
+            ( const(void)[] value )
             {
                 exists = true;
                 stored_hash = Fnv1a(value);
@@ -274,7 +274,7 @@ public abstract class UpdateProtocol_v0 : IRequest
     ***************************************************************************/
 
     abstract protected bool get ( cstring channel, hash_t key,
-        scope void delegate ( Const!(void)[] value ) dg );
+        scope void delegate ( const(void)[] value ) dg );
 
     /***************************************************************************
 

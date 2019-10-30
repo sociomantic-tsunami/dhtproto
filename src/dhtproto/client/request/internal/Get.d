@@ -224,7 +224,7 @@ public struct Get
                         conn.receive(
                             ( const(void)[] const_payload )
                             {
-                                Const!(void)[] payload = const_payload;
+                                const(void)[] payload = const_payload;
                                 auto value =
                                     conn.message_parser.getArray!(void)(payload);
 

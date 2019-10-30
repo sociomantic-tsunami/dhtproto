@@ -102,7 +102,7 @@ public abstract scope class Listen : SingleChannel
             this.writer.fiber.register(this.writer);
 
             Hash.HexDigest key;
-            Const!(void)[] value;
+            const(void)[] value;
 
             while (this.getNextRecord(channel_name, key[], value))
             {
@@ -137,7 +137,7 @@ public abstract scope class Listen : SingleChannel
     ***************************************************************************/
 
     abstract protected bool getNextRecord( cstring channel_name, mstring key,
-        out Const!(void)[] value );
+        out const(void)[] value );
 
     /***************************************************************************
 

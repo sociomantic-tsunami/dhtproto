@@ -54,7 +54,7 @@ public class MirrorRemove : NeoDhtTestCase
         auto mirror = Mirror(this.dht);
         mirror.start(mirror_settings, this.test_channel,
             ( DhtClient.Neo.Mirror.Notification info,
-                Const!(DhtClient.Neo.Mirror.Args) args )
+                const(DhtClient.Neo.Mirror.Args) args )
             {
                 with ( info.Active ) switch ( info.active )
                 {
@@ -118,13 +118,13 @@ public class MirrorUpdate : NeoDhtTestCase
         mirror_settings.periodic_refresh_s = 0;
 
         void putNotifier ( DhtClient.Neo.Put.Notification info,
-            Const!(DhtClient.Neo.Put.Args) args ) { }
+            const(DhtClient.Neo.Put.Args) args ) { }
 
         static immutable num_written = 100;
         auto mirror = Mirror(this.dht);
         mirror.start(mirror_settings, this.test_channel,
             ( DhtClient.Neo.Mirror.Notification info,
-                Const!(DhtClient.Neo.Mirror.Args) args )
+                const(DhtClient.Neo.Mirror.Args) args )
             {
                 with ( info.Active ) switch ( info.active )
                 {
@@ -192,7 +192,7 @@ public class MirrorConnError : NeoDhtTestCase
         auto mirror = Mirror(this.dht);
         mirror.start(mirror_settings, this.test_channel,
             ( DhtClient.Neo.Mirror.Notification info,
-                Const!(DhtClient.Neo.Mirror.Args) args )
+                const(DhtClient.Neo.Mirror.Args) args )
             {
                 with ( info.Active ) switch ( info.active )
                 {
@@ -292,7 +292,7 @@ public class MirrorSuspend : NeoDhtTestCase
 
         mirror.start(mirror_settings, this.test_channel,
             ( DhtClient.Neo.Mirror.Notification info,
-                Const!(DhtClient.Neo.Mirror.Args) args )
+                const(DhtClient.Neo.Mirror.Args) args )
             {
                 with ( info.Active ) switch ( info.active )
                 {
@@ -379,7 +379,7 @@ public class MirrorRefresh : NeoDhtTestCase
         auto mirror = Mirror(this.dht);
         mirror.start(mirror_settings, this.test_channel,
             ( DhtClient.Neo.Mirror.Notification info,
-                Const!(DhtClient.Neo.Mirror.Args) args )
+                const(DhtClient.Neo.Mirror.Args) args )
             {
                 with ( info.Active ) switch ( info.active )
                 {
@@ -452,7 +452,7 @@ public class MirrorRefreshSuspend : NeoDhtTestCase
         bool received_while_suspended;
         mirror.start(mirror_settings, this.test_channel,
             ( DhtClient.Neo.Mirror.Notification info,
-                Const!(DhtClient.Neo.Mirror.Args) args )
+                const(DhtClient.Neo.Mirror.Args) args )
             {
                 with ( info.Active ) switch ( info.active )
                 {
@@ -528,7 +528,7 @@ public class MirrorRemoveChannel : NeoDhtTestCase
         mirror_settings.periodic_refresh_s = 0;
 
         void putNotifier ( DhtClient.Neo.Put.Notification info,
-            Const!(DhtClient.Neo.Put.Args) args ) { }
+            const(DhtClient.Neo.Put.Args) args ) { }
 
         void delNotifier ( DhtClient.Neo.RemoveChannel.Notification info,
             DhtClient.Neo.RemoveChannel.Args args ) { }
@@ -536,7 +536,7 @@ public class MirrorRemoveChannel : NeoDhtTestCase
         auto mirror = Mirror(this.dht);
         mirror.start(mirror_settings, this.test_channel,
             ( DhtClient.Neo.Mirror.Notification info,
-                Const!(DhtClient.Neo.Mirror.Args) args )
+                const(DhtClient.Neo.Mirror.Args) args )
             {
                 with ( info.Active ) switch ( info.active )
                 {
@@ -712,7 +712,7 @@ private struct Mirror
     ***************************************************************************/
 
     private void counterNotifier ( DhtClient.Neo.Mirror.Notification info,
-        Const!(DhtClient.Neo.Mirror.Args) args )
+        const(DhtClient.Neo.Mirror.Args) args )
     {
         with ( info.Active ) switch ( info.active )
         {
