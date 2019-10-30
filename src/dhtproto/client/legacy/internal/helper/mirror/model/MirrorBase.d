@@ -49,10 +49,10 @@ abstract public class MirrorBase ( Dht : DhtClient )
     protected istring channel_;
 
     /// Time (in milliseconds) to wait between successful GetAlls.
-    public Const!(uint) update_time_ms;
+    public const(uint) update_time_ms;
 
     /// Time (in milliseconds) to wait between failed requests.
-    public Const!(uint) retry_time_ms;
+    public const(uint) retry_time_ms;
 
     /***************************************************************************
 

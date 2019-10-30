@@ -403,7 +403,7 @@ public struct NeoVerifier
         bool duplicate;
 
         void notifier ( DhtClient.Neo.GetAll.Notification info,
-            Const!(DhtClient.Neo.GetAll.Args) args )
+            const(DhtClient.Neo.GetAll.Args) args )
         {
             with ( info.Active ) switch ( info.active )
             {
@@ -488,7 +488,7 @@ public struct NeoVerifier
         bool duplicate;
 
         void notifier ( DhtClient.Neo.GetAll.Notification info,
-            Const!(DhtClient.Neo.GetAll.Args) args )
+            const(DhtClient.Neo.GetAll.Args) args )
         {
             with ( info.Active ) switch ( info.active )
             {
@@ -552,7 +552,7 @@ public struct NeoVerifier
         bool duplicate;
 
         void notifier ( DhtClient.Neo.GetAll.Notification info,
-            Const!(DhtClient.Neo.GetAll.Args) args )
+            const(DhtClient.Neo.GetAll.Args) args )
         {
             with ( info.Active ) switch ( info.active )
             {

@@ -39,7 +39,7 @@ class NoRecord : NeoDhtTestCase
         bool record_not_found;
 
         void notifier ( DhtClient.Neo.Update.Notification info,
-            Const!(DhtClient.Neo.Update.Args) args )
+            const(DhtClient.Neo.Update.Args) args )
         {
             with ( info.Active ) final switch ( info.active )
             {
@@ -91,7 +91,7 @@ class Update : NeoDhtTestCase
         bool update_succeeded;
 
         void notifier ( DhtClient.Neo.Update.Notification info,
-            Const!(DhtClient.Neo.Update.Args) args )
+            const(DhtClient.Neo.Update.Args) args )
         {
             with ( info.Active ) final switch ( info.active )
             {
@@ -165,7 +165,7 @@ class SerializerUpdate : NeoDhtTestCase
         bool update_succeeded;
 
         void notifier ( DhtClient.Neo.Update.Notification info,
-            Const!(DhtClient.Neo.Update.Args) args )
+            const(DhtClient.Neo.Update.Args) args )
         {
             with ( info.Active ) final switch ( info.active )
             {

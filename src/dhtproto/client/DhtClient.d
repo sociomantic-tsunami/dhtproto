@@ -1041,7 +1041,7 @@ public class DhtClient : IClient
         key to the dht. The database record value is read from the specified
         input delegate, which should be of the form:
 
-            Const!(char)[] delegate ( RequestContext context )
+            const(char)[] delegate ( RequestContext context )
 
         It is illegal to put empty values to the node.
 

@@ -104,7 +104,7 @@ public class GetAllSuspend : NeoDhtTestCase
 
         getall.start(this.test_channel,
             ( DhtClient.Neo.GetAll.Notification info,
-                Const!(DhtClient.Neo.GetAll.Args) args )
+                const(DhtClient.Neo.GetAll.Args) args )
             {
                 with ( info.Active ) switch ( info.active )
                 {
@@ -175,7 +175,7 @@ public class GetAllConnError : NeoDhtTestCase
         auto getall = GetAll(this.dht);
         getall.start(this.test_channel,
             ( DhtClient.Neo.GetAll.Notification info,
-                Const!(DhtClient.Neo.GetAll.Args) args )
+                const(DhtClient.Neo.GetAll.Args) args )
             {
                 with ( info.Active ) switch ( info.active )
                 {
@@ -352,7 +352,7 @@ private struct GetAll
     ***************************************************************************/
 
     private void counterNotifier ( DhtClient.Neo.GetAll.Notification info,
-        Const!(DhtClient.Neo.GetAll.Args) args )
+        const(DhtClient.Neo.GetAll.Args) args )
     {
         with ( info.Active ) switch ( info.active )
         {

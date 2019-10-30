@@ -142,7 +142,7 @@ public scope class Listen : Protocol.Listen, DhtListener
     ***************************************************************************/
 
     override protected bool getNextRecord( cstring channel_name, mstring key,
-        out Const!(void)[] value )
+        out const(void)[] value )
     {
         verify(key.length == HashDigits);
 

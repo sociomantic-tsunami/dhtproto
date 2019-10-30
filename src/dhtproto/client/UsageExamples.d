@@ -199,7 +199,7 @@ unittest
         // the Put request. See dhtproto.client.request.Put for
         // details of the parameters of the notifier.
         private void putNotifier ( DhtClient.Neo.Put.Notification info,
-            Const!(DhtClient.Neo.Put.Args) args )
+            const(DhtClient.Neo.Put.Args) args )
         {
             formatNotification(info, this.msg_buf);
 
@@ -249,7 +249,7 @@ unittest
         // the Put request. See dhtproto.client.request.Put for
         // details of the parameters of the notifier.
         private void putNotifier ( DhtClient.Neo.Put.Notification info,
-            Const!(DhtClient.Neo.Put.Args) args )
+            const(DhtClient.Neo.Put.Args) args )
         {
             formatNotification(info, this.msg_buf);
 
@@ -322,7 +322,7 @@ unittest
         // the Get request. See dhtproto.client.request.Get for
         // details of the parameters of the notifier.
         private void getNotifier ( DhtClient.Neo.Get.Notification info,
-            Const!(DhtClient.Neo.Get.Args) args )
+            const(DhtClient.Neo.Get.Args) args )
         {
             formatNotification(info, this.msg_buf);
 
@@ -376,7 +376,7 @@ unittest
         // the Get request. See dhtproto.client.request.Get for
         // details of the parameters of the notifier.
         private void getNotifier ( DhtClient.Neo.Get.Notification info,
-            Const!(DhtClient.Neo.Get.Args) args )
+            const(DhtClient.Neo.Get.Args) args )
         {
             // Struct expected to be serialized in the received record value.
             struct Record
@@ -444,7 +444,7 @@ unittest
         // the Get request. See dhtproto.client.request.Get for
         // details of the parameters of the notifier.
         private void getNotifier ( DhtClient.Neo.Get.Notification info,
-            Const!(DhtClient.Neo.Get.Args) args )
+            const(DhtClient.Neo.Get.Args) args )
         {
             formatNotification(info, this.msg_buf);
 
@@ -527,7 +527,7 @@ unittest
         // the Exists request. See dhtproto.client.request.Exists for
         // details of the parameters of the notifier.
         private void existsNotifier ( DhtClient.Neo.Exists.Notification info,
-            Const!(DhtClient.Neo.Exists.Args) args )
+            const(DhtClient.Neo.Exists.Args) args )
         {
             formatNotification(info, this.msg_buf);
 
@@ -578,7 +578,7 @@ unittest
         // the Exists request. See dhtproto.client.request.Exists for
         // details of the parameters of the notifier.
         private void existsNotifier ( DhtClient.Neo.Exists.Notification info,
-            Const!(DhtClient.Neo.Exists.Args) args )
+            const(DhtClient.Neo.Exists.Args) args )
         {
             formatNotification(info, this.msg_buf);
 
@@ -657,7 +657,7 @@ unittest
         // the Remove request. See dhtproto.client.request.Remove for
         // details of the parameters of the notifier.
         private void removeNotifier ( DhtClient.Neo.Remove.Notification info,
-            Const!(DhtClient.Neo.Remove.Args) args )
+            const(DhtClient.Neo.Remove.Args) args )
         {
             formatNotification(info, this.msg_buf);
 
@@ -707,7 +707,7 @@ unittest
         // the Remove request. See dhtproto.client.request.Remove for
         // details of the parameters of the notifier.
         private void removeNotifier ( DhtClient.Neo.Remove.Notification info,
-            Const!(DhtClient.Neo.Remove.Args) args )
+            const(DhtClient.Neo.Remove.Args) args )
         {
             formatNotification(info, this.msg_buf);
 
@@ -795,7 +795,7 @@ unittest
         // the Mirror request. See dhtproto.client.request.Mirror for
         // details of the parameters of the notifier.
         private void mirrorNotifier ( DhtClient.Neo.Mirror.Notification info,
-            Const!(DhtClient.Neo.Mirror.Args) args )
+            const(DhtClient.Neo.Mirror.Args) args )
         {
             formatNotification(info, this.msg_buf);
 
@@ -888,7 +888,7 @@ unittest
         // the GetAll request. See dhtproto.client.request.GetAll for
         // details of the parameters of the notifier.
         private void getAllNotifier ( DhtClient.Neo.GetAll.Notification info,
-            Const!(DhtClient.Neo.GetAll.Args) args )
+            const(DhtClient.Neo.GetAll.Args) args )
         {
             formatNotification(info, this.msg_buf);
 
@@ -979,7 +979,7 @@ unittest
         // the Update request. See dhtproto.client.request.Update for
         // details of the parameters of the notifier.
         private void updateNotifier ( DhtClient.Neo.Update.Notification info,
-            Const!(DhtClient.Neo.Update.Args) args )
+            const(DhtClient.Neo.Update.Args) args )
         {
             formatNotification(info, this.msg_buf);
 
@@ -1041,7 +1041,7 @@ unittest
         // the Update request. See dhtproto.client.request.Update for
         // details of the parameters of the notifier.
         private void updateNotifier ( DhtClient.Neo.Update.Notification info,
-            Const!(DhtClient.Neo.Update.Args) args )
+            const(DhtClient.Neo.Update.Args) args )
         {
             // Struct expected to be serialized in the received record value.
             struct Record
@@ -1120,7 +1120,7 @@ unittest
         // the Update request. See dhtproto.client.request.Update for
         // details of the parameters of the notifier.
         private void updateNotifier ( DhtClient.Neo.Update.Notification info,
-            Const!(DhtClient.Neo.Update.Args) args )
+            const(DhtClient.Neo.Update.Args) args )
         {
             formatNotification(info, this.msg_buf);
 

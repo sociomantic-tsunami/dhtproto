@@ -383,7 +383,7 @@ public abstract class MirrorProtocol_v0 : IRequest
     ***************************************************************************/
 
     public void handle ( RequestOnConn connection, Object resources,
-        Const!(void)[] init_payload )
+        const(void)[] init_payload )
     {
         this.initialise(connection, resources);
 
@@ -815,7 +815,7 @@ public abstract class MirrorProtocol_v0 : IRequest
 
         ***********************************************************************/
 
-        private void sendRecordChanged ( hash_t key, Const!(void)[] value )
+        private void sendRecordChanged ( hash_t key, const(void)[] value )
         {
             this.outer.request_event_dispatcher.send(this.fiber,
                 ( RequestOnConnBase.EventDispatcher.Payload payload )

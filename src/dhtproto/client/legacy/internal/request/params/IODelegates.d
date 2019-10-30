@@ -55,7 +55,7 @@ import ocean.transition;
 
 *******************************************************************************/
 
-public alias Const!(char[]) delegate (RequestContext) PutValueDg;
+public alias const(char[]) delegate (RequestContext) PutValueDg;
 
 
 /*******************************************************************************
@@ -82,7 +82,7 @@ public alias RedistributeInfo delegate (RequestContext) RedistributeDg;
 
 *******************************************************************************/
 
-public alias void delegate (RequestContext, Const!(char[])) GetValueDg;
+public alias void delegate (RequestContext, const(char[])) GetValueDg;
 
 
 /*******************************************************************************
@@ -91,7 +91,7 @@ public alias void delegate (RequestContext, Const!(char[])) GetValueDg;
 
 *******************************************************************************/
 
-public alias void delegate (RequestContext, Const!(char[]), Const!(char[])) GetPairDg;
+public alias void delegate (RequestContext, const(char[]), const(char[])) GetPairDg;
 
 
 /*******************************************************************************
@@ -109,7 +109,7 @@ public alias void delegate (RequestContext, bool) GetBoolDg;
 
 *******************************************************************************/
 
-public alias void delegate (RequestContext, Const!(char[]), ushort, HashRange) GetResponsibleRangeDg;
+public alias void delegate (RequestContext, const(char[]), ushort, HashRange) GetResponsibleRangeDg;
 
 
 /*******************************************************************************
@@ -119,7 +119,7 @@ public alias void delegate (RequestContext, Const!(char[]), ushort, HashRange) G
 
 *******************************************************************************/
 
-public alias void delegate (RequestContext, Const!(char[]), ushort, size_t) GetNumConnectionsDg;
+public alias void delegate (RequestContext, const(char[]), ushort, size_t) GetNumConnectionsDg;
 
 
 /*******************************************************************************
@@ -129,7 +129,7 @@ public alias void delegate (RequestContext, Const!(char[]), ushort, size_t) GetN
 
 *******************************************************************************/
 
-public alias void delegate (RequestContext, Const!(char[]), ushort, Const!(char[])) GetNodeValueDg;
+public alias void delegate (RequestContext, const(char[]), ushort, const(char[])) GetNodeValueDg;
 
 
 /*******************************************************************************
@@ -139,7 +139,7 @@ public alias void delegate (RequestContext, Const!(char[]), ushort, Const!(char[
 
 *******************************************************************************/
 
-public alias void delegate (RequestContext, Const!(char[]), ushort, ulong, ulong) GetSizeInfoDg;
+public alias void delegate (RequestContext, const(char[]), ushort, ulong, ulong) GetSizeInfoDg;
 
 
 /*******************************************************************************
@@ -149,7 +149,7 @@ public alias void delegate (RequestContext, Const!(char[]), ushort, ulong, ulong
 
 *******************************************************************************/
 
-public alias void delegate (RequestContext, Const!(char[]), ushort, Const!(char[]), ulong, ulong) GetChannelSizeInfoDg;
+public alias void delegate (RequestContext, const(char[]), ushort, const(char[]), ulong, ulong) GetChannelSizeInfoDg;
 
 
 /*******************************************************************************

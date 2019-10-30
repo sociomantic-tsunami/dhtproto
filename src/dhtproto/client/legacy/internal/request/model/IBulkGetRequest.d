@@ -260,7 +260,7 @@ abstract public scope class IBulkGetPairsRequest : IBulkGetRequest
             this.resources.request_suspender.handleSuspension();
         }
 
-        this.resources.record_batch.decompress(cast(Const!(ubyte)[])batch);
+        this.resources.record_batch.decompress(cast(const(ubyte)[])batch);
         foreach ( key, value; this.resources.record_batch )
         {
             receivePair(key, value);
@@ -327,7 +327,7 @@ abstract public scope class IBulkGetValuesRequest : IBulkGetRequest
             this.resources.request_suspender.handleSuspension();
         }
 
-        this.resources.record_batch.decompress(cast(Const!(ubyte)[])batch);
+        this.resources.record_batch.decompress(cast(const(ubyte)[])batch);
         foreach ( value; this.resources.record_batch )
         {
             receiveValue(value);

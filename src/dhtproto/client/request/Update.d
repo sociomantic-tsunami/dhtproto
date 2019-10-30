@@ -132,4 +132,4 @@ public alias SmartUnion!(NotificationUnion) Notification;
 
 *******************************************************************************/
 
-public alias void delegate ( Notification, Const!(Args) ) Notifier;
+public alias void delegate ( Notification, const(Args) ) Notifier;
