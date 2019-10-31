@@ -43,6 +43,14 @@ jobs:
           env: DMD=2.086.* F=production
         - <<: *test-matrix
           env: DMD=2.086.* F=devel
+        - <<: *test-matrix
+          env: DIST=bionic DMD=2.078.3.s* F=production
+        - <<: *test-matrix
+          env: DIST=bionic DMD=2.078.3.s* F=devel
+        - <<: *test-matrix
+          env: DIST=bionic DMD=2.086.* F=production
+        - <<: *test-matrix
+          env: DIST=bionic DMD=2.086.* F=devel
 
         # Additional stages
 
