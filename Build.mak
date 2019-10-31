@@ -4,6 +4,12 @@ override LDFLAGS += -llzo2 -lebtree -lrt -lgcrypt -lgpg-error -lglib-2.0 -lpcre
 override DFLAGS  += -w -de
 DC:=dmd-transitional
 
+# Ubuntu bionic requires builds to use position independent code and
+# dmd-transitional does not set the flag -fPIC by default
+ifeq ($(DC),dmd-transitional)
+override DFLAGS += -fPIC
+endif
+
 $B/fakedht: $C/src/fakedht/main.d
 $B/fakedht: override LDFLAGS += -llzo2 -lebtree -lrt -lpcre
 
