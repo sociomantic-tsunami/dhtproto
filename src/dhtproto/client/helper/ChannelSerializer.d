@@ -299,7 +299,7 @@ public class ChannelSerializer ( S )
     }
 }
 
-version ( UnitTest )
+version ( unittest )
 {
     import ocean.util.container.map.HashMap;
 

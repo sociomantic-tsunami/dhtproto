@@ -28,7 +28,7 @@ import ocean.util.container.map.Map : StandardKeyHashingMap;
 import ocean.util.serialize.contiguous.Contiguous;
 import ocean.util.serialize.contiguous.Util : copy;
 
-version (UnitTest)
+version (unittest)
 {
     import ocean.core.Test;
 }

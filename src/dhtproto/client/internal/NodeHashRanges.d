@@ -381,7 +381,7 @@ private class NodeHashRangesBase
     }
 }
 
-version ( UnitTest )
+version ( unittest )
 {
     import ocean.core.Test;
     import Integer = ocean.text.convert.Integer_tango;

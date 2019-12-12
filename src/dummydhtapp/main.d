@@ -63,7 +63,7 @@ DhtClient             dht;
 
 *******************************************************************************/
 
-version ( UnitTest ) { }
+version ( unittest ) { }
 else
 void main ( istring[] args )
 {

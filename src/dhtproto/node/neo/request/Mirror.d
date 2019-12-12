@@ -16,7 +16,7 @@ import swarm.neo.node.IRequest;
 
 import ocean.util.log.Logger;
 
-version ( UnitTest )
+version ( unittest )
 {
     import ocean.core.Test;
 }

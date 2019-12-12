@@ -43,7 +43,7 @@ class DhtRestartTests : TurtleRunnerTask!(TestedAppKind.Daemon)
     }
 }
 
-version ( UnitTest ) { }
+version ( unittest ) { }
 else
 int main ( istring[] args )
 {

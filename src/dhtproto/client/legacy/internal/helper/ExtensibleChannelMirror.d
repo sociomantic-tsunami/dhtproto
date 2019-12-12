@@ -237,7 +237,7 @@ public class ExtensibleMirror
     }
 }
 
-version ( UnitTest )
+version ( unittest )
 {
     import dhtproto.client.legacy.internal.helper.Mirror;
 }
@@ -285,7 +285,7 @@ public template ExtensibleChannelMirror ( Dht : DhtClient, Plugins ... )
         ExtensibleChannelMirror;
 }
 
-version ( UnitTest )
+version ( unittest )
 {
     import ocean.io.Stdout;
     import ocean.io.select.EpollSelectDispatcher;

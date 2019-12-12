@@ -549,7 +549,7 @@ public class Dht : Node!(DhtNode, "dht")
     }
 }
 
-version (UnitTest)
+version (unittest)
 {
     void initDht ( )
     {
