@@ -24,7 +24,7 @@ import ocean.util.test.DirectorySandbox;
 import ocean.util.container.map.HashMap;
 import Path = ocean.io.Path;
 
-version ( UnitTest ) { }
+version ( unittest ) { }
 else
 int main ( istring[] args )
 {

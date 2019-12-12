@@ -167,7 +167,7 @@ public struct NodeAvailabilty
     private NodeErrorTracker[hash_t] error_trackers;
 }
 
-version ( UnitTest )
+version ( unittest )
 {
     import ocean.core.Test;
     import swarm.Const;

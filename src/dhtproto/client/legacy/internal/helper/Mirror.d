@@ -605,7 +605,7 @@ unittest
     // TODO: epoll.eventLoop();
 }
 
-version ( UnitTest )
+version ( unittest )
 {
     import ocean.io.select.EpollSelectDispatcher;
 }

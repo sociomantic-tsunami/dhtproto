@@ -26,7 +26,7 @@
 
 module dhtproto.client.UsageExamples;
 
-version ( UnitTest )
+version ( unittest )
 {
     import ocean.transition;
     import ocean.core.SmartUnion;

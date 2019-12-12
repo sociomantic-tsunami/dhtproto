@@ -19,7 +19,7 @@ import turtle.runner.Runner;
 import turtle.TestCase;
 import turtle.env.Dht;
 
-version ( UnitTest ) { }
+version ( unittest ) { }
 else
 int main ( istring[] args )
 {

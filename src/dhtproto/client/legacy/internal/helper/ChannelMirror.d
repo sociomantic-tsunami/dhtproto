@@ -301,7 +301,7 @@ abstract public class ChannelMirror ( Dht : DhtClient ) : MirrorBase!(Dht)
 
     ***************************************************************************/
 
-    version ( UnitTest )
+    version ( unittest )
     public this ( Dht dht, cstring channel,
                   uint update_time_s, uint retry_time_s,
                   lazy ListenRequest listen, lazy GetAllRequest get_all,
@@ -474,7 +474,7 @@ unittest
     // TODO: epoll.eventLoop()
 }
 
-version ( UnitTest )
+version ( unittest )
 {
     import ocean.core.Test;
     import ocean.io.select.EpollSelectDispatcher;
