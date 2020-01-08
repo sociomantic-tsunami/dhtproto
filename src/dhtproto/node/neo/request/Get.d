@@ -71,7 +71,7 @@ public abstract class GetProtocol_v0 : IRequest
 
         this.channel = this.resources.getVoidBuffer();
         (*this.channel).copy(ed.message_parser.getArray!(char)(init_payload));
-        enableStomping(*this.channel);
+        assumeSafeAppend(*this.channel);
         this.key = *ed.message_parser.getValue!(hash_t)(init_payload);
 
         void sendResponse ( MessageType status_code,
