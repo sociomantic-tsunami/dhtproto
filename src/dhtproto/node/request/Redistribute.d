@@ -123,7 +123,7 @@ public abstract scope class Redistribute : DhtCommand
         log.trace("New hash range: 0x{:x16}..0x{:x16}", this.min, this.max);
 
         (*this.redistribute_node_buffer).length = 0;
-        enableStomping(*this.redistribute_node_buffer);
+        assumeSafeAppend(*this.redistribute_node_buffer);
 
         while (true)
         {
@@ -147,7 +147,7 @@ public abstract scope class Redistribute : DhtCommand
         // Cut off final "end of flow" marker
         (*this.redistribute_node_buffer).length =
             (*this.redistribute_node_buffer).length - 1;
-        enableStomping(*this.redistribute_node_buffer);
+        assumeSafeAppend(*this.redistribute_node_buffer);
     }
 
     /***************************************************************************
