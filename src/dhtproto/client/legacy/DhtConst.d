@@ -189,7 +189,7 @@ public struct NodeHashRange
 
     ***************************************************************************/
 
-    mixin (genOpCmp(`
+    public int opCmp ( const typeof(this) rhs ) const
     {
         auto node_cmp = this.node.opCmp(rhs.node);
         if ( node_cmp == 0 )
@@ -200,7 +200,8 @@ public struct NodeHashRange
         {
             return node_cmp;
         }
-    }`));
+    }
+
 
     /***************************************************************************
 
