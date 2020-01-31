@@ -21,7 +21,7 @@ module dhtproto.node.request.Redistribute;
 import dhtproto.node.request.model.DhtCommand;
 
 import ocean.util.log.Logger;
-import ocean.transition;
+import ocean.meta.types.Qualifiers;
 
 /*******************************************************************************
 

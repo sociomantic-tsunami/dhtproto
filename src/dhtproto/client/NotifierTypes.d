@@ -12,7 +12,7 @@
 
 module dhtproto.client.NotifierTypes;
 
-import ocean.transition;
+import ocean.meta.types.Qualifiers;
 import Formatter = ocean.text.convert.Formatter;
 
 /*******************************************************************************

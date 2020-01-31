@@ -20,7 +20,7 @@
 
 module dhtproto.client.internal.NodeHashRanges;
 
-import ocean.transition;
+import ocean.meta.types.Qualifiers;
 import ocean.util.container.VoidBufferAsArrayOf;
 
 /// ditto

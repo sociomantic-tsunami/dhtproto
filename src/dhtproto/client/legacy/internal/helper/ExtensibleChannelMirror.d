@@ -27,7 +27,7 @@ module dhtproto.client.legacy.internal.helper.ExtensibleChannelMirror;
 
 *******************************************************************************/
 
-import ocean.transition;
+import ocean.meta.types.Qualifiers;
 import ocean.core.Enforce;
 import ocean.core.Verify;
 

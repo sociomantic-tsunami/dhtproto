@@ -18,7 +18,7 @@ module fakedht.request.Listen;
 
 *******************************************************************************/
 
-import ocean.transition;
+import ocean.meta.types.Qualifiers;
 import ocean.util.log.Logger;
 
 import swarm.util.Hash;

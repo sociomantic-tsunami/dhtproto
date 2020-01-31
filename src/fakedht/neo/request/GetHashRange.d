@@ -25,7 +25,7 @@ import fakedht.neo.SharedResources;
 import swarm.neo.node.RequestOnConn;
 import swarm.neo.request.Command;
 
-import ocean.transition;
+import ocean.meta.types.Qualifiers;
 
 /*******************************************************************************
 

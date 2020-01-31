@@ -18,7 +18,7 @@ module dhtproto.node.request.Remove;
 
 *******************************************************************************/
 
-import ocean.transition;
+import ocean.meta.types.Qualifiers;
 
 import dhtproto.node.request.model.SingleKey;
 

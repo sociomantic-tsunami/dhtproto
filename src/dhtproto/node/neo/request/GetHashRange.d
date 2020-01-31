@@ -53,7 +53,7 @@ public abstract scope class GetHashRangeProtocol_v0 : IRequest
     import dhtproto.common.GetHashRange;
     import dhtproto.node.neo.request.core.Mixins;
 
-    import ocean.transition;
+    import ocean.meta.types.Qualifiers;
     import ocean.core.Verify;
 
     /// Mixin the initialiser and the connection and resources members.

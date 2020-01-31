@@ -12,7 +12,7 @@
 
 module dhtproto.client.request.internal.Update;
 
-import ocean.transition;
+import ocean.meta.types.Qualifiers;
 import ocean.core.VersionCheck;
 import ocean.util.log.Logger;
 import ocean.core.Verify;

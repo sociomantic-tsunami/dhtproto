@@ -14,7 +14,7 @@ module integrationtest.channelserializer.main;
 
 import dhtproto.client.helper.ChannelSerializer;
 
-import ocean.transition;
+import ocean.meta.types.Qualifiers;
 import ocean.core.Test;
 import ocean.core.DeepCompare;
 import ocean.util.serialize.contiguous.Contiguous;

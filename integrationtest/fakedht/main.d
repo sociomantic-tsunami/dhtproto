@@ -14,7 +14,7 @@ module integrationtest.fakedht.main;
 
 import turtle.runner.Runner;
 import dhttest.TestRunner;
-import ocean.transition;
+import ocean.meta.types.Qualifiers;
 
 version ( unittest ) { }
 else

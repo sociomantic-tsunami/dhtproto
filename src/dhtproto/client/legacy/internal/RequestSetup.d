@@ -33,7 +33,7 @@ public import swarm.client.RequestSetup;
 
 public template IODelegate ( )
 {
-    import ocean.transition;
+    import ocean.meta.types.Qualifiers;
     import ocean.core.TypeConvert : downcast;
     import ocean.core.Verify;
 
@@ -97,7 +97,7 @@ public template IODelegate ( )
 
 public template Filter ( )
 {
-    import ocean.transition;
+    import ocean.meta.types.Qualifiers;
     import ocean.core.TypeConvert : downcast;
     import ocean.core.Verify;
 
@@ -174,7 +174,7 @@ public template Filter ( )
 
 public template Key ( )
 {
-    import ocean.transition;
+    import ocean.meta.types.Qualifiers;
     import ocean.core.TypeConvert : downcast;
     import ocean.core.Verify;
     static import swarm.util.Hash;

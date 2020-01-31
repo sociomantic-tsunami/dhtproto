@@ -12,7 +12,7 @@
 
 module fakedht.mixins.ChannelIteration;
 
-import ocean.transition;
+import ocean.meta.types.Qualifiers;
 
 /*******************************************************************************
 
@@ -43,7 +43,7 @@ public template ChannelIteration ( IterationKind kind,
     alias predicate = alwaysTrue )
 {
     import fakedht.Storage;
-    import ocean.transition;
+    import ocean.meta.types.Qualifiers;
     import ocean.core.Tuple;
     import ocean.core.TypeConvert;
 

@@ -50,7 +50,7 @@ import ocean.math.Range;
 
 import ocean.io.compress.lzo.LzoChunkCompressor;
 
-import ocean.transition;
+import ocean.meta.types.Qualifiers;
 
 
 /*******************************************************************************

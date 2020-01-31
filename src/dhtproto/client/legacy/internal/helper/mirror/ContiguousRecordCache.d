@@ -21,7 +21,7 @@ module dhtproto.client.legacy.internal.helper.mirror.ContiguousRecordCache;
 
 import dhtproto.client.legacy.internal.helper.mirror.model.IContiguousRecordCache;
 
-import ocean.transition;
+import ocean.meta.types.Qualifiers;
 import ocean.core.Verify;
 import ocean.util.container.map.model.IAllocator;
 import ocean.util.container.map.Map : StandardKeyHashingMap;

@@ -19,7 +19,7 @@ module dhttest.cases.Basic;
 *******************************************************************************/
 
 import ocean.core.Test;
-import ocean.transition;
+import ocean.meta.types.Qualifiers;
 import ocean.core.Test;
 import dhttest.DhtTestCase;
 

@@ -25,7 +25,7 @@ module dhtproto.client.legacy.internal.helper.ChannelMirror;
 
 *******************************************************************************/
 
-import ocean.transition;
+import ocean.meta.types.Qualifiers;
 
 import swarm.client.request.notifier.IRequestNotification;
 

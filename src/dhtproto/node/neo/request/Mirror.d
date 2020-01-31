@@ -31,7 +31,7 @@ public abstract class MirrorProtocol_v0 : IRequest
     import swarm.neo.util.MessageFiber;
     import dhtproto.common.Mirror;
     import dhtproto.node.neo.request.core.Mixins;
-    import ocean.transition;
+    import ocean.meta.types.Qualifiers;
     import ocean.core.Verify;
 
     /***************************************************************************

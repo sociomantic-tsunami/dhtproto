@@ -24,7 +24,7 @@ module dhtproto.client.legacy.internal.request.PutRequest;
 
 import dhtproto.client.legacy.internal.request.model.IPutRequest;
 
-import ocean.transition;
+import ocean.meta.types.Qualifiers;
 
 
 /*******************************************************************************

@@ -20,7 +20,7 @@
 
 module dhtproto.client.legacy.internal.helper.mirror.model.MirrorBase;
 
-import ocean.transition;
+import ocean.meta.types.Qualifiers;
 import ocean.core.Verify;
 
 import dhtproto.client.DhtClient;

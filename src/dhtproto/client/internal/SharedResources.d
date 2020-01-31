@@ -12,7 +12,7 @@
 
 module dhtproto.client.internal.SharedResources;
 
-import ocean.transition;
+import ocean.meta.types.Qualifiers;
 
 /// ditto
 public final class SharedResources
