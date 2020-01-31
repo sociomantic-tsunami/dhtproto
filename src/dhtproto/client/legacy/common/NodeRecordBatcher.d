@@ -35,7 +35,7 @@ import ocean.util.container.pool.FreeList;
 
 import ocean.util.container.map.Map;
 
-import ocean.transition;
+import ocean.meta.types.Qualifiers;
 import ocean.core.Verify;
 
 

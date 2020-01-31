@@ -27,7 +27,7 @@ public abstract class UpdateProtocol_v0 : IRequest
     import dhtproto.common.Update;
     import dhtproto.node.neo.request.core.Mixins;
 
-    import ocean.transition;
+    import ocean.meta.types.Qualifiers;
     import ocean.core.array.Mutation : copy;
     import ocean.io.digest.Fnv1;
 

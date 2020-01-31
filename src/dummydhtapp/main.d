@@ -27,7 +27,7 @@ module dummydhtapp.main;
 import core.thread;
 import core.stdc.stdlib : abort;
 
-import ocean.transition;
+import ocean.meta.types.Qualifiers;
 import ocean.io.Stdout;
 import ocean.core.Time;
 

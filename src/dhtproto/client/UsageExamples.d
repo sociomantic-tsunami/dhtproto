@@ -28,7 +28,7 @@ module dhtproto.client.UsageExamples;
 
 version ( unittest )
 {
-    import ocean.transition;
+    import ocean.meta.types.Qualifiers;
     import ocean.core.SmartUnion;
     import ocean.util.app.DaemonApp;
     import dhtproto.client.DhtClient;

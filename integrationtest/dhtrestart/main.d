@@ -14,7 +14,7 @@
 
 module integrationtest.dhtrestart.main;
 
-import ocean.transition;
+import ocean.meta.types.Qualifiers;
 
 import turtle.runner.Runner;
 import turtle.TestCase;

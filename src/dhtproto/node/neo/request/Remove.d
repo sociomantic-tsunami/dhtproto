@@ -27,7 +27,7 @@ public abstract class RemoveProtocol_v0 : IRequest
     import dhtproto.common.Remove;
     import dhtproto.node.neo.request.core.Mixins;
 
-    import ocean.transition;
+    import ocean.meta.types.Qualifiers;
 
     /// Mixin the initialiser and the connection and resources members.
     mixin IRequestHandlerRequestCore!();

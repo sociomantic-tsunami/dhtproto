@@ -22,7 +22,7 @@ public abstract class GetChannelsProtocol_v0 : IRequest
     import dhtproto.common.GetChannels;
     import dhtproto.node.neo.request.core.Mixins;
     import ocean.core.Array : copy;
-    import ocean.transition;
+    import ocean.meta.types.Qualifiers;
 
     /***************************************************************************
 

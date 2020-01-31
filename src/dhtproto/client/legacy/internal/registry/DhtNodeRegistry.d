@@ -43,7 +43,7 @@ import dhtproto.client.legacy.DhtConst;
 
 import dhtproto.client.legacy.internal.DhtClientExceptions;
 
-import ocean.transition;
+import ocean.meta.types.Qualifiers;
 
 import ocean.io.select.EpollSelectDispatcher;
 

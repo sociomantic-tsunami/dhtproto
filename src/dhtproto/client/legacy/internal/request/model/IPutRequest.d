@@ -30,7 +30,7 @@ import swarm.client.ClientExceptions;
 
 import ocean.core.Enforce;
 
-import ocean.transition;
+import ocean.meta.types.Qualifiers;
 
 
 /*******************************************************************************

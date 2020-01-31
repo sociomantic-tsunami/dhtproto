@@ -18,7 +18,7 @@ module fakedht.request.GetChannelSize;
 
 *******************************************************************************/
 
-import ocean.transition;
+import ocean.meta.types.Qualifiers;
 
 import Protocol = dhtproto.node.request.GetChannelSize;
 

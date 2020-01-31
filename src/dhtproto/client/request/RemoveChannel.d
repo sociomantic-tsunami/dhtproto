@@ -17,7 +17,7 @@
 
 module dhtproto.client.request.RemoveChannel;
 
-import ocean.transition;
+import ocean.meta.types.Qualifiers;
 import ocean.core.SmartUnion;
 public import swarm.neo.client.NotifierTypes;
 

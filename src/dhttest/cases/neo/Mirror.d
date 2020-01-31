@@ -12,7 +12,7 @@
 
 module dhttest.cases.neo.Mirror;
 
-import ocean.transition;
+import ocean.meta.types.Qualifiers;
 import ocean.core.Test;
 import ocean.core.Verify;
 import dhttest.DhtTestCase : NeoDhtTestCase;

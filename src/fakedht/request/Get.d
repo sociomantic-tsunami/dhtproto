@@ -18,7 +18,7 @@ module fakedht.request.Get;
 
 *******************************************************************************/
 
-import ocean.transition;
+import ocean.meta.types.Qualifiers;
 
 import Protocol = dhtproto.node.request.Get;
 

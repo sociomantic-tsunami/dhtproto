@@ -29,7 +29,7 @@
 
 module dhtproto.client.helper.ChannelSerializer;
 
-import ocean.transition;
+import ocean.meta.types.Qualifiers;
 import ocean.io.device.File;
 import ocean.io.serialize.SimpleStreamSerializer;
 import ocean.io.stream.Buffered;

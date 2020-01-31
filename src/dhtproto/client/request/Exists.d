@@ -26,7 +26,7 @@
 
 module dhtproto.client.request.Exists;
 
-import ocean.transition;
+import ocean.meta.types.Qualifiers;
 import ocean.core.SmartUnion;
 public import swarm.neo.client.NotifierTypes;
 

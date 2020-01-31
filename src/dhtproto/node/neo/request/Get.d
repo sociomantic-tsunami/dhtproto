@@ -27,7 +27,7 @@ public abstract class GetProtocol_v0 : IRequest
     import dhtproto.common.Get;
     import dhtproto.node.neo.request.core.Mixins;
 
-    import ocean.transition;
+    import ocean.meta.types.Qualifiers;
     import ocean.core.Verify;
     import ocean.core.array.Mutation : copy;
 

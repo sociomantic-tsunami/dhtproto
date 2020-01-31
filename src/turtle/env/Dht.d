@@ -15,7 +15,7 @@
 
 module turtle.env.Dht;
 
-import ocean.transition;
+import ocean.meta.types.Qualifiers;
 
 import turtle.env.model.Node;
 

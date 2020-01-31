@@ -12,7 +12,7 @@
 
 module fakedht.neo.SharedResources;
 
-import ocean.transition;
+import ocean.meta.types.Qualifiers;
 
 import dhtproto.node.neo.request.core.IRequestResources;
 

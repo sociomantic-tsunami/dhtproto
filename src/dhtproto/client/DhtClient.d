@@ -123,7 +123,7 @@ module dhtproto.client.DhtClient;
 
 *******************************************************************************/
 
-import ocean.transition;
+import ocean.meta.types.Qualifiers;
 
 import swarm.util.ExtensibleClass;
 import swarm.Const;
@@ -171,7 +171,7 @@ import ocean.core.Verify;
 
 debug ( SwarmClient ) import ocean.io.Stdout;
 
-import ocean.transition;
+import ocean.meta.types.Qualifiers;
 
 
 /*******************************************************************************

@@ -19,7 +19,7 @@ module dhtproto.client.legacy.internal.helper.mirror.model.IContiguousRecordCach
 
 *******************************************************************************/
 
-import ocean.transition;
+import ocean.meta.types.Qualifiers;
 import ocean.util.serialize.contiguous.Contiguous;
 
 

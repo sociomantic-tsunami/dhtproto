@@ -20,7 +20,7 @@ module dhtproto.client.legacy.internal.connection.DhtRequestConnection;
 
 *******************************************************************************/
 
-import ocean.transition;
+import ocean.meta.types.Qualifiers;
 import ocean.core.Enforce;
 
 import swarm.client.connection.RequestConnection;

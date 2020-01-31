@@ -35,7 +35,7 @@ import dhtproto.client.legacy.common.NodeRecordBatcher;
 
 import dhtproto.client.legacy.internal.request.params.RedistributeInfo;
 
-import ocean.transition;
+import ocean.meta.types.Qualifiers;
 
 
 /*******************************************************************************

@@ -16,7 +16,7 @@
 
 module dhttest.cases.neo.RemoveChannel;
 
-import ocean.transition;
+import ocean.meta.types.Qualifiers;
 import ocean.core.Test;
 import dhttest.DhtTestCase : NeoDhtTestCase;
 import dhtproto.client.DhtClient;

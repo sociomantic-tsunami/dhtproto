@@ -28,7 +28,7 @@ module dhtproto.client.legacy.internal.request.model.IBulkGetRequest;
 
 *******************************************************************************/
 
-import ocean.transition;
+import ocean.meta.types.Qualifiers;
 
 import swarm.Const : NodeItem;
 

@@ -26,7 +26,7 @@ public abstract class GetAllProtocol_v0 : IRequest
     import swarm.util.RecordBatcher;
     import dhtproto.common.GetAll;
     import dhtproto.node.neo.request.core.Mixins;
-    import ocean.transition;
+    import ocean.meta.types.Qualifiers;
     import ocean.core.Verify;
 
     /***************************************************************************

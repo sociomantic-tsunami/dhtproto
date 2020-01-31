@@ -18,7 +18,7 @@ module fakedht.Storage;
 
 *******************************************************************************/
 
-import ocean.transition;
+import ocean.meta.types.Qualifiers;
 
 import ocean.core.Enforce;
 import ocean.task.Task;

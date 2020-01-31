@@ -29,7 +29,7 @@ import swarm.util.RecordBatcher;
 
 import ocean.core.Tuple;
 
-import ocean.transition;
+import ocean.meta.types.Qualifiers;
 
 /*******************************************************************************
 

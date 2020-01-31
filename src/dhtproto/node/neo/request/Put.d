@@ -27,7 +27,7 @@ public abstract class PutProtocol_v0 : IRequest
     import dhtproto.common.Put;
     import dhtproto.node.neo.request.core.Mixins;
 
-    import ocean.transition;
+    import ocean.meta.types.Qualifiers;
 
     /***************************************************************************
 

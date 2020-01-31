@@ -22,7 +22,7 @@ module dhtproto.node.request.model.CompressedBatch;
 
 import dhtproto.node.request.model.SingleChannel;
 
-import ocean.transition;
+import ocean.meta.types.Qualifiers;
 import ocean.core.Verify;
 import ocean.util.log.Logger;
 

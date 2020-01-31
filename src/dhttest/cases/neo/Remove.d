@@ -12,7 +12,7 @@
 
 module dhttest.cases.neo.Remove;
 
-import ocean.transition;
+import ocean.meta.types.Qualifiers;
 import dhttest.DhtTestCase : NeoDhtTestCase;
 
 /*******************************************************************************
