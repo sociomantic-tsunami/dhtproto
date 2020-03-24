@@ -28,9 +28,6 @@ core client and server code over a series of alpha releases in a separate branch
 Note that the DHT client and node defined in this repo support *both* neo and
 legacy features.
 
-When the alpha releases are considered stable, the ``neo`` branch will be merged
-into the main release branch (currently ``v13.x.x``).
-
 When sufficient neo features have been implemented and the legacy protocol is no
 longer in active use, the legacy protocol will be deprecated and eventually
 removed.
@@ -41,9 +38,9 @@ Dependencies
 ==========  =======
 Dependency  Version
 ==========  =======
-ocean       v4.0.x
-swarm       v5.0.x
-turtle      v9.0.x
+ocean       v5.0.x
+swarm       v6.0.x
+turtle      v10.0.x
 ==========  =======
 
 Versioning
@@ -68,10 +65,10 @@ Maintained Major Branches
 ======= ==================== =============== =====
 Major   Initial release date Supported until Notes
 ======= ==================== =============== =====
-v14.x.x v14.0.0_: 30/01/2018 TBD
+v15.x.x v15.0.0_: 04/06/2019 TBD
 ======= ==================== =============== =====
 
-.. _v14.0.0: https://github.com/sociomantic-tsunami/dhtproto/releases/tag/v14.0.0
+.. _v15.0.0: https://github.com/sociomantic-tsunami/dhtproto/releases/tag/v15.0.0
 
 
 Contributing
