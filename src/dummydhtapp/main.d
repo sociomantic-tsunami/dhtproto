@@ -25,11 +25,11 @@ module dummydhtapp.main;
 *******************************************************************************/
 
 import core.thread;
+import core.time;
 import core.stdc.stdlib : abort;
 
 import ocean.meta.types.Qualifiers;
 import ocean.io.Stdout;
-import ocean.core.Time;
 
 import ocean.net.server.unix.UnixListener;
 
@@ -206,7 +206,7 @@ class Sync
             // app compatible with them, listen request needs to be restarted
             // upon failures until the app gets killed
             Stderr.formatln("Listen failure, trying again in 100 ms").flush();
-            Thread.sleep(seconds(0.1));
+            Thread.sleep(100.msecs);
             (new Sync(this.src, this.dst)).register();
         }
     }
