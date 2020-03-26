@@ -290,7 +290,7 @@ public abstract class MirrorProtocol_v0 : IRequest
 
         ***********************************************************************/
 
-        public void opPostInc ( )
+        public void opUnary(string op : "++") ( )
         {
             this.last_overflow_time = time(null);
             this.count_since_last_notification++;
