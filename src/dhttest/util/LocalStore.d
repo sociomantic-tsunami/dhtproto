@@ -459,8 +459,8 @@ public struct NeoVerifier
 
         mstring buf;
         mstring[] channels;
-        foreach ( channel; dht.blocking.getChannels(buf) )
-            channels ~= channel.dup;
+        foreach ( chan; dht.blocking.getChannels(buf) )
+            channels ~= chan.dup;
 
         test(channels.contains(channel));
     }
