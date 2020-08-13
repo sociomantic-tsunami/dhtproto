@@ -32,10 +32,6 @@ jobs:
     include:
         # Test matrix
         - <<: *test-matrix
-          env: DMD=2.071.2.s* F=production
-        - <<: *test-matrix
-          env: DMD=2.071.2.s* F=devel
-        - <<: *test-matrix
           env: DMD=2.078.3.s* F=production
         - <<: *test-matrix
           env: DMD=2.078.3.s* F=devel
