@@ -264,7 +264,6 @@ public struct NodeHashRange
 
 private class NodeHashRangesBase
 {
-    import ocean.core.Traits : ReturnTypeOf;
     import swarm.neo.AddrPort;
     import swarm.neo.client.ConnectionSet;
     import swarm.util.Hash : isWithinNodeResponsibility;
@@ -275,7 +274,7 @@ private class NodeHashRangesBase
     private static ulong order_counter;
 
     /// Convenience alias for the comparison type of AddrPort.
-    private alias ReturnTypeOf!(AddrPort.cmp_id) Addr;
+    private alias typeof(AddrPort.init.cmp_id()) Addr;
 
     /// Map of IP address -> node hash range.
     private NodeHashRange[Addr] node_hash_ranges;
