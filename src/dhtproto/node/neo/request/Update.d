@@ -102,9 +102,6 @@ public abstract class UpdateProtocol_v0 : IRequest
                 payload.add(response);
             }
         );
-
-        static if (!hasFeaturesFrom!("swarm", 4, 7))
-            ed.flush();
     }
 
     /***************************************************************************
@@ -138,9 +135,6 @@ public abstract class UpdateProtocol_v0 : IRequest
                         payload.addArray(value);
                     }
                 );
-
-                static if (!hasFeaturesFrom!("swarm", 4, 7))
-                    ed.flush();
             }
         );
 

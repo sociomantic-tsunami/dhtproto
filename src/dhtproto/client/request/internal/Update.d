@@ -407,9 +407,6 @@ private struct FirstROCHandler
             }
         );
 
-        static if (!hasFeaturesFrom!("swarm", 4, 7))
-            conn.flush();
-
         // Receive supported code from node.
         auto supported = conn.receiveValue!(SupportedStatus)();
         if ( !Update.handleSupportedCodes(supported, this.context,
@@ -515,9 +512,6 @@ private struct FirstROCHandler
             }
         );
 
-        static if (!hasFeaturesFrom!("swarm", 4, 7))
-            conn.flush();
-
         // Handle response message.
         auto result = conn.receiveValue!(MessageType)();
         with ( MessageType ) switch ( result )
@@ -600,9 +594,6 @@ private struct FirstROCHandler
             }
         );
 
-        static if (!hasFeaturesFrom!("swarm", 4, 7))
-            conn.flush();
-
         // Handle response message.
         auto result = conn.receiveValue!(MessageType)();
         with ( MessageType ) switch ( result )
@@ -651,9 +642,6 @@ private struct FirstROCHandler
                 payload.addCopy(MessageType.LeaveRecord);
             }
         );
-
-        static if (!hasFeaturesFrom!("swarm", 4, 7))
-            conn.flush();
 
         auto result = conn.receiveValue!(MessageType)();
         with ( MessageType ) switch ( result )
@@ -742,9 +730,6 @@ private struct SecondROCHandler
                     payload.addArray(*this.context.shared_working.updated_value);
                 }
             );
-
-            static if (!hasFeaturesFrom!("swarm", 4, 7))
-                conn.flush();
 
             // Receive supported code from node.
             auto supported = conn.receiveValue!(SupportedStatus)();

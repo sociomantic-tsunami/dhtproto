@@ -119,9 +119,6 @@ public abstract scope class GetHashRangeProtocol_v0 : IRequest
             }
         );
 
-        static if (!hasFeaturesFrom!("swarm", 4, 7))
-            ed.flush();
-
         while ( true )
         {
             // Send all pending updates to the client

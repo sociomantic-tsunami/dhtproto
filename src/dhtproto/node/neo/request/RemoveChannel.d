@@ -74,9 +74,6 @@ public abstract scope class RemoveChannelProtocol_v0 : IRequest
                 payload.add(this.response);
             }
         );
-
-        static if (!hasFeaturesFrom!("swarm", 4, 7))
-            ed.flush();
     }
 
     /***************************************************************************

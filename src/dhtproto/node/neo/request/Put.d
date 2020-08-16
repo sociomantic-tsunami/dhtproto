@@ -84,9 +84,6 @@ public abstract class PutProtocol_v0 : IRequest
                 payload.add(response);
             }
         );
-
-        static if (!hasFeaturesFrom!("swarm", 4, 7))
-            ed.flush();
     }
 
     /***************************************************************************
