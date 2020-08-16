@@ -318,4 +318,3 @@ abstract class NeoDhtTestCase : TestCase
             this.connect_task.resume();
     }
 }
-

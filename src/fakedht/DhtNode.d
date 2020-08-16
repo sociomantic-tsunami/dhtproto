@@ -1,5 +1,5 @@
 /*******************************************************************************
-    
+
     Provides simple dht node implementation. Intended to emulate node in tests,
     both in protocol tests and in any client application test suite.
 
@@ -155,7 +155,7 @@ public class DhtNode
     }
 
     /***************************************************************************
-    
+
         Make any error fatal
 
     ***************************************************************************/
