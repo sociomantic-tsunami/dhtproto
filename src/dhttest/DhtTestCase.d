@@ -196,9 +196,6 @@ abstract class NeoDhtTestCase : TestCase
         this.dht = new DhtClient(theScheduler.epoll, auth_name,
             auth_key.content, &this.neoConnectionNotifier, max_connections);
 
-        static if (!hasFeaturesFrom!("swarm", 4, 7))
-            this.dht.neo.enableSocketNoDelay();
-
         this.connect(10000);
     }
 

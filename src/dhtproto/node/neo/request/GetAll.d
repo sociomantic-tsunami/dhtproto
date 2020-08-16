@@ -173,9 +173,6 @@ public abstract class GetAllProtocol_v0 : IRequest
             }
         );
 
-        static if (!hasFeaturesFrom!("swarm", 4, 7))
-            this.connection.event_dispatcher.flush();
-
         if ( !this.initialised_ok )
             return;
 
@@ -425,11 +422,6 @@ public abstract class GetAllProtocol_v0 : IRequest
                     payload.addArray(*this.outer.compressed_batch);
                 }
             );
-
-            // flush() does not suspend the fiber, so is safe to call in a
-            // RequestEventDispatcher-managed request.
-            static if (!hasFeaturesFrom!("swarm", 4, 7))
-                this.outer.connection.event_dispatcher.flush();
         }
     }
 

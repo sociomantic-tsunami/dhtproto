@@ -117,9 +117,6 @@ public abstract class GetProtocol_v0 : IRequest
         }
         else
             sendResponse(MessageType.WrongNode);
-
-        static if (!hasFeaturesFrom!("swarm", 4, 7))
-            ed.flush();
     }
 
     /***************************************************************************

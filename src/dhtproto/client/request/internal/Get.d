@@ -198,9 +198,6 @@ public struct Get
                 }
             );
 
-            static if (!hasFeaturesFrom!("swarm", 4, 7))
-                conn.flush();
-
             // Receive supported code from node
             auto supported = conn.receiveValue!(SupportedStatus)();
             if ( !Get.handleSupportedCodes(supported, context,

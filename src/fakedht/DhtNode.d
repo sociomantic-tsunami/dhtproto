@@ -96,10 +96,6 @@ public class DhtNode
         Options neo_options;
         neo_options.requests = requests;
         neo_options.epoll = epoll;
-
-        static if (!hasFeaturesFrom!("swarm", 4, 7))
-            neo_options.no_delay = true; // favour network turn-around over packet efficiency
-
         neo_options.credentials_map["admin"] = Key.init;
 
         ushort neo_port = node_item.Port;
