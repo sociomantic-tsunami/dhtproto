@@ -34,7 +34,7 @@ import dhtproto.client.legacy.internal.request.model.IKeyRequest;
 
 *******************************************************************************/
 
-public scope class GetRequest : IKeyRequest
+public class GetRequest : IKeyRequest
 {
     /***************************************************************************
 

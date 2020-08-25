@@ -35,7 +35,7 @@ public class ExistsImpl_v0 : ExistsProtocol_v0
     static immutable Command command = Command(RequestCode.Exists, 0);
 
     /// Request name for stats tracking. Required by ConnectionHandler.
-    static immutable istring name = "Exists";
+    static immutable string name = "Exists";
 
     /// Flag indicating whether timing stats should be gathered for requests of
     /// this type.

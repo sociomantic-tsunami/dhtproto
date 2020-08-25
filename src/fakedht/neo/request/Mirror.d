@@ -46,7 +46,7 @@ public class MirrorImpl_v0 : MirrorProtocol_v0, DhtListener
     static immutable Command command = Command(RequestCode.Mirror, 0);
 
     /// Request name for stats tracking. Required by ConnectionHandler.
-    static immutable istring name = "Mirror";
+    static immutable string name = "Mirror";
 
     /// Flag indicating whether timing stats should be gathered for requests of
     /// this type.
@@ -63,7 +63,7 @@ public class MirrorImpl_v0 : MirrorProtocol_v0, DhtListener
     private cstring channel_name;
 
     /// List of keys to visit during an iteration.
-    private istring[] iterate_keys;
+    private string[] iterate_keys;
 
     /***************************************************************************
 

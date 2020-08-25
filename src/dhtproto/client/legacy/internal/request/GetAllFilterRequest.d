@@ -35,7 +35,7 @@ import ocean.io.select.client.FiberSelectEvent;
 
 *******************************************************************************/
 
-public scope class GetAllFilterRequest : IBulkGetPairsRequest
+public class GetAllFilterRequest : IBulkGetPairsRequest
 {
     /**************************************************************************
 

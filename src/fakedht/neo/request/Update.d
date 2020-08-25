@@ -35,7 +35,7 @@ public class UpdateImpl_v0 : UpdateProtocol_v0
     static immutable Command command = Command(RequestCode.Update, 0);
 
     /// Request name for stats tracking. Required by ConnectionHandler.
-    static immutable istring name = "Update";
+    static immutable string name = "Update";
 
     /// Flag indicating whether timing stats should be gathered for requests of
     /// this type.

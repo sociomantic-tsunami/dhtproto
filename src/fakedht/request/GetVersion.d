@@ -26,7 +26,7 @@ import Protocol = dhtproto.node.request.GetVersion;
 
 *******************************************************************************/
 
-public scope class GetVersion : Protocol.GetVersion
+public class GetVersion : Protocol.GetVersion
 {
     import fakedht.mixins.RequestConstruction;
 

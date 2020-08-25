@@ -136,7 +136,7 @@ public struct RemoveChannel
 
 *******************************************************************************/
 
-private scope class RemoveChannelHandler
+private class RemoveChannelHandler
 {
     import swarm.neo.client.RequestOnConn;
     import swarm.neo.connection.RequestOnConnBase;

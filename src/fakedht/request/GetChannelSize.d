@@ -28,7 +28,7 @@ import Protocol = dhtproto.node.request.GetChannelSize;
 
 *******************************************************************************/
 
-public scope class GetChannelSize : Protocol.GetChannelSize
+public class GetChannelSize : Protocol.GetChannelSize
 {
     import fakedht.mixins.RequestConstruction;
     import fakedht.Storage;

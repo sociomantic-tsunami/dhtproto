@@ -28,7 +28,7 @@ import Protocol = dhtproto.node.request.PutBatch;
 
 *******************************************************************************/
 
-public scope class PutBatch : Protocol.PutBatch
+public class PutBatch : Protocol.PutBatch
 {
     import fakedht.mixins.RequestConstruction;
     import fakedht.Storage;

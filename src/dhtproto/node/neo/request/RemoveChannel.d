@@ -17,7 +17,7 @@ import ocean.util.log.Logger;
 import swarm.neo.node.IRequest;
 
 /// ditto
-public abstract scope class RemoveChannelProtocol_v0 : IRequest
+public abstract class RemoveChannelProtocol_v0 : IRequest
 {
     import swarm.neo.node.RequestOnConn;
     import dhtproto.common.RemoveChannel;

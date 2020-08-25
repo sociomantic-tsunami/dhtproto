@@ -26,7 +26,7 @@ import dhtproto.node.request.model.DhtCommand;
 
 *******************************************************************************/
 
-public abstract scope class GetResponsibleRange : DhtCommand
+public abstract class GetResponsibleRange : DhtCommand
 {
     import dhtproto.client.legacy.DhtConst;
 

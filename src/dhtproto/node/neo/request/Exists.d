@@ -21,7 +21,7 @@ import swarm.neo.node.IRequest;
 
 *******************************************************************************/
 
-public abstract scope class ExistsProtocol_v0 : IRequest
+public abstract class ExistsProtocol_v0 : IRequest
 {
     import swarm.neo.node.RequestOnConn;
     import dhtproto.common.Exists;

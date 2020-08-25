@@ -39,7 +39,7 @@ import ocean.meta.types.Qualifiers;
 
 *******************************************************************************/
 
-public scope class IPutRequest : IKeyRequest
+public class IPutRequest : IKeyRequest
 {
     /***************************************************************************
 

@@ -28,7 +28,7 @@ import dhtproto.node.request.model.SingleChannel;
 
 *******************************************************************************/
 
-public abstract scope class PutBatch : SingleChannel
+public abstract class PutBatch : SingleChannel
 {
     import dhtproto.node.request.model.DhtCommand;
 

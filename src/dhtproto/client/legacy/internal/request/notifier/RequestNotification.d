@@ -36,7 +36,7 @@ import ocean.core.Verify;
 
 *******************************************************************************/
 
-public scope class RequestNotification : IRequestNotification
+public class RequestNotification : IRequestNotification
 {
     /***************************************************************************
 

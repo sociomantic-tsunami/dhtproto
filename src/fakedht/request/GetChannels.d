@@ -28,7 +28,7 @@ import Protocol = dhtproto.node.request.GetChannels;
 
 *******************************************************************************/
 
-public scope class GetChannels : Protocol.GetChannels
+public class GetChannels : Protocol.GetChannels
 {
     import fakedht.mixins.RequestConstruction;
     import fakedht.Storage;

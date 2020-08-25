@@ -68,7 +68,7 @@ public template ChannelIteration ( IterationKind kind,
 
     ***************************************************************************/
 
-    private istring[] remaining_keys;
+    private string[] remaining_keys;
 
     /***************************************************************************
 

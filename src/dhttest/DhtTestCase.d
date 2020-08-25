@@ -60,7 +60,7 @@ abstract class DhtTestCase : TestCase
 
     ***************************************************************************/
 
-    protected istring test_channel;
+    protected string test_channel;
 
     /***************************************************************************
 
@@ -150,7 +150,7 @@ abstract class NeoDhtTestCase : TestCase
 
     ***************************************************************************/
 
-    protected istring test_channel;
+    protected string test_channel;
 
     /***************************************************************************
 

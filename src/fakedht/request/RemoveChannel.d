@@ -28,7 +28,7 @@ import Protocol = dhtproto.node.request.RemoveChannel;
 
 *******************************************************************************/
 
-public scope class RemoveChannel : Protocol.RemoveChannel
+public class RemoveChannel : Protocol.RemoveChannel
 {
     import fakedht.mixins.RequestConstruction;
     import fakedht.Storage;

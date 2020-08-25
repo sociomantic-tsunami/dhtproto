@@ -28,7 +28,7 @@ import dhtproto.node.request.model.DhtCommand;
 
 *******************************************************************************/
 
-public abstract scope class GetVersion : DhtCommand
+public abstract class GetVersion : DhtCommand
 {
     import dhtproto.client.legacy.DhtConst;
 

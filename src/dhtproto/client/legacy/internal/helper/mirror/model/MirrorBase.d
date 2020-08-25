@@ -46,7 +46,7 @@ abstract public class MirrorBase ( Dht : DhtClient )
     protected Dht dht;
 
     /// Name of DHT channel to mirror.
-    protected istring channel_;
+    protected string channel_;
 
     /// Time (in milliseconds) to wait between successful GetAlls.
     public const(uint) update_time_ms;
@@ -82,7 +82,7 @@ abstract public class MirrorBase ( Dht : DhtClient )
 
     ***************************************************************************/
 
-    public istring channel ()
+    public string channel ()
     {
         return this.channel_;
     }

@@ -37,7 +37,7 @@ import dhtproto.client.legacy.internal.request.model.IDhtRequestResources;
 
 *******************************************************************************/
 
-public scope class IRequest : Core.IRequest
+public class IRequest : Core.IRequest
 {
     /***************************************************************************
 

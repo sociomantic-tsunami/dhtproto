@@ -28,7 +28,7 @@ import dhtproto.node.request.model.DhtCommand;
 
 *******************************************************************************/
 
-public abstract scope class GetChannels : DhtCommand
+public abstract class GetChannels : DhtCommand
 {
     import dhtproto.client.legacy.DhtConst;
 

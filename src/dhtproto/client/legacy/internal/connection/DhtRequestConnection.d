@@ -121,7 +121,7 @@ public class DhtRequestConnection :
 
     ***************************************************************************/
 
-    private scope class DhtRequestResources
+    private class DhtRequestResources
         : RequestResources, IDhtRequestResources
     {
         import swarm.Const : NodeItem;

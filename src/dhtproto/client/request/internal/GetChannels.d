@@ -177,7 +177,7 @@ public struct GetChannels
 
 *******************************************************************************/
 
-private scope class GetChannelsHandler
+private class GetChannelsHandler
 {
     import swarm.neo.client.RequestOnConn;
     import swarm.neo.connection.RequestOnConnBase;

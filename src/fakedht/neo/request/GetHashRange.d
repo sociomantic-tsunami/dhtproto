@@ -41,7 +41,7 @@ public class GetHashRangeImpl_v0 : GetHashRangeProtocol_v0
     static immutable Command command = Command(RequestCode.GetHashRange, 0);
 
     /// Request name for stats tracking. Required by ConnectionHandler.
-    static immutable istring name = "GetHashRange";
+    static immutable string name = "GetHashRange";
 
     /// Flag indicating whether timing stats should be gathered for requests of
     /// this type.

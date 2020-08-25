@@ -47,7 +47,7 @@ public struct HashRangeUpdate
 
 *******************************************************************************/
 
-public abstract scope class GetHashRangeProtocol_v0 : IRequest
+public abstract class GetHashRangeProtocol_v0 : IRequest
 {
     import swarm.neo.node.RequestOnConn;
     import dhtproto.common.GetHashRange;

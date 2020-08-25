@@ -65,7 +65,7 @@ DhtClient             dht;
 
 version ( unittest ) { }
 else
-void main ( istring[] args )
+void main ( string[] args )
 {
     if (args.length > 1 && args[1] == "--message")
     {

@@ -28,7 +28,7 @@ import Protocol = dhtproto.node.request.GetAllFilter;
 
 *******************************************************************************/
 
-public scope class GetAllFilter : Protocol.GetAllFilter
+public class GetAllFilter : Protocol.GetAllFilter
 {
     import fakedht.mixins.RequestConstruction;
     import fakedht.mixins.ChannelIteration;

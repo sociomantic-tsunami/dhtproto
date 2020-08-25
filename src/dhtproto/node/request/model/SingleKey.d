@@ -32,7 +32,7 @@ import dhtproto.node.request.model.SingleChannel;
 
 *******************************************************************************/
 
-public abstract scope class SingleKey : SingleChannel
+public abstract class SingleKey : SingleChannel
 {
     import dhtproto.node.request.model.DhtCommand;
 
