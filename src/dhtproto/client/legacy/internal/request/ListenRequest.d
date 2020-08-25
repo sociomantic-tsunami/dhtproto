@@ -44,7 +44,7 @@ import ocean.io.select.client.FiberSelectEvent;
 
 *******************************************************************************/
 
-public scope class ListenRequest : IChannelRequest, IStreamInfo
+public class ListenRequest : IChannelRequest, IStreamInfo
 {
     /***************************************************************************
 

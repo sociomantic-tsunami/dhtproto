@@ -26,7 +26,7 @@ import Path = ocean.io.Path;
 
 version ( unittest ) { }
 else
-int main ( istring[] args )
+int main ( string[] args )
 {
     struct S
     {

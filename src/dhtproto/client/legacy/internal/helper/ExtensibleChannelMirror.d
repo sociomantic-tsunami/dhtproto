@@ -96,7 +96,7 @@ public class ExtensibleMirror
         mixin ReusableExceptionImplementation!();
 
         public void enforce ( cstring key,
-            istring file = __FILE__, long line = __LINE__ )
+            string file = __FILE__, long line = __LINE__ )
         {
             if ( !isHash(key) )
             {
@@ -256,7 +256,7 @@ unittest
         RawRecordDeserializer!(Record), DeserializedRecordCache!(Record))
         ExampleMirror;
 
-    istring channel = "channel";
+    string channel = "channel";
     auto deserializer = new RawRecordDeserializer!(Record);
     auto cache = new DeserializedRecordCache!(Record)(100);
     auto mirror = new ExampleMirror(
@@ -298,7 +298,7 @@ unittest
     void example ( )
     {
         // Channel to be mirrored
-        istring channel = "channel";
+        string channel = "channel";
 
         // Struct contained (serialized) in the channel
         static struct Record
@@ -309,7 +309,7 @@ unittest
             hash_t id;
             size_t count;
 
-            istring toString ( )
+            string toString ( )
             {
                 return format("[{}, {}, {}]",
                     this.update_time, this.id, this.count);
@@ -681,7 +681,7 @@ public class DeserializedRecordCache ( T )
     {
         assert(c !is null);
     }
-    body
+    do
     {
         return this.cache_;
     }

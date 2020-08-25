@@ -84,7 +84,7 @@ public class DhtConnectionHandler :
 
     ***************************************************************************/
 
-    private scope class DhtRequestResources : DhtCommand.Resources
+    private class DhtRequestResources : DhtCommand.Resources
     {
         import dhtproto.node.request.params.RedistributeNode;
         import swarm.util.RecordBatcher;

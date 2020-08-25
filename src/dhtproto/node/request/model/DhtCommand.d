@@ -29,7 +29,7 @@ import swarm.node.protocol.Command;
 
 *******************************************************************************/
 
-public abstract scope class DhtCommand : Command
+public abstract class DhtCommand : Command
 {
     import dhtproto.node.request.params.RedistributeNode;
 

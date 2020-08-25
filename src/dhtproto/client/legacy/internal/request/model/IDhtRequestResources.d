@@ -1,6 +1,6 @@
 /*******************************************************************************
 
-    Interface and base scope class containing getter methods to acquire
+    Interface and base class containing getter methods to acquire
     resources needed by a dht client request. Multiple calls to the same
     getter only result in the acquiring of a single resource of that type, so
     that the same resource is used over the life time of a request. When a
@@ -101,7 +101,7 @@ public interface IDhtRequestResources : IRequestResources
 
 /*******************************************************************************
 
-    Mix in a scope class called RequestResources which implements
+    Mix in a class called RequestResources which implements
     IRequestResources.
 
     Note that this class does not implement the additional methods required by

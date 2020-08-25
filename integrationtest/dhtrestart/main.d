@@ -25,7 +25,7 @@ class DhtRestartTests : TurtleRunnerTask!(TestedAppKind.Daemon)
     import turtle.env.Dht;
 
     override protected void configureTestedApplication ( out double delay,
-        out istring[] args, out istring[istring] env )
+        out string[] args, out string[string] env )
     {
         delay = 0.1;
     }
@@ -45,7 +45,7 @@ class DhtRestartTests : TurtleRunnerTask!(TestedAppKind.Daemon)
 
 version ( unittest ) { }
 else
-int main ( istring[] args )
+int main ( string[] args )
 {
     auto runner = new TurtleRunner!(DhtRestartTests)("dhtapp", "");
     return runner.main(args);

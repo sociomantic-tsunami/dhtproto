@@ -58,7 +58,7 @@ struct DHT
 
     ***************************************************************************/
 
-    private Channel[istring] channels;
+    private Channel[string] channels;
 
     /***************************************************************************
 
@@ -180,9 +180,9 @@ struct DHT
 
     ***************************************************************************/
 
-    public istring[] getChannelList ( )
+    public string[] getChannelList ( )
     {
-        istring[] result;
+        string[] result;
 
         foreach (key, value; this.channels)
             result ~= key;
@@ -308,7 +308,7 @@ class Channel
 
     ***************************************************************************/
 
-    private ValueType[istring] data;
+    private ValueType[string] data;
 
     /***************************************************************************
 
@@ -338,9 +338,9 @@ class Channel
 
     ***************************************************************************/
 
-    public istring[] getKeys ( )
+    public string[] getKeys ( )
     {
-        istring[] result;
+        string[] result;
 
         foreach (key, value; this.data)
             result ~= key;
@@ -476,7 +476,7 @@ class Channel
     {
         assert((key in this.data) is null);
     }
-    body
+    do
     {
         auto existed = (key in this.data) !is null;
         this.data.remove(idup(key));
@@ -576,7 +576,7 @@ class Channel
 
 class MissingChannelException : Exception
 {
-    this ( istring name, istring file = __FILE__, int line = __LINE__ )
+    this ( string name, string file = __FILE__, int line = __LINE__ )
     {
         super("Trying to work with non-existent channel " ~ name, file, line);
     }
@@ -590,7 +590,7 @@ class MissingChannelException : Exception
 
 class MissingRecordException : Exception
 {
-    this ( istring key, istring file = __FILE__, int line = __LINE__ )
+    this ( string key, string file = __FILE__, int line = __LINE__ )
     {
         super("Trying to work with non-existent record (key = " ~ key ~ ")",
             file, line);

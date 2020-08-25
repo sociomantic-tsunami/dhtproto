@@ -28,7 +28,7 @@ import dhtproto.node.request.model.SingleKey;
 
 *******************************************************************************/
 
-public abstract scope class Remove : SingleKey
+public abstract class Remove : SingleKey
 {
     import dhtproto.node.request.model.DhtCommand;
 

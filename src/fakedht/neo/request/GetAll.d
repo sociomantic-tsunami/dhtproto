@@ -43,7 +43,7 @@ public class GetAllImpl_v0 : GetAllProtocol_v0
     static immutable Command command = Command(RequestCode.GetAll, 0);
 
     /// Request name for stats tracking. Required by ConnectionHandler.
-    static immutable istring name = "GetAll";
+    static immutable string name = "GetAll";
 
     /// Flag indicating whether timing stats should be gathered for requests of
     /// this type.
@@ -57,7 +57,7 @@ public class GetAllImpl_v0 : GetAllProtocol_v0
     private Channel channel;
 
     /// List of keys to visit during an iteration.
-    private istring[] iterate_keys;
+    private string[] iterate_keys;
 
     /***************************************************************************
 

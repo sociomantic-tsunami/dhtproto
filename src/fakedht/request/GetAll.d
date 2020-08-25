@@ -28,7 +28,7 @@ import Protocol = dhtproto.node.request.GetAll;
 
 *******************************************************************************/
 
-public scope class GetAll : Protocol.GetAll
+public class GetAll : Protocol.GetAll
 {
     import fakedht.mixins.RequestConstruction;
     import fakedht.mixins.ChannelIteration;

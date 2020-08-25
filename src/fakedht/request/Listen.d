@@ -44,7 +44,7 @@ static this ( )
 
 *******************************************************************************/
 
-public scope class Listen : Protocol.Listen, DhtListener
+public class Listen : Protocol.Listen, DhtListener
 {
     import ocean.core.Verify;
     import fakedht.mixins.RequestConstruction;
@@ -73,7 +73,7 @@ public scope class Listen : Protocol.Listen, DhtListener
 
     ***************************************************************************/
 
-    private istring[] remaining_keys;
+    private string[] remaining_keys;
 
     /***************************************************************************
 

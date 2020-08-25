@@ -26,7 +26,7 @@ import Protocol = dhtproto.node.request.GetResponsibleRange;
 
 *******************************************************************************/
 
-public scope class GetResponsibleRange : Protocol.GetResponsibleRange
+public class GetResponsibleRange : Protocol.GetResponsibleRange
 {
     import fakedht.mixins.RequestConstruction;
 

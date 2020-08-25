@@ -28,7 +28,7 @@ import Protocol = dhtproto.node.request.Put;
 
 *******************************************************************************/
 
-public scope class Put : Protocol.Put
+public class Put : Protocol.Put
 {
     import fakedht.mixins.RequestConstruction;
     import fakedht.Storage;

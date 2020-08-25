@@ -636,7 +636,7 @@ private struct Mirror
     {
         assert(this.user_notifier !is null);
     }
-    body
+    do
     {
         verify(this.user_notifier is null);
         this.user_notifier = user_notifier;

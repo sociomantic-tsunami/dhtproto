@@ -28,7 +28,7 @@ import dhtproto.node.request.model.DhtCommand;
 
 *******************************************************************************/
 
-public abstract scope class GetSize : DhtCommand
+public abstract class GetSize : DhtCommand
 {
     import dhtproto.client.legacy.DhtConst;
 

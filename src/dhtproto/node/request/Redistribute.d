@@ -42,7 +42,7 @@ static this ( )
 
 *******************************************************************************/
 
-public abstract scope class Redistribute : DhtCommand
+public abstract class Redistribute : DhtCommand
 {
     import dhtproto.node.request.params.RedistributeNode;
 
@@ -99,7 +99,7 @@ public abstract scope class Redistribute : DhtCommand
 
     /***************************************************************************
     
-        Destructor (relies on this being a scope class)
+        Destructor (relies on this being a class)
 
     ***************************************************************************/
 

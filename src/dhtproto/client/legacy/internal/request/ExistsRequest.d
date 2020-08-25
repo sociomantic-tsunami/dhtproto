@@ -34,7 +34,7 @@ import ocean.core.Verify;
 
 *******************************************************************************/
 
-public scope class ExistsRequest : IKeyRequest
+public class ExistsRequest : IKeyRequest
 {
     /***************************************************************************
 

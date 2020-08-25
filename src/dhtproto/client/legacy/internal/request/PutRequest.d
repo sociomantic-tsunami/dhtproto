@@ -33,7 +33,7 @@ import ocean.meta.types.Qualifiers;
 
 *******************************************************************************/
 
-public scope class PutRequest : IPutRequest
+public class PutRequest : IPutRequest
 {
     /***************************************************************************
 

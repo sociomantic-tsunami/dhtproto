@@ -28,7 +28,7 @@ import dhtproto.node.request.model.DhtCommand;
 
 *******************************************************************************/
 
-public abstract scope class GetNumConnections : DhtCommand
+public abstract class GetNumConnections : DhtCommand
 {
     import dhtproto.client.legacy.DhtConst;
 

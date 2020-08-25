@@ -53,7 +53,7 @@ import ocean.util.serialize.Version;
 public class ChannelSerializer ( S )
 {
     /// Path of the dump file.
-    private istring path;
+    private string path;
 
     /// Buffer for formatting temporary paths (see forkEntryPoint()).
     private mstring temp_path;
@@ -95,7 +95,7 @@ public class ChannelSerializer ( S )
 
     ***************************************************************************/
 
-    public this ( istring path )
+    public this ( string path )
     {
         static immutable buffer_size = 64 * 1024;
 

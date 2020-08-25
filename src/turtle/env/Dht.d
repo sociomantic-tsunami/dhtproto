@@ -435,7 +435,7 @@ public class Dht : Node!(DhtNode, "dht")
     ***************************************************************************/
 
     private void waitForCondition ( double timeout, double check_interval,
-        scope bool delegate ( ) condition, lazy istring err_msg )
+        scope bool delegate ( ) condition, lazy string err_msg )
     {
         auto total_wait = 0.0;
 
@@ -601,7 +601,7 @@ unittest
 {
     initDht();
 
-    istring[hash_t] data = [
+    string[hash_t] data = [
         100 : "100"[],
         101 : "101",
         102 : "102"

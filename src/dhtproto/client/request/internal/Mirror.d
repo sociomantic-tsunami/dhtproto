@@ -138,7 +138,7 @@ public struct Mirror
 
 *******************************************************************************/
 
-private scope class MirrorHandler
+private class MirrorHandler
 {
     import swarm.neo.client.RequestOnConn;
     import swarm.neo.connection.RequestOnConnBase;

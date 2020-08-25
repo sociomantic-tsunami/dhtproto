@@ -28,7 +28,7 @@ import Protocol = dhtproto.node.request.Exists;
 
 *******************************************************************************/
 
-public scope class Exists : Protocol.Exists
+public class Exists : Protocol.Exists
 {
     import fakedht.mixins.RequestConstruction;
     import fakedht.Storage;

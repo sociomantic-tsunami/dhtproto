@@ -36,7 +36,7 @@ import swarm.util.Hash : HashRange;
 
 ******************************************************************************/
 
-public scope class GetResponsibleRangeRequest : IRequest
+public class GetResponsibleRangeRequest : IRequest
 {
     /**************************************************************************
 

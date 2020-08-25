@@ -26,7 +26,7 @@ import Protocol = dhtproto.node.request.GetAllKeys;
 
 *******************************************************************************/
 
-public scope class GetAllKeys : Protocol.GetAllKeys
+public class GetAllKeys : Protocol.GetAllKeys
 {
     import fakedht.mixins.RequestConstruction;
     import fakedht.mixins.ChannelIteration;

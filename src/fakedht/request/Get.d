@@ -28,7 +28,7 @@ import Protocol = dhtproto.node.request.Get;
 
 *******************************************************************************/
 
-public scope class Get : Protocol.Get
+public class Get : Protocol.Get
 {
     import fakedht.mixins.RequestConstruction;
     import fakedht.Storage;

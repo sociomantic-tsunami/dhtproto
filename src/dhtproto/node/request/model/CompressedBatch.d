@@ -50,7 +50,7 @@ static this ( )
 
 *******************************************************************************/
 
-public abstract scope class CompressedBatch(T...) : SingleChannel
+public abstract class CompressedBatch(T...) : SingleChannel
 {
     import dhtproto.node.request.model.DhtCommand;
 

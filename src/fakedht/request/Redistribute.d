@@ -26,7 +26,7 @@ import Protocol = dhtproto.node.request.Redistribute;
 
 *******************************************************************************/
 
-public scope class Redistribute : Protocol.Redistribute
+public class Redistribute : Protocol.Redistribute
 {
     import ocean.core.Enforce;
     import dhtproto.node.request.params.RedistributeNode;

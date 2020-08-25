@@ -28,7 +28,7 @@ import dhtproto.node.request.model.SingleChannel;
 
 *******************************************************************************/
 
-public abstract scope class GetChannelSize : SingleChannel
+public abstract class GetChannelSize : SingleChannel
 {
     import dhtproto.node.request.model.DhtCommand;
 

@@ -30,7 +30,7 @@ import dhtproto.node.request.model.SingleChannel;
 
 *******************************************************************************/
 
-public abstract scope class Listen : SingleChannel
+public abstract class Listen : SingleChannel
 {
     import dhtproto.node.request.model.DhtCommand;
 

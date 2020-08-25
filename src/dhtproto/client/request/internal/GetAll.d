@@ -157,7 +157,7 @@ public struct GetAll
 
 *******************************************************************************/
 
-private scope class GetAllHandler
+private class GetAllHandler
 {
     import swarm.neo.client.RequestOnConn;
     import swarm.neo.connection.RequestOnConnBase;

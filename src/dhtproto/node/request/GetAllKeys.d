@@ -28,7 +28,7 @@ import dhtproto.node.request.model.CompressedBatch;
 
 *******************************************************************************/
 
-public abstract scope class GetAllKeys : CompressedBatch!(mstring)
+public abstract class GetAllKeys : CompressedBatch!(mstring)
 {
     import dhtproto.node.request.model.DhtCommand;
 

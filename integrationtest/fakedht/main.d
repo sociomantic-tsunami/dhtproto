@@ -18,7 +18,7 @@ import ocean.meta.types.Qualifiers;
 
 version ( unittest ) { }
 else
-int main ( istring[] args )
+int main ( string[] args )
 {
     auto runner = new TurtleRunner!(DhtTestRunner)("fakedht", "dhttest.cases.neo");
     return runner.main(args);

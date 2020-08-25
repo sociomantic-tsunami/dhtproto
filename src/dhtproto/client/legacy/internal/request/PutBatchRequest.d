@@ -24,7 +24,7 @@ import dhtproto.client.legacy.internal.request.model.IChannelRequest;
 
 
 
-public scope class PutBatchRequest : IChannelRequest
+public class PutBatchRequest : IChannelRequest
 {
     /***************************************************************************
 

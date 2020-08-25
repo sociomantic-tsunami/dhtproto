@@ -30,7 +30,7 @@ import ocean.text.convert.Formatter;
 
 *******************************************************************************/
 
-public abstract scope class SingleChannel : DhtCommand
+public abstract class SingleChannel : DhtCommand
 {
     import dhtproto.client.legacy.DhtConst;
     import swarm.Const : validateChannelName;
